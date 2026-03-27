@@ -9,6 +9,8 @@ import SearchBar from '@/components/SearchBar';
 
 const prisma = new PrismaClient();
 
+type Client = Awaited<ReturnType<typeof prisma.client.findMany>>[0];
+
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -23,7 +25,7 @@ export default async function DashboardPage({
   const userRole = (session.user as any).role;
   const userClientId = (session.user as any).clientId;
 
-  let clients;
+  let clients: Client[] = [];
 
   if (userRole === 'admin') {
     clients = await prisma.client.findMany({
@@ -33,8 +35,6 @@ export default async function DashboardPage({
     clients = await prisma.client.findMany({
       where: { id: parseInt(userClientId) },
     });
-  } else {
-    clients = [];
   }
 
   const search = searchParams.search?.toLowerCase() || '';
