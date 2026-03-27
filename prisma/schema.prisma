@@ -1,0 +1,276 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id                  Int       @id @default(autoincrement())
+  name                String
+  slug                String    @unique
+  website_url         String?
+  pm_name             String?
+  package             String    @default("essentials")
+  ghl_location_id     String?
+  ga4_property_id     String?
+  gsc_site_url        String?
+  meta_ad_account_id  String?
+  google_business_id  String?
+  created_at          DateTime  @default(now())
+  users               User[]
+  seo_rankings        SeoRanking[]
+  seo_backlinks       SeoBacklink[]
+  site_audits         SiteAudit[]
+  ga4_metrics         Ga4Metric[]
+  ga4_pages           Ga4Page[]
+  ga4_sources         Ga4Source[]
+  gsc_metrics         GscMetric[]
+  meta_ads            MetaAd[]
+  ghl_leads           GhlLead[]
+  ghl_appointments    GhlAppointment[]
+  ghl_calls           GhlCall[]
+  google_reviews      GoogleReview[]
+  reports             Report[]
+  dashboards          Dashboard[]
+
+  @@map("clients")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  name          String
+  role          String    @default("pm")
+  client_id     Int?
+  client        Client?   @relation(fields: [client_id], references: [id])
+  password_hash String
+  created_at    DateTime  @default(now())
+
+  @@map("users")
+}
+
+model SeoRanking {
+  id           Int      @id @default(autoincrement())
+  client_id    Int
+  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  keyword      String
+  position     Int
+  url          String?
+  search_volume Int?
+  date         DateTime
+  created_at   DateTime @default(now())
+
+  @@map("seo_rankings")
+}
+
+model SeoBacklink {
+  id              Int      @id @default(autoincrement())
+  client_id       Int
+  client          Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  source_url      String
+  target_url      String
+  anchor_text     String?
+  domain_rating   Int?
+  first_seen      DateTime
+  last_checked    DateTime
+  status          String   @default("active")
+  created_at      DateTime @default(now())
+
+  @@map("seo_backlinks")
+}
+
+model SiteAudit {
+  id                    Int      @id @default(autoincrement())
+  client_id             Int
+  client                Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  date                  DateTime
+  overall_score         Int
+  errors_count          Int      @default(0)
+  warnings_count        Int      @default(0)
+  notices_count         Int      @default(0)
+  pages_crawled         Int      @default(0)
+  load_time_avg         Float?
+  mobile_friendly_score Int?
+  created_at            DateTime @default(now())
+
+  @@map("site_audits")
+}
+
+model Ga4Metric {
+  id                Int      @id @default(autoincrement())
+  client_id         Int
+  client            Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  date              DateTime
+  sessions          Int      @default(0)
+  users             Int      @default(0)
+  page_views        Int      @default(0)
+  avg_session_duration Float?
+  bounce_rate       Float?
+  conversions       Int      @default(0)
+  created_at        DateTime @default(now())
+
+  @@map("ga4_metrics")
+}
+
+model Ga4Page {
+  id           Int      @id @default(autoincrement())
+  client_id    Int
+  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  date         DateTime
+  page_path    String
+  page_views   Int      @default(0)
+  unique_views Int      @default(0)
+  avg_time     Float?
+  created_at   DateTime @default(now())
+
+  @@map("ga4_pages")
+}
+
+model Ga4Source {
+  id           Int      @id @default(autoincrement())
+  client_id    Int
+  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  date         DateTime
+  source       String
+  medium       String
+  sessions     Int      @default(0)
+  users        Int      @default(0)
+  conversions  Int      @default(0)
+  created_at   DateTime @default(now())
+
+  @@map("ga4_sources")
+}
+
+model GscMetric {
+  id           Int      @id @default(autoincrement())
+  client_id    Int
+  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  date         DateTime
+  clicks       Int      @default(0)
+  impressions  Int      @default(0)
+  ctr          Float?
+  position     Float?
+  created_at   DateTime @default(now())
+
+  @@map("gsc_metrics")
+}
+
+model MetaAd {
+  id              Int      @id @default(autoincrement())
+  client_id       Int
+  client          Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  date            DateTime
+  campaign_name   String
+  ad_set_name     String?
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  spend           Float    @default(0)
+  conversions     Int      @default(0)
+  cost_per_result Float?
+  created_at      DateTime @default(now())
+
+  @@map("meta_ads")
+}
+
+model GhlLead {
+  id           Int      @id @default(autoincrement())
+  client_id    Int
+  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  contact_id   String
+  name         String
+  email        String?
+  phone        String?
+  source       String?
+  status       String?
+  created_date DateTime
+  created_at   DateTime @default(now())
+
+  @@map("ghl_leads")
+}
+
+model GhlAppointment {
+  id                Int      @id @default(autoincrement())
+  client_id         Int
+  client            Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  appointment_id    String
+  contact_name      String?
+  calendar_name     String?
+  appointment_date  DateTime
+  status            String?
+  created_at        DateTime @default(now())
+
+  @@map("ghl_appointments")
+}
+
+model GhlCall {
+  id           Int      @id @default(autoincrement())
+  client_id    Int
+  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  call_id      String
+  contact_name String?
+  direction    String?
+  duration     Int?
+  status       String?
+  call_date    DateTime
+  created_at   DateTime @default(now())
+
+  @@map("ghl_calls")
+}
+
+model GoogleReview {
+  id           Int      @id @default(autoincrement())
+  client_id    Int
+  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  review_id    String   @unique
+  author_name  String
+  rating       Int
+  text         String?
+  review_date  DateTime
+  reply_text   String?
+  reply_date   DateTime?
+  created_at   DateTime @default(now())
+
+  @@map("google_reviews")
+}
+
+model Report {
+  id           Int      @id @default(autoincrement())
+  client_id    Int
+  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  title        String
+  report_type  String
+  period_start DateTime
+  period_end   DateTime
+  data         String   @db.Text
+  generated_at DateTime @default(now())
+  created_at   DateTime @default(now())
+
+  @@map("reports")
+}
+
+model Dashboard {
+  id               Int               @id @default(autoincrement())
+  client_id        Int
+  client           Client            @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  name             String
+  layout           String            @db.Text
+  created_at       DateTime          @default(now())
+  dashboard_widgets DashboardWidget[]
+
+  @@map("dashboards")
+}
+
+model DashboardWidget {
+  id           Int       @id @default(autoincrement())
+  dashboard_id Int
+  dashboard    Dashboard @relation(fields: [dashboard_id], references: [id], onDelete: Cascade)
+  widget_type  String
+  position     Int
+  config       String    @db.Text
+  created_at   DateTime  @default(now())
+
+  @@map("dashboard_widgets")
+}
