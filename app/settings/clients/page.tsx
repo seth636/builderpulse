@@ -28,6 +28,7 @@ export default function ClientsSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [syncing, setSyncing] = useState<number | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -81,6 +82,43 @@ export default function ClientsSettingsPage() {
     fetchClients();
   };
 
+  const handleSync = async (client: Client) => {
+    if (!client.ga4_property_id && !client.gsc_site_url) {
+      alert('No GA4 Property ID or GSC Site URL configured for this client.');
+      return;
+    }
+
+    setSyncing(client.id);
+    try {
+      const res = await fetch(`/api/sync/${client.slug}`, {
+        method: 'POST',
+      });
+      const result = await res.json();
+
+      if (res.ok) {
+        let message = 'Sync completed!\n';
+        if (result.ga4) {
+          message += result.ga4.success
+            ? `GA4: ${result.ga4.rowsInserted} rows synced\n`
+            : `GA4 Error: ${result.ga4.error}\n`;
+        }
+        if (result.gsc) {
+          message += result.gsc.success
+            ? `GSC: ${result.gsc.rowsInserted} rows synced`
+            : `GSC Error: ${result.gsc.error}`;
+        }
+        alert(message);
+      } else {
+        alert('Sync failed');
+      }
+    } catch (error) {
+      console.error('Failed to sync:', error);
+      alert('Failed to sync data');
+    } finally {
+      setSyncing(null);
+    }
+  };
+
   if (loading || status === 'loading') {
     return (
       <div className="flex min-h-screen">
@@ -125,6 +163,9 @@ export default function ClientsSettingsPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                     Package
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
+                    Integrations
+                  </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
                     Actions
                   </th>
@@ -145,7 +186,33 @@ export default function ClientsSettingsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-muted capitalize">
                       {client.package}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex gap-1">
+                        {client.ga4_property_id && (
+                          <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded">
+                            GA4
+                          </span>
+                        )}
+                        {client.gsc_site_url && (
+                          <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded">
+                            GSC
+                          </span>
+                        )}
+                        {!client.ga4_property_id && !client.gsc_site_url && (
+                          <span className="text-muted text-xs">-</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+                      {(client.ga4_property_id || client.gsc_site_url) && (
+                        <button
+                          onClick={() => handleSync(client)}
+                          disabled={syncing === client.id}
+                          className="text-blue-400 hover:text-blue-300 font-medium disabled:opacity-50"
+                        >
+                          {syncing === client.id ? 'Syncing...' : 'Sync'}
+                        </button>
+                      )}
                       <button
                         onClick={() => handleEdit(client)}
                         className="text-accent hover:text-accent/80 font-medium"

@@ -5,6 +5,8 @@ import { redirect, notFound } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import TopBar from '@/components/TopBar';
 import PackageBadge from '@/components/PackageBadge';
+import AnalyticsCard from '@/components/AnalyticsCard';
+import SearchConsoleCard from '@/components/SearchConsoleCard';
 
 const prisma = new PrismaClient();
 
@@ -34,9 +36,7 @@ export default async function ClientDetailPage({
     redirect('/dashboard');
   }
 
-  const sections = [
-    { title: 'Analytics', description: 'GA4 traffic and user metrics' },
-    { title: 'SEO', description: 'Rankings, backlinks, and audits' },
+  const otherSections = [
     { title: 'Ads', description: 'Meta advertising performance' },
     { title: 'Leads', description: 'GHL leads and appointments' },
     { title: 'Reviews', description: 'Google Business reviews' },
@@ -77,7 +77,15 @@ export default async function ClientDetailPage({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sections.map((section) => (
+            <AnalyticsCard
+              clientSlug={client.slug}
+              hasGA4={!!client.ga4_property_id}
+            />
+            <SearchConsoleCard
+              clientSlug={client.slug}
+              hasGSC={!!client.gsc_site_url}
+            />
+            {otherSections.map((section) => (
               <div
                 key={section.title}
                 className="bg-card border border-border rounded-xl p-6"
@@ -87,7 +95,7 @@ export default async function ClientDetailPage({
                 </h3>
                 <p className="text-muted text-sm mb-4">{section.description}</p>
                 <div className="bg-background/50 rounded-lg p-4 text-center">
-                  <p className="text-muted text-sm">Coming in Phase 2-5</p>
+                  <p className="text-muted text-sm">Coming in Phase 3-5</p>
                 </div>
               </div>
             ))}

@@ -103,29 +103,35 @@ model Ga4Metric {
   id                Int      @id @default(autoincrement())
   client_id         Int
   client            Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  date              DateTime
+  date              DateTime @db.Date
   sessions          Int      @default(0)
-  users             Int      @default(0)
-  page_views        Int      @default(0)
-  avg_session_duration Float?
-  bounce_rate       Float?
+  total_users       Int      @default(0)
+  new_users         Int      @default(0)
+  bounce_rate       Float    @default(0)
+  avg_session_duration Float @default(0)
   conversions       Int      @default(0)
+  page_views        Int      @default(0)
   created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 
+  @@unique([client_id, date])
   @@map("ga4_metrics")
 }
 
 model Ga4Page {
-  id           Int      @id @default(autoincrement())
-  client_id    Int
-  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  date         DateTime
-  page_path    String
-  page_views   Int      @default(0)
-  unique_views Int      @default(0)
-  avg_time     Float?
-  created_at   DateTime @default(now())
+  id                 Int      @id @default(autoincrement())
+  client_id          Int
+  client             Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  start_date         String
+  end_date           String
+  page_path          String
+  page_views         Int      @default(0)
+  avg_session_duration Float  @default(0)
+  bounce_rate        Float    @default(0)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
 
+  @@unique([client_id, start_date, end_date, page_path])
   @@map("ga4_pages")
 }
 
@@ -133,14 +139,16 @@ model Ga4Source {
   id           Int      @id @default(autoincrement())
   client_id    Int
   client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  date         DateTime
+  start_date   String
+  end_date     String
   source       String
   medium       String
   sessions     Int      @default(0)
-  users        Int      @default(0)
   conversions  Int      @default(0)
   created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
+  @@unique([client_id, start_date, end_date, source, medium])
   @@map("ga4_sources")
 }
 
@@ -148,13 +156,17 @@ model GscMetric {
   id           Int      @id @default(autoincrement())
   client_id    Int
   client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  date         DateTime
+  date         DateTime @db.Date
+  query        String
+  page         String
   clicks       Int      @default(0)
   impressions  Int      @default(0)
-  ctr          Float?
-  position     Float?
+  ctr          Float    @default(0)
+  position     Float    @default(0)
   created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
+  @@unique([client_id, date, query, page])
   @@map("gsc_metrics")
 }
 
