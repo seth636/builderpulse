@@ -55,5 +55,16 @@ export async function GET(
     avgPosition: data.reduce((s, r) => s + r.position, 0) / data.length,
   } : { totalClicks: 0, totalImpressions: 0, avgCtr: 0, avgPosition: 0 };
 
-  return NextResponse.json({ queries, pages, summary });
+  // Daily aggregation for chart
+  const dailyMap = new Map<string, { date: string; clicks: number; impressions: number }>();
+  for (const row of data) {
+    const dateKey = row.date.toISOString().split('T')[0];
+    const d = dailyMap.get(dateKey) || { date: dateKey, clicks: 0, impressions: 0 };
+    d.clicks += row.clicks;
+    d.impressions += row.impressions;
+    dailyMap.set(dateKey, d);
+  }
+  const daily = [...dailyMap.values()].sort((a, b) => a.date.localeCompare(b.date));
+
+  return NextResponse.json({ queries, pages, summary, daily });
 }
