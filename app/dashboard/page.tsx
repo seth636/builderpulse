@@ -1,7 +1,6 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+export const dynamic = 'force-dynamic';
+
 import { PrismaClient } from '@prisma/client';
-import { redirect } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import TopBar from '@/components/TopBar';
 import ClientCard from '@/components/ClientCard';
@@ -16,26 +15,9 @@ export default async function DashboardPage({
 }: {
   searchParams: { search?: string };
 }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect('/login');
-  }
-
-  const userRole = (session.user as any).role;
-  const userClientId = (session.user as any).clientId;
-
-  let clients: Client[] = [];
-
-  if (userRole === 'admin') {
-    clients = await prisma.client.findMany({
-      orderBy: { name: 'asc' },
-    });
-  } else if (userClientId) {
-    clients = await prisma.client.findMany({
-      where: { id: parseInt(userClientId) },
-    });
-  }
+  const clients = await prisma.client.findMany({
+    orderBy: { name: 'asc' },
+  });
 
   const search = searchParams.search?.toLowerCase() || '';
   const filteredClients = clients.filter((client) =>

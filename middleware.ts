@@ -1,7 +1,4 @@
-export { default } from 'next-auth/middleware';
-
+// Auth disabled temporarily
 export const config = {
-  matcher: [
-    '/((?!api/auth|api/cron|login|_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: [],
 };

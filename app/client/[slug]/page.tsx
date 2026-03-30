@@ -1,7 +1,5 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { PrismaClient } from '@prisma/client';
-import { redirect, notFound } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import ClientSidebar from '@/components/ClientSidebar';
 import TopBar from '@/components/TopBar';
 import ClientDashboard from '@/components/dashboard/ClientDashboard';
@@ -13,25 +11,12 @@ export default async function ClientDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect('/login');
-  }
-
   const client = await prisma.client.findUnique({
     where: { slug: params.slug },
   });
 
   if (!client) {
     notFound();
-  }
-
-  const userRole = (session.user as any).role;
-  const userClientId = (session.user as any).clientId;
-
-  if (userRole !== 'admin' && parseInt(userClientId) !== client.id) {
-    redirect('/dashboard');
   }
 
   return (
