@@ -16,7 +16,7 @@ function slugify(text: string): string {
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { slug: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -31,13 +31,17 @@ export async function PUT(
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
 
-    const slug = slugify(name);
+    const newSlug = slugify(name);
+    const idOrSlug = params.slug;
+    const id = parseInt(idOrSlug);
+
+    const whereClause = !isNaN(id) ? { id } : { slug: idOrSlug };
 
     const client = await prisma.client.update({
-      where: { id: parseInt(params.id) },
+      where: whereClause,
       data: {
         name,
-        slug,
+        slug: newSlug,
         website_url: website_url || null,
         pm_name: pm_name || null,
         package: pkg || 'essentials',
@@ -56,7 +60,7 @@ export async function PUT(
 
     return NextResponse.json(client);
   } catch (error) {
-    console.error('PUT /api/clients/[id] error:', error);
+    console.error('PUT /api/clients/[slug] error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -66,7 +70,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { slug: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -74,13 +78,15 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await prisma.client.delete({
-      where: { id: parseInt(params.id) },
-    });
+    const idOrSlug = params.slug;
+    const id = parseInt(idOrSlug);
+    const whereClause = !isNaN(id) ? { id } : { slug: idOrSlug };
+
+    await prisma.client.delete({ where: whereClause });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('DELETE /api/clients/[id] error:', error);
+    console.error('DELETE /api/clients/[slug] error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
