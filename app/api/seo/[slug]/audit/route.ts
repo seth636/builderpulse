@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { PrismaClient } from '@prisma/client';
 import { runSiteAudit } from '@/lib/integrations/site-audit';
 
+export const dynamic = 'force-dynamic';
+
 const prisma = new PrismaClient();
 
 export async function POST(
