@@ -19,6 +19,8 @@ model Client {
   gsc_site_url        String?
   meta_ad_account_id  String?
   google_business_id  String?
+  auto_send_reports   Boolean   @default(false)
+  report_email        String?
   created_at          DateTime  @default(now())
   users               User[]
   seo_rankings        SeoRanking[]
@@ -249,16 +251,19 @@ model GoogleReview {
 }
 
 model Report {
-  id           Int      @id @default(autoincrement())
-  client_id    Int
-  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  title        String
-  report_type  String
-  period_start DateTime
-  period_end   DateTime
-  data         String   @db.Text
-  generated_at DateTime @default(now())
-  created_at   DateTime @default(now())
+  id                  Int       @id @default(autoincrement())
+  client_id           Int
+  client              Client    @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  period_start        DateTime  @db.Date
+  period_end          DateTime  @db.Date
+  period_label        String
+  status              String    @default("draft")
+  ai_summary          String?   @db.Text
+  ai_recommendations  String?   @db.Text
+  report_html         String?   @db.Text
+  sent_at             DateTime?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
 
   @@map("reports")
 }

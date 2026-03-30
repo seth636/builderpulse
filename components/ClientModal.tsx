@@ -14,6 +14,8 @@ interface Client {
   meta_ad_account_id: string | null;
   ghl_location_id: string | null;
   google_business_id: string | null;
+  auto_send_reports?: boolean;
+  report_email?: string | null;
 }
 
 interface ClientModalProps {
@@ -32,6 +34,8 @@ export default function ClientModal({ client, onClose }: ClientModalProps) {
     meta_ad_account_id: '',
     ghl_location_id: '',
     google_business_id: '',
+    auto_send_reports: false,
+    report_email: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -47,6 +51,8 @@ export default function ClientModal({ client, onClose }: ClientModalProps) {
         meta_ad_account_id: client.meta_ad_account_id || '',
         ghl_location_id: client.ghl_location_id || '',
         google_business_id: client.google_business_id || '',
+        auto_send_reports: client.auto_send_reports || false,
+        report_email: client.report_email || '',
       });
     }
   }, [client]);
@@ -215,6 +221,41 @@ export default function ClientModal({ client, onClose }: ClientModalProps) {
               }
               className="w-full px-4 py-2 bg-background border border-border rounded-lg text-white placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
             />
+          </div>
+
+          <div className="border-t border-border pt-4">
+            <p className="text-xs text-muted uppercase tracking-wider font-semibold mb-3">Report Settings</p>
+            <div className="flex items-center justify-between mb-4">
+              <label className="text-sm font-medium text-white">
+                Auto-send monthly reports
+              </label>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, auto_send_reports: !formData.auto_send_reports })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                  formData.auto_send_reports ? 'bg-accent' : 'bg-white/10'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    formData.auto_send_reports ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Report email
+              </label>
+              <input
+                type="email"
+                placeholder="client@example.com"
+                value={formData.report_email}
+                onChange={(e) => setFormData({ ...formData, report_email: e.target.value })}
+                className="w-full px-4 py-2 bg-background border border-border rounded-lg text-white placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
+              />
+              <p className="text-xs text-muted mt-1">Where monthly reports are sent. Falls back to client email if blank.</p>
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4">

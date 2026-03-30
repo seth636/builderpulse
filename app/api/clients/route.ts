@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, website_url, pm_name, package: pkg, ga4_property_id, gsc_site_url, meta_ad_account_id, ghl_location_id, google_business_id } = body;
+    const { name, website_url, pm_name, package: pkg, ga4_property_id, gsc_site_url, meta_ad_account_id, ghl_location_id, google_business_id, auto_send_reports, report_email } = body;
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
@@ -63,6 +63,8 @@ export async function POST(req: NextRequest) {
         meta_ad_account_id: meta_ad_account_id || null,
         ghl_location_id: ghl_location_id || null,
         google_business_id: google_business_id || null,
+        auto_send_reports: auto_send_reports ?? false,
+        report_email: report_email || null,
       },
     });
 

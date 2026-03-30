@@ -11,8 +11,15 @@ const CLIENT_SECTIONS = [
   { id: 'ads', label: 'Ads', phase: 4 },
   { id: 'leads', label: 'Leads', phase: 4 },
   { id: 'reviews', label: 'Reviews', phase: 4 },
-  { id: 'reports', label: 'Reports', phase: 5 },
+  { id: 'reports', label: 'Reports', phase: null, isPage: true },
 ];
+
+type Section = {
+  id: string;
+  label: string;
+  phase: number | null;
+  isPage?: boolean;
+};
 
 type Props = {
   clientName: string;
@@ -54,6 +61,17 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
                   P{section.phase}
                 </span>
               </div>
+            );
+          }
+          if (section.isPage) {
+            return (
+              <Link
+                key={section.id}
+                href={`/client/${clientSlug}/${section.id}`}
+                className="block px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+              >
+                {section.label}
+              </Link>
             );
           }
           return (
