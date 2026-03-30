@@ -2,11 +2,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { PrismaClient } from '@prisma/client';
 import { redirect, notFound } from 'next/navigation';
-import Sidebar from '@/components/Sidebar';
+import ClientSidebar from '@/components/ClientSidebar';
 import TopBar from '@/components/TopBar';
-import PackageBadge from '@/components/PackageBadge';
-import AnalyticsCard from '@/components/AnalyticsCard';
-import SearchConsoleCard from '@/components/SearchConsoleCard';
+import ClientDashboard from '@/components/dashboard/ClientDashboard';
 
 const prisma = new PrismaClient();
 
@@ -36,70 +34,20 @@ export default async function ClientDetailPage({
     redirect('/dashboard');
   }
 
-  const otherSections = [
-    { title: 'Ads', description: 'Meta advertising performance' },
-    { title: 'Leads', description: 'GHL leads and appointments' },
-    { title: 'Reviews', description: 'Google Business reviews' },
-    { title: 'Reports', description: 'Generated client reports' },
-  ];
-
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      <ClientSidebar clientName={client.name} clientSlug={client.slug} />
       <div className="flex-1 ml-60">
         <TopBar title={client.name} />
         <div className="p-8">
-          <div className="bg-card border border-border rounded-xl p-6 mb-8">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  {client.name}
-                </h2>
-                {client.website_url && (
-                  <a
-                    href={client.website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-accent hover:underline"
-                  >
-                    {client.website_url}
-                  </a>
-                )}
-              </div>
-              <PackageBadge package={client.package} />
-            </div>
-            {client.pm_name && (
-              <p className="text-muted">
-                <span className="text-white/60">Project Manager:</span>{' '}
-                {client.pm_name}
-              </p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AnalyticsCard
-              clientSlug={client.slug}
-              hasGA4={!!client.ga4_property_id}
-            />
-            <SearchConsoleCard
-              clientSlug={client.slug}
-              hasGSC={!!client.gsc_site_url}
-            />
-            {otherSections.map((section) => (
-              <div
-                key={section.title}
-                className="bg-card border border-border rounded-xl p-6"
-              >
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  {section.title}
-                </h3>
-                <p className="text-muted text-sm mb-4">{section.description}</p>
-                <div className="bg-background/50 rounded-lg p-4 text-center">
-                  <p className="text-muted text-sm">Coming in Phase 3-5</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ClientDashboard client={{
+            id: client.id,
+            name: client.name,
+            slug: client.slug,
+            website_url: client.website_url,
+            ga4_property_id: (client as any).ga4_property_id ?? null,
+            gsc_site_url: (client as any).gsc_site_url ?? null,
+          }} />
         </div>
       </div>
     </div>
