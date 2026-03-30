@@ -35,11 +35,15 @@ export default function SEOSection({ slug, startDate, endDate }: Props) {
     setLoading(true);
     setError(false);
     try {
+      const safeGSC = (raw: any) =>
+        raw && Array.isArray(raw.daily)
+          ? raw
+          : { daily: [], queries: [], pages: [], summary: { totalClicks: 0, totalImpressions: 0, avgCtr: 0, avgPosition: 0 } };
       const [curr, prev] = await Promise.all([
-        fetch(`/api/search-console/${slug}?start_date=${startDate}&end_date=${endDate}`).then(r => r.json()),
+        fetch(`/api/search-console/${slug}?start_date=${startDate}&end_date=${endDate}`).then(r => r.json()).then(safeGSC),
         (() => {
           const p = getPreviousPeriod(startDate, endDate);
-          return fetch(`/api/search-console/${slug}?start_date=${p.start}&end_date=${p.end}`).then(r => r.json());
+          return fetch(`/api/search-console/${slug}?start_date=${p.start}&end_date=${p.end}`).then(r => r.json()).then(safeGSC);
         })(),
       ]);
       setData(curr);

@@ -69,11 +69,15 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
     setLoading(true);
     setError(false);
     try {
+      const safeAnalytics = (raw: any) =>
+        raw && Array.isArray(raw.daily)
+          ? raw
+          : { daily: [], summary: { totalSessions: 0, totalUsers: 0, avgBounceRate: 0, totalConversions: 0 }, topPages: [], sources: [] };
       const [curr, prev] = await Promise.all([
-        fetch(`/api/analytics/${slug}?start_date=${startDate}&end_date=${endDate}`).then(r => r.json()),
+        fetch(`/api/analytics/${slug}?start_date=${startDate}&end_date=${endDate}`).then(r => r.json()).then(safeAnalytics),
         (() => {
           const p = getPreviousPeriod(startDate, endDate);
-          return fetch(`/api/analytics/${slug}?start_date=${p.start}&end_date=${p.end}`).then(r => r.json());
+          return fetch(`/api/analytics/${slug}?start_date=${p.start}&end_date=${p.end}`).then(r => r.json()).then(safeAnalytics);
         })(),
       ]);
       setData(curr);

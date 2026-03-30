@@ -106,12 +106,14 @@ export default function ClientDashboard({ client }: Props) {
     const prev = getPreviousPeriod(dateRange.startDate, dateRange.endDate);
 
     // GA4
+    const safeGA4 = (raw: any) =>
+      raw && raw.summary ? raw : { summary: { totalSessions: 0 }, daily: [] };
     if (client.ga4_property_id) {
       setAnalyticsLoading(true);
       try {
         const [curr, prevA] = await Promise.all([
-          fetch(`/api/analytics/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()),
-          fetch(`/api/analytics/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()),
+          fetch(`/api/analytics/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()).then(safeGA4),
+          fetch(`/api/analytics/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()).then(safeGA4),
         ]);
         setAnalyticsSummary({
           totalSessions: curr.summary?.totalSessions ?? 0,
@@ -123,12 +125,14 @@ export default function ClientDashboard({ client }: Props) {
     } else { setAnalyticsLoading(false); }
 
     // GSC
+    const safeGSC = (raw: any) =>
+      raw && raw.summary ? raw : { summary: { avgPosition: null }, daily: [] };
     if (client.gsc_site_url) {
       setGscLoading(true);
       try {
         const [curr, prevG] = await Promise.all([
-          fetch(`/api/search-console/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()),
-          fetch(`/api/search-console/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()),
+          fetch(`/api/search-console/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()).then(safeGSC),
+          fetch(`/api/search-console/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()).then(safeGSC),
         ]);
         const pos = curr.summary?.avgPosition ?? null;
         if (pos !== null) {
