@@ -118,7 +118,8 @@ function buildReportHtml(
   periodLabel: string,
   data: ReportData,
   aiSummary: string,
-  aiRecommendations: string
+  aiRecommendations: string,
+  seoExtras?: { auditScore?: number | null; auditErrors?: number; auditWarnings?: number; referringDomains?: number }
 ): string {
   const now = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
@@ -168,11 +169,29 @@ function buildReportHtml(
   if (data.gsc) {
     const g = data.gsc;
     const momPct = g.clicksPrevMonth > 0 ? Math.round(((g.clicks - g.clicksPrevMonth) / g.clicksPrevMonth) * 100) : 0;
-    const cardHtml = cards([
+
+    // Build cards — include Phase 7 SEO extras if available
+    const seoExtraCards: { label: string; value: string; sub?: string }[] = [];
+    if (seoExtras?.auditScore != null) {
+      const scoreColor = seoExtras.auditScore >= 80 ? '#10b981' : seoExtras.auditScore >= 50 ? '#f59e0b' : '#ef4444';
+      seoExtraCards.push({
+        label: 'Site Health Score',
+        value: `<span style="color:${scoreColor};font-weight:bold">${seoExtras.auditScore}/100</span>`,
+        sub: seoExtras.auditErrors !== undefined ? `${seoExtras.auditErrors} critical, ${seoExtras.auditWarnings} warnings` : undefined,
+      });
+    }
+    if (seoExtras?.referringDomains) {
+      seoExtraCards.push({ label: 'Referring Domains', value: seoExtras.referringDomains.toString() });
+    }
+
+    const mainCards = [
       { label: 'Clicks', value: g.clicks.toLocaleString(), trend: momPct },
       { label: 'Impressions', value: g.impressions.toLocaleString() },
       { label: 'Avg Position', value: g.avgPosition.toFixed(1) },
-    ], 3);
+      ...seoExtraCards,
+    ];
+
+    const cardHtml = cards(mainCards, 4);
 
     const tableHtml = g.topKeywords.length
       ? table(['Keyword', 'Clicks', 'Position'], g.topKeywords.slice(0, 10).map((k) => [k.keyword, k.clicks.toLocaleString(), k.position.toFixed(1)]))
@@ -588,11 +607,31 @@ export async function generateReport(
     reviews: reviewsData,
   };
 
+  // Phase 7: Fetch SEO tools data for report
+  let seoExtras: { auditScore?: number | null; auditErrors?: number; auditWarnings?: number; referringDomains?: number } | undefined;
+  try {
+    const [latestAudit, backlinkDomains] = await Promise.all([
+      prisma.siteAudit.findFirst({ where: { client_id: clientId }, orderBy: { date: 'desc' } }),
+      prisma.seoBacklink.findMany({ where: { client_id: clientId } }),
+    ]);
+    const referringDomains = new Set(
+      backlinkDomains.map((b: any) => {
+        try { return new URL(b.source_url).hostname; } catch { return b.source_url; }
+      })
+    ).size;
+    seoExtras = {
+      auditScore: latestAudit?.overall_score ?? null,
+      auditErrors: latestAudit?.errors_count,
+      auditWarnings: latestAudit?.warnings_count,
+      referringDomains,
+    };
+  } catch { /* graceful */ }
+
   // Generate AI summary
   const { summary, recommendations } = await generateReportSummary(reportData);
 
   // Build HTML
-  const html = buildReportHtml(client.name, periodLabel, reportData, summary, recommendations);
+  const html = buildReportHtml(client.name, periodLabel, reportData, summary, recommendations, seoExtras);
 
   // Upsert report (replace existing for same client+period)
   const existing = await prisma.report.findFirst({

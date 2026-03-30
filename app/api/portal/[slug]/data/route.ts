@@ -70,6 +70,9 @@ export async function GET(
       ghlAppointments,
       googleReviews,
       reports,
+      seoRankings,
+      latestAudit,
+      seoBacklinks,
     ] = await Promise.all([
       client.ga4_property_id ? prisma.ga4Metric.findMany({
         where: { client_id: client.id, date: { gte: new Date(startDate), lte: new Date(endDate) } },
@@ -110,6 +113,20 @@ export async function GET(
         orderBy: { period_start: 'desc' },
         take: 12,
       }),
+      // SEO Phase 7 data
+      prisma.seoRanking.findMany({
+        where: { client_id: client.id },
+        orderBy: { date: 'desc' },
+      }),
+      prisma.siteAudit.findFirst({
+        where: { client_id: client.id },
+        orderBy: { date: 'desc' },
+      }),
+      prisma.seoBacklink.findMany({
+        where: { client_id: client.id },
+        orderBy: { first_seen: 'desc' },
+        take: 100,
+      }),
     ]);
 
     // Compute summaries
@@ -145,6 +162,26 @@ export async function GET(
       averageRating: (googleReviews as any[]).reduce((s: number, r: any) => s + r.rating, 0) / (googleReviews as any[]).length,
     } : null;
 
+    // SEO summaries
+    const seenKeywords = new Set<string>();
+    const latestRankings: typeof seoRankings = [];
+    for (const r of seoRankings) {
+      if (!seenKeywords.has(r.keyword)) {
+        seenKeywords.add(r.keyword);
+        latestRankings.push(r);
+      }
+    }
+    const topKeywords = latestRankings
+      .filter(r => r.position > 0)
+      .sort((a, b) => a.position - b.position)
+      .slice(0, 10);
+
+    const referringDomains = new Set(
+      (seoBacklinks as any[]).map((b: any) => {
+        try { return new URL(b.source_url).hostname; } catch { return b.source_url; }
+      })
+    ).size;
+
     return NextResponse.json({
       client: {
         id: client.id,
@@ -162,6 +199,12 @@ export async function GET(
       ghl: { leads: ghlLeads, appointments: ghlAppointments, summary: ghlSummary },
       reviews: { items: googleReviews, summary: reviewsSummary },
       reports,
+      seo: {
+        topKeywords,
+        latestAudit,
+        referringDomains,
+        hasData: topKeywords.length > 0 || !!latestAudit,
+      },
     });
   } catch (error) {
     console.error('GET /api/portal/[slug]/data error:', error);

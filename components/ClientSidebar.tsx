@@ -4,23 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 
-const CLIENT_SECTIONS = [
-  { id: 'overview', label: 'Overview', phase: null },
-  { id: 'traffic', label: 'Traffic', phase: null },
-  { id: 'seo', label: 'SEO', phase: null },
-  { id: 'ads', label: 'Ads', phase: 4 },
-  { id: 'leads', label: 'Leads', phase: 4 },
-  { id: 'reviews', label: 'Reviews', phase: 4 },
-  { id: 'reports', label: 'Reports', phase: null, isPage: true },
-];
-
-type Section = {
-  id: string;
-  label: string;
-  phase: number | null;
-  isPage?: boolean;
-};
-
 type Props = {
   clientName: string;
   clientSlug: string;
@@ -28,6 +11,23 @@ type Props = {
 
 export default function ClientSidebar({ clientName, clientSlug }: Props) {
   const { data: session } = useSession();
+  const pathname = usePathname();
+
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+
+  const linkClass = (href: string) =>
+    `block px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+      isActive(href)
+        ? 'bg-accent/10 text-accent'
+        : 'text-slate-400 hover:bg-white/5 hover:text-white'
+    }`;
+
+  const subLinkClass = (href: string) =>
+    `block pl-8 pr-4 py-1.5 rounded-lg text-sm transition-colors ${
+      isActive(href)
+        ? 'text-accent'
+        : 'text-slate-500 hover:text-white'
+    }`;
 
   return (
     <div className="fixed left-0 top-0 h-screen w-60 bg-card border-r border-border flex flex-col">
@@ -47,43 +47,37 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         <p className="text-white font-bold text-sm truncate">{clientName}</p>
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-        {CLIENT_SECTIONS.map((section) => {
-          const isDisabled = section.phase !== null;
-          if (isDisabled) {
-            return (
-              <div
-                key={section.id}
-                className="flex items-center justify-between px-4 py-2 rounded-lg text-sm cursor-not-allowed"
-              >
-                <span className="text-slate-600">{section.label}</span>
-                <span className="text-xs text-slate-600 bg-slate-800 px-1.5 py-0.5 rounded">
-                  P{section.phase}
-                </span>
-              </div>
-            );
-          }
-          if (section.isPage) {
-            return (
-              <Link
-                key={section.id}
-                href={`/client/${clientSlug}/${section.id}`}
-                className="block px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
-              >
-                {section.label}
-              </Link>
-            );
-          }
-          return (
-            <a
-              key={section.id}
-              href={`#${section.id}`}
-              className="block px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
-            >
-              {section.label}
-            </a>
-          );
-        })}
+      <nav className="flex-1 px-4 py-4 space-y-0.5 overflow-y-auto">
+        <a href="#overview" className={linkClass(`/client/${clientSlug}`)}>Overview</a>
+        <a href="#traffic" className="block px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors">Traffic</a>
+
+        {/* SEO section with sub-links */}
+        <a href="#seo" className="block px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors">SEO</a>
+        <Link href={`/client/${clientSlug}/seo/keywords`} className={subLinkClass(`/client/${clientSlug}/seo/keywords`)}>
+          ↳ Keywords
+        </Link>
+        <Link href={`/client/${clientSlug}/seo/audit`} className={subLinkClass(`/client/${clientSlug}/seo/audit`)}>
+          ↳ Site Audit
+        </Link>
+        <Link href={`/client/${clientSlug}/seo/backlinks`} className={subLinkClass(`/client/${clientSlug}/seo/backlinks`)}>
+          ↳ Backlinks
+        </Link>
+
+        {/* Disabled items */}
+        {[
+          { label: 'Ads', phase: 4 },
+          { label: 'Leads', phase: 4 },
+          { label: 'Reviews', phase: 4 },
+        ].map(s => (
+          <div key={s.label} className="flex items-center justify-between px-4 py-2 rounded-lg text-sm cursor-not-allowed">
+            <span className="text-slate-600">{s.label}</span>
+            <span className="text-xs text-slate-600 bg-slate-800 px-1.5 py-0.5 rounded">P{s.phase}</span>
+          </div>
+        ))}
+
+        <Link href={`/client/${clientSlug}/reports`} className={linkClass(`/client/${clientSlug}/reports`)}>
+          Reports
+        </Link>
       </nav>
 
       <div className="p-4 border-t border-border">

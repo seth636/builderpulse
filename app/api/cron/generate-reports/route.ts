@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { generateReport } from '@/lib/report-generator';
+import { updateRankingsFromGSC } from '@/lib/integrations/rank-tracker';
+import { pullBacklinks } from '@/lib/integrations/backlinks';
+import { runSiteAudit } from '@/lib/integrations/site-audit';
 
 const prisma = new PrismaClient();
 
@@ -116,5 +119,42 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.json(results);
+  // Phase 7: SEO sync for all clients
+  const seoResults = { rankingsUpdated: 0, backlinksUpdated: 0, auditsRun: 0, seoErrors: [] as string[] };
+  const isMonday = now.getDay() === 1;
+
+  for (const client of clients) {
+    try {
+      // Update rankings from GSC
+      if (client.gsc_site_url) {
+        await updateRankingsFromGSC(client.id);
+        seoResults.rankingsUpdated++;
+      }
+
+      // Pull backlinks
+      if (client.gsc_site_url) {
+        await pullBacklinks(client.id, client.gsc_site_url);
+        seoResults.backlinksUpdated++;
+      }
+
+      // Weekly audit: run on Mondays if no audit in last 6 days
+      if (isMonday && client.website_url) {
+        const recentAudit = await prisma.siteAudit.findFirst({
+          where: {
+            client_id: client.id,
+            date: { gte: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000) },
+          },
+        });
+        if (!recentAudit) {
+          await runSiteAudit(client.id, client.website_url);
+          seoResults.auditsRun++;
+        }
+      }
+    } catch (e: any) {
+      seoResults.seoErrors.push(`[SEO] ${client.name}: ${e.message}`);
+    }
+  }
+
+  return NextResponse.json({ ...results, seo: seoResults });
 }
+

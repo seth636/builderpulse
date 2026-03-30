@@ -163,6 +163,58 @@ export default function PortalDashboardClient({
           </section>
         )}
 
+        {/* SEO Tools (Phase 7) — show only if data exists */}
+        {!loading && data?.seo?.hasData && (
+          <section style={{ marginBottom: '48px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '20px' }}>
+              SEO Tools
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+              {data?.seo?.latestAudit && (
+                <div style={{ backgroundColor: 'white', borderRadius: '10px', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', padding: '16px' }}>
+                  <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Site Health</p>
+                  <p style={{
+                    fontSize: '24px', fontWeight: '700',
+                    color: data.seo.latestAudit.overall_score >= 80 ? '#10b981' : data.seo.latestAudit.overall_score >= 50 ? '#f59e0b' : '#ef4444',
+                  }}>
+                    {data.seo.latestAudit.overall_score}/100
+                  </p>
+                </div>
+              )}
+              {data?.seo?.referringDomains !== undefined && (
+                <div style={{ backgroundColor: 'white', borderRadius: '10px', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', padding: '16px' }}>
+                  <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Referring Domains</p>
+                  <p style={{ fontSize: '24px', fontWeight: '700', color: '#6366f1' }}>{data.seo.referringDomains}</p>
+                </div>
+              )}
+            </div>
+
+            {data?.seo?.topKeywords?.length > 0 && (
+              <div style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', padding: '20px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', marginBottom: '12px' }}>Top Keyword Rankings</h3>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left', color: '#6b7280', fontWeight: '500', paddingBottom: '8px', paddingRight: '12px' }}>Keyword</th>
+                      <th style={{ textAlign: 'right', color: '#6b7280', fontWeight: '500', paddingBottom: '8px' }}>Position</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.seo.topKeywords.map((kw: any, i: number) => (
+                      <tr key={i} style={{ borderTop: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '8px 12px 8px 0', color: '#374151', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{kw.keyword}</td>
+                        <td style={{ padding: '8px 0', textAlign: 'right', fontWeight: '600', color: kw.position <= 10 ? '#10b981' : kw.position <= 20 ? '#6366f1' : '#6b7280' }}>
+                          #{kw.position}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+
         {/* Ads */}
         {(hasMeta || loading) && (
           <section style={{ marginBottom: '48px' }}>

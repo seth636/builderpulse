@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import DateRangePicker, { DateRange, getDateRange, getPreviousPeriod } from './DateRangePicker';
 import MetricCard from './MetricCard';
 import TrafficSection from './TrafficSection';
@@ -161,7 +162,20 @@ export default function ClientDashboard({ client }: Props) {
 
       {/* Section 2 — SEO */}
       <section id="seo" className="mb-12">
-        <h2 className="text-xl font-bold text-white mb-6">SEO Performance</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-white">SEO Performance</h2>
+          <div className="flex gap-2">
+            <Link href={`/client/${client.slug}/seo/keywords`} className="px-3 py-1.5 text-xs font-medium bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-border">
+              View Keywords
+            </Link>
+            <Link href={`/client/${client.slug}/seo/audit`} className="px-3 py-1.5 text-xs font-medium bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-border">
+              Run Audit
+            </Link>
+            <Link href={`/client/${client.slug}/seo/backlinks`} className="px-3 py-1.5 text-xs font-medium bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-border">
+              View Backlinks
+            </Link>
+          </div>
+        </div>
         <SEOSection slug={client.slug} startDate={dateRange.startDate} endDate={dateRange.endDate} />
       </section>
 
