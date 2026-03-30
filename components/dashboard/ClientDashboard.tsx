@@ -10,6 +10,19 @@ import AdsSection from './AdsSection';
 import LeadsSection from './LeadsSection';
 import ReviewsSection from './ReviewsSection';
 
+function getHealthScoreColor(score: number): string {
+  if (score >= 90) return '#16a34a';
+  if (score >= 70) return '#0ea5e9';
+  if (score >= 50) return '#f59e0b';
+  return '#ef4444';
+}
+function getHealthScoreLabel(score: number): string {
+  if (score >= 90) return 'Excellent';
+  if (score >= 70) return 'Good';
+  if (score >= 50) return 'Needs Attention';
+  return 'Critical';
+}
+
 type Client = {
   id: number;
   name: string;
@@ -25,6 +38,46 @@ type Props = { client: Client };
 
 export default function ClientDashboard({ client }: Props) {
   const [dateRange, setDateRange] = useState<DateRange>(getDateRange('last30'));
+
+  // AI intelligence state
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const [insights, setInsights] = useState<any[]>([]);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [healthScore, setHealthScore] = useState<number | null>(null);
+
+  // Load AI data on mount
+  useEffect(() => {
+    fetch(`/api/clients/${client.slug}/insights?month=${currentMonth}`)
+      .then(r => r.json()).then(d => setInsights(d.insights || [])).catch(() => {});
+    fetch(`/api/alerts?clientId=${client.id}&isResolved=false`)
+      .then(r => r.json()).then(d => setAlerts(d.alerts || [])).catch(() => {});
+    fetch(`/api/clients/${client.slug}/health`)
+      .then(r => r.json()).then(d => { if (d.score != null) setHealthScore(d.score); }).catch(() => {});
+  }, [client.slug, client.id, currentMonth]);
+
+  const handleGenerateInsights = async () => {
+    setInsightsLoading(true);
+    try {
+      const res = await fetch(`/api/clients/${client.slug}/insights`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ month: currentMonth }),
+      });
+      const data = await res.json();
+      setInsights(data.insights || []);
+    } catch { /* ignore */ }
+    setInsightsLoading(false);
+  };
+
+  const resolveAlert = async (alertId: number) => {
+    await fetch(`/api/alerts/${alertId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isResolved: true }),
+    });
+    setAlerts(prev => prev.filter(a => a.id !== alertId));
+  };
 
   // Analytics summary
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
@@ -107,6 +160,74 @@ export default function ClientDashboard({ client }: Props) {
 
   return (
     <div>
+      {/* Health Score + AI header row */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          {healthScore != null && (
+            <div className="flex items-center gap-3">
+              <div className="relative w-16 h-16">
+                <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#374151" strokeWidth="3"/>
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={getHealthScoreColor(healthScore)} strokeWidth="3" strokeDasharray={`${healthScore}, 100`}/>
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">{healthScore}</span>
+              </div>
+              <div>
+                <div className="text-white text-sm font-semibold">Health Score</div>
+                <div className="text-xs" style={{ color: getHealthScoreColor(healthScore) }}>{getHealthScoreLabel(healthScore)}</div>
+              </div>
+            </div>
+          )}
+        </div>
+        <Link href={`/client/${client.slug}/recommendations`} className="text-sm px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-border transition-colors">
+          View Recommendations
+        </Link>
+      </div>
+
+      {/* Active Alerts */}
+      {alerts.filter(a => !a.is_resolved).length > 0 && (
+        <div className="bg-red-900/10 border border-red-800 rounded-xl p-4 mb-6">
+          <h3 className="text-red-400 font-semibold mb-3 text-sm">⚠ Active Alerts ({alerts.filter(a => !a.is_resolved).length})</h3>
+          {alerts.filter(a => !a.is_resolved).slice(0, 5).map((alert: any) => (
+            <div key={alert.id} className="flex justify-between items-start py-2 border-b border-red-900/30 last:border-0">
+              <div>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded mr-2 ${alert.severity === 'critical' ? 'bg-red-800 text-red-200' : 'bg-amber-800 text-amber-200'}`}>
+                  {alert.severity.toUpperCase()}
+                </span>
+                <span className="text-white text-sm font-medium">{alert.title}</span>
+                <p className="text-gray-400 text-xs mt-0.5">{alert.description}</p>
+              </div>
+              <button onClick={() => resolveAlert(alert.id)} className="text-xs text-gray-500 hover:text-white ml-4 flex-shrink-0">Resolve</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* AI Insights Card */}
+      <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-white font-semibold text-base">AI Insights — {currentMonth}</h2>
+          <button onClick={handleGenerateInsights} disabled={insightsLoading} className="text-sm bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg transition-colors">
+            {insightsLoading ? 'Generating...' : insights.length > 0 ? 'Regenerate' : 'Generate Insights'}
+          </button>
+        </div>
+        {insights.length === 0 ? (
+          <p className="text-gray-400 text-sm">No insights yet. Click "Generate Insights" to analyze this month's performance.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {insights.map((insight: any, i: number) => (
+              <div key={i} className={`p-4 rounded-lg border ${insight.type === 'positive' ? 'bg-green-900/20 border-green-800' : insight.type === 'negative' ? 'bg-red-900/20 border-red-800' : 'bg-blue-900/20 border-blue-800'}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span>{insight.type === 'positive' ? '✅' : insight.type === 'negative' ? '🚨' : 'ℹ️'}</span>
+                  <span className="font-semibold text-sm text-white">{insight.title}</span>
+                </div>
+                <p className="text-gray-300 text-sm">{insight.body}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Header */}
       <div id="overview" className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>

@@ -75,6 +75,9 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
           </div>
         ))}
 
+        <Link href={`/client/${clientSlug}/recommendations`} className={linkClass(`/client/${clientSlug}/recommendations`)}>
+          AI Recommendations
+        </Link>
         <Link href={`/client/${clientSlug}/reports`} className={linkClass(`/client/${clientSlug}/reports`)}>
           Reports
         </Link>

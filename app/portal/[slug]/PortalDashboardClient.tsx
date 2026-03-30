@@ -10,6 +10,19 @@ import PortalAdsSection from '../components/PortalAdsSection';
 import PortalLeadsSection from '../components/PortalLeadsSection';
 import PortalReviewsSection from '../components/PortalReviewsSection';
 
+function getHealthScoreColorPortal(score: number): string {
+  if (score >= 90) return '#16a34a';
+  if (score >= 70) return '#0ea5e9';
+  if (score >= 50) return '#f59e0b';
+  return '#ef4444';
+}
+function getHealthScoreLabelPortal(score: number): string {
+  if (score >= 90) return 'Excellent';
+  if (score >= 70) return 'Good';
+  if (score >= 50) return 'Needs Attention';
+  return 'Critical';
+}
+
 type Props = {
   slug: string;
   clientName: string;
@@ -75,6 +88,21 @@ export default function PortalDashboardClient({
   const hasGHLData = hasGHL && (ghlSummary?.newLeads > 0 || ghlSummary?.appointments > 0);
   const hasReviewsData = data?.reviews?.items?.length > 0;
 
+  // AI intelligence for portal
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const [portalInsights, setPortalInsights] = useState<any[]>([]);
+  const [portalHealthScore, setPortalHealthScore] = useState<number | null>(null);
+  const [portalRecs, setPortalRecs] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/clients/${slug}/insights?month=${currentMonth}`)
+      .then(r => r.json()).then(d => setPortalInsights(d.insights || [])).catch(() => {});
+    fetch(`/api/clients/${slug}/health`)
+      .then(r => r.json()).then(d => { if (d.score != null) setPortalHealthScore(d.score); }).catch(() => {});
+    fetch(`/api/clients/${slug}/recommendations?month=${currentMonth}`)
+      .then(r => r.json()).then(d => setPortalRecs((d.recommendations || []).slice(0, 3))).catch(() => {});
+  }, [slug, currentMonth]);
+
   return (
     <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
       <PortalHeader
@@ -136,6 +164,69 @@ export default function PortalDashboardClient({
             notAvailable={!hasReviewsData && !loading}
           />
         </div>
+
+        {/* Health Score */}
+        {portalHealthScore != null && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', padding: '20px' }}>
+            <div style={{ position: 'relative', width: '64px', height: '64px', flexShrink: 0 }}>
+              <svg viewBox="0 0 36 36" style={{ width: '64px', height: '64px', transform: 'rotate(-90deg)' }}>
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3"/>
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={getHealthScoreColorPortal(portalHealthScore)} strokeWidth="3" strokeDasharray={`${portalHealthScore}, 100`}/>
+              </svg>
+              <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '16px', color: '#111827' }}>{portalHealthScore}</span>
+            </div>
+            <div>
+              <p style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '2px' }}>Client Health Score</p>
+              <p style={{ fontSize: '14px', color: getHealthScoreColorPortal(portalHealthScore), fontWeight: '500' }}>{getHealthScoreLabelPortal(portalHealthScore)}</p>
+            </div>
+          </div>
+        )}
+
+        {/* AI Insights (read-only) */}
+        <section style={{ marginBottom: '48px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '16px' }}>AI Insights — {currentMonth}</h2>
+          {portalInsights.length === 0 ? (
+            <div style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #f1f5f9', padding: '24px', color: '#6b7280', fontSize: '14px' }}>
+              No insights available yet. Check back after your next data sync.
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
+              {portalInsights.map((insight: any, i: number) => (
+                <div key={i} style={{
+                  padding: '16px',
+                  borderRadius: '10px',
+                  border: `1px solid ${insight.type === 'positive' ? '#166534' : insight.type === 'negative' ? '#991b1b' : '#1e40af'}30`,
+                  backgroundColor: insight.type === 'positive' ? '#f0fdf4' : insight.type === 'negative' ? '#fef2f2' : '#eff6ff',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span>{insight.type === 'positive' ? '✅' : insight.type === 'negative' ? '⚠️' : 'ℹ️'}</span>
+                    <strong style={{ fontSize: '13px', color: '#111827' }}>{insight.title}</strong>
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#374151', margin: 0, lineHeight: '1.5' }}>{insight.body}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Top 3 Recommendations (read-only) */}
+        {portalRecs.length > 0 && (
+          <section style={{ marginBottom: '48px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '16px' }}>This Month's Focus Areas</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {portalRecs.map((rec: any, i: number) => (
+                <div key={i} style={{ backgroundColor: 'white', borderRadius: '10px', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '11px', fontWeight: '700', padding: '2px 6px', borderRadius: '4px', backgroundColor: rec.priority === 'high' ? '#fee2e2' : rec.priority === 'medium' ? '#fef9c3' : '#dcfce7', color: rec.priority === 'high' ? '#b91c1c' : rec.priority === 'medium' ? '#92400e' : '#166534', textTransform: 'uppercase' as const }}>{rec.priority}</span>
+                    <span style={{ fontSize: '11px', fontWeight: '600', padding: '2px 6px', borderRadius: '4px', backgroundColor: '#f1f5f9', color: '#6b7280', textTransform: 'uppercase' as const }}>{rec.category}</span>
+                    <strong style={{ fontSize: '14px', color: '#111827' }}>{rec.title}</strong>
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#4b5563', margin: 0, lineHeight: '1.5' }}>{rec.body}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Traffic */}
         {(hasGA4 || loading) && (

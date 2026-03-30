@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { generateReportSummary, ReportData } from './report-ai';
+import { getInsights, Insight } from './ai-insights';
+import { getRecommendations, Recommendation } from './ai-recommendations';
+import { getLatestHealthScore, getHealthScoreColor } from './client-health';
 
 const prisma = new PrismaClient();
 
@@ -119,7 +122,10 @@ function buildReportHtml(
   data: ReportData,
   aiSummary: string,
   aiRecommendations: string,
-  seoExtras?: { auditScore?: number | null; auditErrors?: number; auditWarnings?: number; referringDomains?: number }
+  seoExtras?: { auditScore?: number | null; auditErrors?: number; auditWarnings?: number; referringDomains?: number },
+  healthScore?: number | null,
+  aiInsights?: Insight[],
+  aiRecs?: Recommendation[]
 ): string {
   const now = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
@@ -137,6 +143,17 @@ function buildReportHtml(
         `<div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:8px;padding:20px">${summaryHtml}</div>`
       )
     );
+  }
+
+  // AI Insights
+  if (aiInsights && aiInsights.length > 0) {
+    const insightsHtml = aiInsights.map((i) => `
+      <div style="padding:12px 16px;margin-bottom:10px;border-radius:6px;border-left:4px solid ${i.type === 'positive' ? '#16a34a' : i.type === 'negative' ? '#dc2626' : '#3b82f6'};">
+        <strong style="color:#0f172a">${i.title}</strong>
+        <p style="margin:4px 0 0;color:#334155;line-height:1.6">${i.body}</p>
+      </div>
+    `).join('');
+    sections.push(section('AI Insights', insightsHtml));
   }
 
   // Website Traffic
@@ -263,8 +280,26 @@ function buildReportHtml(
     sections.push(section('Reviews', cardHtml + tableHtml));
   }
 
-  // Recommendations
-  if (aiRecommendations) {
+  // Recommendations — use AI structured recs if available, fallback to text
+  if (aiRecs && aiRecs.length > 0) {
+    const priorityColors: Record<string, string> = { high: '#ef4444', medium: '#f59e0b', low: '#16a34a' };
+    const topRecs = [...aiRecs].sort((a, b) => {
+      const order = { high: 0, medium: 1, low: 2 };
+      return (order[a.priority] || 1) - (order[b.priority] || 1);
+    }).slice(0, 5);
+    const recsHtml = topRecs.map((r) => `
+      <div style="padding:14px 16px;margin-bottom:10px;border-radius:8px;border:1px solid #e2e8f0;background:white">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${priorityColors[r.priority] || '#94a3b8'}20;color:${priorityColors[r.priority] || '#94a3b8'};text-transform:uppercase">${r.priority}</span>
+          <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:#f1f5f9;color:#64748b;text-transform:uppercase">${r.category}</span>
+          <strong style="color:#0f172a;font-size:14px">${r.title}</strong>
+        </div>
+        <p style="margin:0 0 6px;color:#334155;line-height:1.6;font-size:13px">${r.body}</p>
+        <p style="margin:0;color:#94a3b8;font-size:12px;font-style:italic">Data: ${r.metricReference}</p>
+      </div>
+    `).join('');
+    sections.push(section('Recommendations', `<div style="background:#f0fdf9;border:1px solid #99f6e4;border-radius:8px;padding:20px">${recsHtml}</div>`));
+  } else if (aiRecommendations) {
     const bullets = aiRecommendations
       .split('\n')
       .filter((l) => l.trim().match(/^[\-\*\•]|^\d+\./))
@@ -304,6 +339,14 @@ function buildReportHtml(
     <div style="font-size:14px;text-transform:uppercase;letter-spacing:0.15em;color:#94a3b8;margin-bottom:16px">Monthly Performance Report</div>
     <div style="font-size:48px;font-weight:800;color:white;margin-bottom:16px;line-height:1.1">${clientName}</div>
     <div style="font-size:24px;color:#38bdf8;font-weight:600;margin-bottom:40px">${periodLabel}</div>
+    ${healthScore != null ? `<div style="margin-bottom:32px;display:flex;flex-direction:column;align-items:center">
+      <svg viewBox="0 0 36 36" style="width:80px;height:80px;transform:rotate(-90deg)">
+        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#374151" stroke-width="3"/>
+        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${getHealthScoreColor(healthScore)}" stroke-width="3" stroke-dasharray="${healthScore}, 100"/>
+      </svg>
+      <div style="font-size:28px;font-weight:700;color:${getHealthScoreColor(healthScore)};margin-top:-54px;margin-bottom:54px">${healthScore}</div>
+      <div style="font-size:13px;color:#94a3b8">Client Health Score</div>
+    </div>` : ''}
     <div style="width:60px;height:2px;background:#14b8a6;margin-bottom:40px"></div>
     <div style="font-size:14px;color:#64748b">Prepared by Home Builder Marketers</div>
     <div style="font-size:13px;color:#475569;margin-top:8px">Generated ${now}</div>
@@ -630,8 +673,21 @@ export async function generateReport(
   // Generate AI summary
   const { summary, recommendations } = await generateReportSummary(reportData);
 
+  // Phase 8: Fetch AI intelligence data
+  const monthKey = periodStart.toISOString().slice(0, 7); // "2026-03"
+  let aiInsightsData: Insight[] = [];
+  let aiRecsData: Recommendation[] = [];
+  let healthScoreData: number | null = null;
+  try {
+    [aiInsightsData, aiRecsData, healthScoreData] = await Promise.all([
+      getInsights(clientId, monthKey),
+      getRecommendations(clientId, monthKey),
+      getLatestHealthScore(clientId),
+    ]);
+  } catch { /* graceful */ }
+
   // Build HTML
-  const html = buildReportHtml(client.name, periodLabel, reportData, summary, recommendations, seoExtras);
+  const html = buildReportHtml(client.name, periodLabel, reportData, summary, recommendations, seoExtras, healthScoreData, aiInsightsData, aiRecsData);
 
   // Upsert report (replace existing for same client+period)
   const existing = await prisma.report.findFirst({

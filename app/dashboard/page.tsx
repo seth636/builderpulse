@@ -8,8 +8,6 @@ import SearchBar from '@/components/SearchBar';
 
 const prisma = new PrismaClient();
 
-type Client = Awaited<ReturnType<typeof prisma.client.findMany>>[0];
-
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -18,6 +16,27 @@ export default async function DashboardPage({
   const clients = await prisma.client.findMany({
     orderBy: { name: 'asc' },
   });
+
+  // Fetch latest health scores and unresolved alert counts for all clients
+  const healthScores = await prisma.clientHealthScore.findMany({
+    where: { client_id: { in: clients.map(c => c.id) } },
+    orderBy: { calculated_at: 'desc' },
+  });
+  const alertCounts = await prisma.anomalyAlert.groupBy({
+    by: ['client_id'],
+    where: { is_resolved: false, client_id: { in: clients.map(c => c.id) } },
+    _count: { id: true },
+  });
+
+  // Build maps
+  const healthMap: Record<number, number> = {};
+  for (const hs of healthScores) {
+    if (healthMap[hs.client_id] == null) healthMap[hs.client_id] = hs.score;
+  }
+  const alertMap: Record<number, number> = {};
+  for (const ac of alertCounts) {
+    alertMap[ac.client_id] = ac._count.id;
+  }
 
   const search = searchParams.search?.toLowerCase() || '';
   const filteredClients = clients.filter((client) =>
@@ -41,6 +60,8 @@ export default async function DashboardPage({
                 website_url={client.website_url}
                 pm_name={client.pm_name}
                 package={client.package}
+                healthScore={healthMap[client.id] ?? null}
+                alertCount={alertMap[client.id] ?? 0}
               />
             ))}
           </div>

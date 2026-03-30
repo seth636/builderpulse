@@ -3,11 +3,20 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const isAdmin = true; // Auth disabled temporarily
+  const [alertCount, setAlertCount] = useState(0);
+
+  useEffect(() => {
+    fetch('/api/alerts?isRead=false&isResolved=false')
+      .then(r => r.json())
+      .then(d => setAlertCount((d.alerts || []).length))
+      .catch(() => {});
+  }, []);
 
   const isActive = (path: string) => {
     return pathname === path || pathname.startsWith(path + '/');
@@ -29,6 +38,21 @@ export default function Sidebar() {
           }`}
         >
           Dashboard
+        </Link>
+        <Link
+          href="/alerts"
+          className={`flex items-center justify-between px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            isActive('/alerts')
+              ? 'bg-accent/10 text-accent'
+              : 'text-muted hover:bg-white/5 hover:text-white'
+          }`}
+        >
+          <span>Alerts</span>
+          {alertCount > 0 && (
+            <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+              {alertCount}
+            </span>
+          )}
         </Link>
 
         {isAdmin && (

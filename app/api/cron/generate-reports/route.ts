@@ -4,6 +4,8 @@ import { generateReport } from '@/lib/report-generator';
 import { updateRankingsFromGSC } from '@/lib/integrations/rank-tracker';
 import { pullBacklinks } from '@/lib/integrations/backlinks';
 import { runSiteAudit } from '@/lib/integrations/site-audit';
+import { checkAnomalies } from '@/lib/anomaly-detector';
+import { calculateHealthScore } from '@/lib/client-health';
 
 const prisma = new PrismaClient();
 
@@ -116,6 +118,16 @@ export async function GET(request: NextRequest) {
     } catch (e: any) {
       results.errors.push(`[Report] ${client.name}: ${e.message}`);
       console.error(`[CRON] Failed for ${client.name}:`, e);
+    }
+  }
+
+  // Phase 8: AI intelligence — anomaly detection + health scores
+  for (const client of clients) {
+    try {
+      await checkAnomalies(client.id);
+      await calculateHealthScore(client.id);
+    } catch (e: any) {
+      results.errors.push(`[AI] ${client.name}: ${e.message}`);
     }
   }
 

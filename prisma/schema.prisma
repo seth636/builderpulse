@@ -41,6 +41,10 @@ model Client {
   google_reviews      GoogleReview[]
   reports             Report[]
   dashboards          Dashboard[]
+  ai_insights         AiInsight[]
+  anomaly_alerts      AnomalyAlert[]
+  ai_recommendations  AiRecommendation[]
+  health_scores       ClientHealthScore[]
 
   @@map("clients")
 }
@@ -294,4 +298,55 @@ model DashboardWidget {
   created_at   DateTime  @default(now())
 
   @@map("dashboard_widgets")
+}
+
+model AiInsight {
+  id            Int      @id @default(autoincrement())
+  client_id     Int
+  client        Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  month         String
+  insights_json Json
+  generated_at  DateTime @default(now())
+
+  @@unique([client_id, month])
+  @@map("ai_insights")
+}
+
+model AnomalyAlert {
+  id          Int      @id @default(autoincrement())
+  client_id   Int
+  client      Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  alert_type  String
+  severity    String
+  title       String
+  description String
+  data_json   Json?
+  is_read     Boolean  @default(false)
+  is_resolved Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  @@map("anomaly_alerts")
+}
+
+model AiRecommendation {
+  id                   Int      @id @default(autoincrement())
+  client_id            Int
+  client               Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  month                String
+  recommendations_json Json
+  generated_at         DateTime @default(now())
+
+  @@unique([client_id, month])
+  @@map("ai_recommendations")
+}
+
+model ClientHealthScore {
+  id             Int      @id @default(autoincrement())
+  client_id      Int
+  client         Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  score          Int
+  breakdown_json Json
+  calculated_at  DateTime @default(now())
+
+  @@map("client_health_scores")
 }
