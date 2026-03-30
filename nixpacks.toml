@@ -1,0 +1,6 @@
+[variables]
+NIXPACKS_NODE_VERSION = "18"
+
+[phases.build]
+cmds = ["npm run build"]
+cacheDirectories = []
