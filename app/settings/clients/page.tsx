@@ -31,17 +31,8 @@ export default function ClientsSettingsPage() {
   const [syncing, setSyncing] = useState<number | null>(null);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else if (status === 'authenticated') {
-      const role = (session?.user as any)?.role;
-      if (role !== 'admin') {
-        router.push('/dashboard');
-      } else {
-        fetchClients();
-      }
-    }
-  }, [session, status, router]);
+    fetchClients();
+  }, []);
 
   const fetchClients = async () => {
     try {
@@ -82,32 +73,24 @@ export default function ClientsSettingsPage() {
     fetchClients();
   };
 
-  const handleSync = async (client: Client) => {
-    if (!client.ga4_property_id && !client.gsc_site_url) {
-      alert('No GA4 Property ID or GSC Site URL configured for this client.');
-      return;
-    }
-
+  const handleSync = async (client: Client, integration?: string) => {
     setSyncing(client.id);
     try {
       const res = await fetch(`/api/sync/${client.slug}`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(integration ? { integration } : {}),
       });
       const result = await res.json();
 
       if (res.ok) {
-        let message = 'Sync completed!\n';
-        if (result.ga4) {
-          message += result.ga4.success
-            ? `GA4: ${result.ga4.rowsInserted} rows synced\n`
-            : `GA4 Error: ${result.ga4.error}\n`;
-        }
-        if (result.gsc) {
-          message += result.gsc.success
-            ? `GSC: ${result.gsc.rowsInserted} rows synced`
-            : `GSC Error: ${result.gsc.error}`;
-        }
-        alert(message);
+        const parts: string[] = [];
+        if (result.ga4) parts.push(result.ga4.success ? `GA4: ${result.ga4.rowsInserted} rows` : `GA4 Error: ${result.ga4.error}`);
+        if (result.gsc) parts.push(result.gsc.success ? `GSC: ${result.gsc.rowsInserted} rows` : `GSC Error: ${result.gsc.error}`);
+        if (result.meta) parts.push(result.meta.success ? `Meta: ${result.meta.rowsInserted} rows` : `Meta Error: ${result.meta.error}`);
+        if (result.ghl) parts.push(result.ghl.success ? `GHL: ${result.ghl.leadsInserted} leads` : `GHL Error: ${result.ghl.error}`);
+        if (result.reviews) parts.push(result.reviews.success ? `Reviews: ${result.reviews.rowsInserted} rows` : `Reviews Error: ${result.reviews.error}`);
+        alert('Sync completed!\n' + (parts.join('\n') || 'Nothing to sync (check credentials)'));
       } else {
         alert('Sync failed');
       }
@@ -119,7 +102,7 @@ export default function ClientsSettingsPage() {
     }
   };
 
-  if (loading || status === 'loading') {
+  if (loading) {
     return (
       <div className="flex min-h-screen">
         <Sidebar />
@@ -203,16 +186,25 @@ export default function ClientsSettingsPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                      {(client.ga4_property_id || client.gsc_site_url) && (
-                        <button
-                          onClick={() => handleSync(client)}
-                          disabled={syncing === client.id}
-                          className="text-blue-400 hover:text-blue-300 font-medium disabled:opacity-50"
-                        >
-                          {syncing === client.id ? 'Syncing...' : 'Sync'}
-                        </button>
-                      )}
+                    <td className="px-6 py-4 text-right text-sm">
+                      <div className="flex flex-wrap justify-end gap-1 mb-2">
+                        {client.ga4_property_id && (
+                          <button onClick={() => handleSync(client, 'ga4')} disabled={syncing === client.id} className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 rounded disabled:opacity-50">GA4</button>
+                        )}
+                        {client.gsc_site_url && (
+                          <button onClick={() => handleSync(client, 'gsc')} disabled={syncing === client.id} className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 rounded disabled:opacity-50">GSC</button>
+                        )}
+                        {client.meta_ad_account_id && (
+                          <button onClick={() => handleSync(client, 'meta')} disabled={syncing === client.id} className="text-xs px-2 py-1 bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 rounded disabled:opacity-50">Meta</button>
+                        )}
+                        {client.ghl_location_id && (
+                          <button onClick={() => handleSync(client, 'ghl')} disabled={syncing === client.id} className="text-xs px-2 py-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded disabled:opacity-50">GHL</button>
+                        )}
+                        {client.ghl_location_id && (
+                          <button onClick={() => handleSync(client, 'reviews')} disabled={syncing === client.id} className="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 rounded disabled:opacity-50">Reviews</button>
+                        )}
+                      </div>
+                      <div className="flex justify-end gap-2">
                       <button
                         onClick={() => handleEdit(client)}
                         className="text-accent hover:text-accent/80 font-medium"
@@ -225,6 +217,7 @@ export default function ClientsSettingsPage() {
                       >
                         Delete
                       </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -5,6 +5,9 @@ import DateRangePicker, { DateRange, getDateRange, getPreviousPeriod } from './D
 import MetricCard from './MetricCard';
 import TrafficSection from './TrafficSection';
 import SEOSection from './SEOSection';
+import AdsSection from './AdsSection';
+import LeadsSection from './LeadsSection';
+import ReviewsSection from './ReviewsSection';
 
 type Client = {
   id: number;
@@ -13,78 +16,93 @@ type Client = {
   website_url: string | null;
   ga4_property_id: string | null;
   gsc_site_url: string | null;
+  meta_ad_account_id: string | null;
+  ghl_location_id: string | null;
 };
 
-type Props = {
-  client: Client;
-};
+type Props = { client: Client };
 
 export default function ClientDashboard({ client }: Props) {
   const [dateRange, setDateRange] = useState<DateRange>(getDateRange('last30'));
 
-  // Analytics summary state
+  // Analytics summary
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
-  const [analyticsSummary, setAnalyticsSummary] = useState<{
-    totalSessions: number;
-    sparkline: number[];
-    prevSessions: number;
-  } | null>(null);
+  const [analyticsSummary, setAnalyticsSummary] = useState<{ totalSessions: number; sparkline: number[]; prevSessions: number } | null>(null);
 
-  // GSC summary state
+  // GSC summary
   const [gscLoading, setGscLoading] = useState(true);
-  const [gscSummary, setGscSummary] = useState<{
-    avgPosition: number;
-    sparkline: number[];
-    prevPosition: number;
-  } | null>(null);
+  const [gscSummary, setGscSummary] = useState<{ avgPosition: number; sparkline: number[]; prevPosition: number } | null>(null);
+
+  // Leads summary
+  const [leadsLoading, setLeadsLoading] = useState(true);
+  const [leadsSummary, setLeadsSummary] = useState<{ count: number; prevCount: number } | null>(null);
+
+  // Reviews summary
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewsSummary, setReviewsSummary] = useState<{ totalReviews: number; avgRating: number } | null>(null);
 
   const fetchSummaries = useCallback(async () => {
     if (!dateRange.startDate || !dateRange.endDate) return;
     const prev = getPreviousPeriod(dateRange.startDate, dateRange.endDate);
 
-    // GA4 summary
-    setAnalyticsLoading(true);
-    try {
-      const [curr, prevA] = await Promise.all([
-        fetch(`/api/analytics/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()),
-        fetch(`/api/analytics/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()),
-      ]);
-      setAnalyticsSummary({
-        totalSessions: curr.summary?.totalSessions ?? 0,
-        sparkline: (curr.daily || []).map((r: any) => r.sessions),
-        prevSessions: prevA.summary?.totalSessions ?? 0,
-      });
-    } catch {
-      setAnalyticsSummary(null);
-    } finally {
-      setAnalyticsLoading(false);
-    }
+    // GA4
+    if (client.ga4_property_id) {
+      setAnalyticsLoading(true);
+      try {
+        const [curr, prevA] = await Promise.all([
+          fetch(`/api/analytics/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()),
+          fetch(`/api/analytics/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()),
+        ]);
+        setAnalyticsSummary({
+          totalSessions: curr.summary?.totalSessions ?? 0,
+          sparkline: (curr.daily || []).map((r: any) => r.sessions),
+          prevSessions: prevA.summary?.totalSessions ?? 0,
+        });
+      } catch { setAnalyticsSummary(null); }
+      finally { setAnalyticsLoading(false); }
+    } else { setAnalyticsLoading(false); }
 
-    // GSC summary
-    setGscLoading(true);
-    try {
-      const [curr, prevG] = await Promise.all([
-        fetch(`/api/search-console/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()),
-        fetch(`/api/search-console/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()),
-      ]);
-      const pos = curr.summary?.avgPosition ?? null;
-      const prevPos = prevG.summary?.avgPosition ?? null;
-      setGscSummary(pos !== null ? {
-        avgPosition: pos,
-        sparkline: (curr.daily || []).map((r: any) => r.clicks),
-        prevPosition: prevPos ?? 0,
-      } : null);
-    } catch {
-      setGscSummary(null);
-    } finally {
-      setGscLoading(false);
-    }
-  }, [client.slug, dateRange.startDate, dateRange.endDate]);
+    // GSC
+    if (client.gsc_site_url) {
+      setGscLoading(true);
+      try {
+        const [curr, prevG] = await Promise.all([
+          fetch(`/api/search-console/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()),
+          fetch(`/api/search-console/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()),
+        ]);
+        const pos = curr.summary?.avgPosition ?? null;
+        if (pos !== null) {
+          setGscSummary({ avgPosition: pos, sparkline: (curr.daily || []).map((r: any) => r.clicks), prevPosition: prevG.summary?.avgPosition ?? 0 });
+        } else { setGscSummary(null); }
+      } catch { setGscSummary(null); }
+      finally { setGscLoading(false); }
+    } else { setGscLoading(false); }
+
+    // Leads
+    if (client.ghl_location_id) {
+      setLeadsLoading(true);
+      try {
+        const [curr, prevL] = await Promise.all([
+          fetch(`/api/leads/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()),
+          fetch(`/api/leads/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()),
+        ]);
+        setLeadsSummary({ count: curr.summary?.newLeads ?? 0, prevCount: prevL.summary?.newLeads ?? 0 });
+      } catch { setLeadsSummary(null); }
+      finally { setLeadsLoading(false); }
+    } else { setLeadsLoading(false); }
+
+    // Reviews
+    if (client.ghl_location_id) {
+      setReviewsLoading(true);
+      try {
+        const res = await fetch(`/api/reviews/${client.slug}`).then(r => r.json());
+        setReviewsSummary({ totalReviews: res.summary?.totalReviews ?? 0, avgRating: res.summary?.averageRating ?? 0 });
+      } catch { setReviewsSummary(null); }
+      finally { setReviewsLoading(false); }
+    } else { setReviewsLoading(false); }
+  }, [client.slug, client.ga4_property_id, client.gsc_site_url, client.ghl_location_id, dateRange.startDate, dateRange.endDate]);
 
   useEffect(() => { fetchSummaries(); }, [fetchSummaries]);
-
-  const hasGA4 = !!client.ga4_property_id;
-  const hasGSC = !!client.gsc_site_url;
 
   return (
     <div>
@@ -105,31 +123,33 @@ export default function ClientDashboard({ client }: Props) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
         <MetricCard
           title="Sessions"
-          value={hasGA4 ? (analyticsSummary?.totalSessions ?? (analyticsLoading ? null : 0)) : null}
+          value={client.ga4_property_id ? (analyticsSummary?.totalSessions ?? (analyticsLoading ? null : 0)) : null}
           previousValue={analyticsSummary?.prevSessions ?? null}
           format="number"
           sparklineData={analyticsSummary?.sparkline}
-          loading={analyticsLoading && hasGA4}
+          loading={analyticsLoading && !!client.ga4_property_id}
         />
         <MetricCard
           title="Total Leads"
-          value={null}
-          previousValue={null}
+          value={client.ghl_location_id ? (leadsSummary?.count ?? (leadsLoading ? null : 0)) : null}
+          previousValue={leadsSummary?.prevCount ?? null}
           format="number"
+          loading={leadsLoading && !!client.ghl_location_id}
         />
         <MetricCard
           title="Avg Google Position"
-          value={hasGSC ? (gscSummary?.avgPosition ?? (gscLoading ? null : null)) : null}
+          value={client.gsc_site_url ? (gscSummary?.avgPosition ?? (gscLoading ? null : null)) : null}
           previousValue={gscSummary?.prevPosition ?? null}
           format="position"
           sparklineData={gscSummary?.sparkline}
-          loading={gscLoading && hasGSC}
+          loading={gscLoading && !!client.gsc_site_url}
         />
         <MetricCard
           title="Google Reviews"
-          value={null}
+          value={client.ghl_location_id ? (reviewsSummary?.totalReviews ?? (reviewsLoading ? null : null)) : null}
           previousValue={null}
           format="number"
+          loading={reviewsLoading && !!client.ghl_location_id}
         />
       </div>
 
@@ -145,28 +165,32 @@ export default function ClientDashboard({ client }: Props) {
         <SEOSection slug={client.slug} startDate={dateRange.startDate} endDate={dateRange.endDate} />
       </section>
 
-      {/* Section 3 — Ads (Phase 4 placeholder) */}
+      {/* Section 3 — Ads */}
       <section id="ads" className="mb-12">
         <h2 className="text-xl font-bold text-white mb-6">Advertising</h2>
-        <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-center">
-          <p className="text-slate-400 text-sm">Meta Ads — Coming in Phase 4</p>
-        </div>
+        <AdsSection
+          slug={client.slug}
+          startDate={dateRange.startDate}
+          endDate={dateRange.endDate}
+          hasMetaAccount={!!client.meta_ad_account_id}
+        />
       </section>
 
-      {/* Section 4 — Leads (Phase 4 placeholder) */}
+      {/* Section 4 — Leads */}
       <section id="leads" className="mb-12">
         <h2 className="text-xl font-bold text-white mb-6">Leads & CRM</h2>
-        <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-center">
-          <p className="text-slate-400 text-sm">GHL Leads & Appointments — Coming in Phase 4</p>
-        </div>
+        <LeadsSection
+          slug={client.slug}
+          startDate={dateRange.startDate}
+          endDate={dateRange.endDate}
+          hasGHL={!!client.ghl_location_id}
+        />
       </section>
 
-      {/* Section 5 — Reviews (Phase 4 placeholder) */}
+      {/* Section 5 — Reviews */}
       <section id="reviews" className="mb-12">
         <h2 className="text-xl font-bold text-white mb-6">Reviews</h2>
-        <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-center">
-          <p className="text-slate-400 text-sm">Google Reviews — Coming in Phase 4</p>
-        </div>
+        <ReviewsSection slug={client.slug} hasGHL={!!client.ghl_location_id} />
       </section>
     </div>
   );

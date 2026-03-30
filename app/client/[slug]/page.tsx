@@ -32,6 +32,8 @@ export default async function ClientDetailPage({
             website_url: client.website_url,
             ga4_property_id: (client as any).ga4_property_id ?? null,
             gsc_site_url: (client as any).gsc_site_url ?? null,
+            meta_ad_account_id: (client as any).meta_ad_account_id ?? null,
+            ghl_location_id: (client as any).ghl_location_id ?? null,
           }} />
         </div>
       </div>
