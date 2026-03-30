@@ -1,14 +1,17 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import DateRangePicker, { DateRange, getDateRange, getPreviousPeriod } from './DateRangePicker';
-import MetricCard from './MetricCard';
-import TrafficSection from './TrafficSection';
-import SEOSection from './SEOSection';
-import AdsSection from './AdsSection';
-import LeadsSection from './LeadsSection';
-import ReviewsSection from './ReviewsSection';
+const MetricCard = dynamic(() => import('./MetricCard'), { ssr: false, loading: () => <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 animate-pulse h-32" /> });
+import SkeletonCard from './SkeletonCard';
+
+const TrafficSection = dynamic(() => import('./TrafficSection'), { ssr: false, loading: () => <div className="space-y-6"><SkeletonCard height="h-64" /><SkeletonCard height="h-64" /></div> });
+const SEOSection = dynamic(() => import('./SEOSection'), { ssr: false, loading: () => <div className="space-y-6"><SkeletonCard height="h-64" /><SkeletonCard height="h-64" /></div> });
+const AdsSection = dynamic(() => import('./AdsSection'), { ssr: false, loading: () => <SkeletonCard height="h-48" /> });
+const LeadsSection = dynamic(() => import('./LeadsSection'), { ssr: false, loading: () => <SkeletonCard height="h-48" /> });
+const ReviewsSection = dynamic(() => import('./ReviewsSection'), { ssr: false, loading: () => <SkeletonCard height="h-48" /> });
 
 function getHealthScoreColor(score: number): string {
   if (score >= 90) return '#16a34a';
