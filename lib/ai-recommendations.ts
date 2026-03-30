@@ -87,11 +87,16 @@ Return as a valid JSON array ONLY (no markdown, no explanation):
     const match = text.match(/\[[\s\S]*\]/);
     const recs: Recommendation[] = match ? JSON.parse(match[0]) : [];
 
-    await prisma.aiRecommendation.upsert({
-      where: { client_id_month: { client_id: clientId, month } },
-      update: { recommendations_json: recs as any, generated_at: new Date() },
-      create: { client_id: clientId, month, recommendations_json: recs as any },
-    });
+    try {
+      await prisma.aiRecommendation.upsert({
+        where: { client_id_month: { client_id: clientId, month } },
+        update: { recommendations_json: recs as any, generated_at: new Date() },
+        create: { client_id: clientId, month, recommendations_json: recs as any },
+      });
+    } catch (saveError) {
+      // Table may not exist yet - still return recommendations
+      console.error('Failed to save recommendations (table may not exist):', saveError);
+    }
 
     return recs;
   } catch (e) {
@@ -101,8 +106,14 @@ Return as a valid JSON array ONLY (no markdown, no explanation):
 }
 
 export async function getRecommendations(clientId: number, month: string): Promise<Recommendation[]> {
-  const record = await prisma.aiRecommendation.findUnique({
-    where: { client_id_month: { client_id: clientId, month } },
-  });
-  return (record?.recommendations_json as unknown as Recommendation[]) || [];
+  try {
+    const record = await prisma.aiRecommendation.findUnique({
+      where: { client_id_month: { client_id: clientId, month } },
+    });
+    return (record?.recommendations_json as unknown as Recommendation[]) || [];
+  } catch (error) {
+    // Table may not exist yet
+    console.error('Failed to get recommendations (table may not exist):', error);
+    return [];
+  }
 }

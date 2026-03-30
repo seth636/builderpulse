@@ -104,11 +104,16 @@ Return as a valid JSON array ONLY (no markdown, no explanation):
     const match = text.match(/\[[\s\S]*\]/);
     const insights: Insight[] = match ? JSON.parse(match[0]) : [];
 
-    await prisma.aiInsight.upsert({
-      where: { client_id_month: { client_id: clientId, month } },
-      update: { insights_json: insights as any, generated_at: new Date() },
-      create: { client_id: clientId, month, insights_json: insights as any },
-    });
+    try {
+      await prisma.aiInsight.upsert({
+        where: { client_id_month: { client_id: clientId, month } },
+        update: { insights_json: insights as any, generated_at: new Date() },
+        create: { client_id: clientId, month, insights_json: insights as any },
+      });
+    } catch (saveError) {
+      // Table may not exist yet - still return insights
+      console.error('Failed to save insights (table may not exist):', saveError);
+    }
 
     return insights;
   } catch (e) {
@@ -118,8 +123,14 @@ Return as a valid JSON array ONLY (no markdown, no explanation):
 }
 
 export async function getInsights(clientId: number, month: string): Promise<Insight[]> {
-  const record = await prisma.aiInsight.findUnique({
-    where: { client_id_month: { client_id: clientId, month } },
-  });
-  return (record?.insights_json as unknown as Insight[]) || [];
+  try {
+    const record = await prisma.aiInsight.findUnique({
+      where: { client_id_month: { client_id: clientId, month } },
+    });
+    return (record?.insights_json as unknown as Insight[]) || [];
+  } catch (error) {
+    // Table may not exist yet
+    console.error('Failed to get insights (table may not exist):', error);
+    return [];
+  }
 }

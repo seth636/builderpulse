@@ -46,14 +46,20 @@ export default function ClientDashboard({ client }: Props) {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [healthScore, setHealthScore] = useState<number | null>(null);
 
-  // Load AI data on mount
+  // Load AI data on mount - graceful handling if tables don't exist yet
   useEffect(() => {
     fetch(`/api/clients/${client.slug}/insights?month=${currentMonth}`)
-      .then(r => r.json()).then(d => setInsights(d.insights || [])).catch(() => {});
+      .then(r => r.ok ? r.json() : { insights: [] })
+      .then(d => setInsights(Array.isArray(d.insights) ? d.insights : []))
+      .catch(() => setInsights([]));
     fetch(`/api/alerts?clientId=${client.id}&isResolved=false`)
-      .then(r => r.json()).then(d => setAlerts(d.alerts || [])).catch(() => {});
+      .then(r => r.ok ? r.json() : { alerts: [] })
+      .then(d => setAlerts(Array.isArray(d.alerts) ? d.alerts : []))
+      .catch(() => setAlerts([]));
     fetch(`/api/clients/${client.slug}/health`)
-      .then(r => r.json()).then(d => { if (d.score != null) setHealthScore(d.score); }).catch(() => {});
+      .then(r => r.ok ? r.json() : { score: null })
+      .then(d => { if (d.score != null) setHealthScore(d.score); })
+      .catch(() => {});
   }, [client.slug, client.id, currentMonth]);
 
   const handleGenerateInsights = async () => {

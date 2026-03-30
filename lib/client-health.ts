@@ -93,19 +93,30 @@ export async function calculateHealthScore(clientId: number): Promise<number> {
 
   const finalScore = Math.round(Math.min(100, Math.max(0, score)));
 
-  await prisma.clientHealthScore.create({
-    data: { client_id: clientId, score: finalScore, breakdown_json: breakdown as any },
-  });
+  try {
+    await prisma.clientHealthScore.create({
+      data: { client_id: clientId, score: finalScore, breakdown_json: breakdown as any },
+    });
+  } catch (error) {
+    // Table may not exist yet - still return the calculated score
+    console.error('Failed to save health score (table may not exist):', error);
+  }
 
   return finalScore;
 }
 
 export async function getLatestHealthScore(clientId: number): Promise<number | null> {
-  const record = await prisma.clientHealthScore.findFirst({
-    where: { client_id: clientId },
-    orderBy: { calculated_at: 'desc' },
-  });
-  return record?.score ?? null;
+  try {
+    const record = await prisma.clientHealthScore.findFirst({
+      where: { client_id: clientId },
+      orderBy: { calculated_at: 'desc' },
+    });
+    return record?.score ?? null;
+  } catch (error) {
+    // Table may not exist yet
+    console.error('Failed to get health score (table may not exist):', error);
+    return null;
+  }
 }
 
 export function getHealthScoreColor(score: number): string {

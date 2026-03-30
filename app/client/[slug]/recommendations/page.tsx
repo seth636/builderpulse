@@ -30,27 +30,28 @@ export default function RecommendationsPage() {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [doneSet, setDoneSet] = useState<Set<number>>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem(`recs-done-${slug}`);
-        return saved ? new Set(JSON.parse(saved)) : new Set();
-      } catch { return new Set(); }
-    }
-    return new Set();
-  });
+  // Initialize empty - hydration-safe. Loaded in useEffect.
+  const [doneSet, setDoneSet] = useState<Set<number>>(new Set());
+
+  // Load localStorage doneSet after mount (hydration-safe)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`recs-done-${slug}`);
+      if (saved) setDoneSet(new Set(JSON.parse(saved)));
+    } catch { /* ignore */ }
+  }, [slug]);
 
   useEffect(() => {
     // Fetch client name
     fetch(`/api/clients`)
-      .then(r => r.json())
+      .then(r => r.ok ? r.json() : { clients: [] })
       .then((d: any) => {
         const c = (d.clients || d || []).find((cl: any) => cl.slug === slug);
         if (c) setClientName(c.name);
       }).catch(() => {});
 
     fetch(`/api/clients/${slug}/recommendations?month=${currentMonth}`)
-      .then(r => r.json())
+      .then(r => r.ok ? r.json() : { recommendations: [] })
       .then(d => { setRecommendations(d.recommendations || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, [slug, currentMonth]);

@@ -14,10 +14,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (body.isRead !== undefined) data.is_read = body.isRead;
   if (body.isResolved !== undefined) data.is_resolved = body.isResolved;
 
-  const alert = await prisma.anomalyAlert.update({
-    where: { id: parseInt(params.id) },
-    data,
-  });
-
-  return NextResponse.json({ alert });
+  try {
+    const alert = await prisma.anomalyAlert.update({
+      where: { id: parseInt(params.id) },
+      data,
+    });
+    return NextResponse.json({ alert });
+  } catch (error) {
+    console.error('Alert update error:', error);
+    return NextResponse.json({ error: 'Alert not found or table not ready' }, { status: 404 });
+  }
 }

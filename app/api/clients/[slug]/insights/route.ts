@@ -14,8 +14,15 @@ export async function GET(req: NextRequest, { params }: { params: { slug: string
   if (!client) return NextResponse.json({ error: 'Client not found' }, { status: 404 });
 
   const month = req.nextUrl.searchParams.get('month') || new Date().toISOString().slice(0, 7);
-  const insights = await getInsights(client.id, month);
-  return NextResponse.json({ insights });
+  
+  try {
+    const insights = await getInsights(client.id, month);
+    return NextResponse.json({ insights });
+  } catch (error) {
+    // Table may not exist yet - return graceful empty response
+    console.error('Insights fetch error (table may not exist):', error);
+    return NextResponse.json({ insights: [] });
+  }
 }
 
 export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
@@ -28,6 +35,11 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
   const body = await req.json().catch(() => ({}));
   const month = body.month || new Date().toISOString().slice(0, 7);
 
-  const insights = await generateInsights(client.id, month);
-  return NextResponse.json({ insights });
+  try {
+    const insights = await generateInsights(client.id, month);
+    return NextResponse.json({ insights });
+  } catch (error) {
+    console.error('Insights generation error:', error);
+    return NextResponse.json({ insights: [], error: 'Failed to generate insights' }, { status: 500 });
+  }
 }

@@ -21,12 +21,17 @@ export async function GET(req: NextRequest) {
   if (isRead !== null) where.is_read = isRead === 'true';
   if (isResolved !== null) where.is_resolved = isResolved === 'true';
 
-  const alerts = await prisma.anomalyAlert.findMany({
-    where,
-    include: { client: { select: { id: true, name: true, slug: true } } },
-    orderBy: { created_at: 'desc' },
-    take: 200,
-  });
-
-  return NextResponse.json({ alerts });
+  try {
+    const alerts = await prisma.anomalyAlert.findMany({
+      where,
+      include: { client: { select: { id: true, name: true, slug: true } } },
+      orderBy: { created_at: 'desc' },
+      take: 200,
+    });
+    return NextResponse.json({ alerts });
+  } catch (error) {
+    // Table may not exist yet - return graceful empty response
+    console.error('Alerts fetch error (table may not exist):', error);
+    return NextResponse.json({ alerts: [] });
+  }
 }
