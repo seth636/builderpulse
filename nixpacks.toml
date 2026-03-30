@@ -1,6 +1,10 @@
+[build]
+builder = "NIXPACKS"
+
 [variables]
 NIXPACKS_NODE_VERSION = "18"
+BUST_CACHE = "v4"
 
 [phases.build]
-cmds = ["npm run build"]
+cmds = ["npm ci", "npm run build"]
 cacheDirectories = []
