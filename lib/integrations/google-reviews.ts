@@ -22,15 +22,20 @@ export async function pullGoogleReviews(
       'Location-Id': locationId,
     };
 
-    // Try GHL reviews endpoint
+    // GHL reviews endpoint (v2)
     const res = await fetch(
-      `${GHL_BASE}/reputation/review?locationId=${locationId}&limit=100`,
+      `${GHL_BASE}/reputation/reviews?locationId=${locationId}&limit=100&page=1`,
       { headers }
     );
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      return { success: false, rowsInserted: 0, error: (body as any)?.message || `HTTP ${res.status}` };
+      const errMsg = (body as any)?.message || `HTTP ${res.status}`;
+      // Reviews scope may not be available on all API keys — treat as soft failure
+      if (res.status === 401 || res.status === 403) {
+        return { success: true, rowsInserted: 0, error: undefined }; // Graceful skip
+      }
+      return { success: false, rowsInserted: 0, error: errMsg };
     }
 
     const data = await res.json();
