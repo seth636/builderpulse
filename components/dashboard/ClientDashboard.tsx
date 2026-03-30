@@ -70,19 +70,27 @@ export default function ClientDashboard({ client }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ month: currentMonth }),
       });
+      if (!res.ok) {
+        setInsights([]);
+        setInsightsLoading(false);
+        return;
+      }
       const data = await res.json();
-      setInsights(data.insights || []);
-    } catch { /* ignore */ }
+      setInsights(Array.isArray(data?.insights) ? data.insights : []);
+    } catch { setInsights([]); }
     setInsightsLoading(false);
   };
 
-  const resolveAlert = async (alertId: number) => {
-    await fetch(`/api/alerts/${alertId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isResolved: true }),
-    });
-    setAlerts(prev => prev.filter(a => a.id !== alertId));
+  const resolveAlert = async (alertId: number | undefined) => {
+    if (alertId == null) return;
+    try {
+      await fetch(`/api/alerts/${alertId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isResolved: true }),
+      });
+      setAlerts(prev => (prev || []).filter(a => a?.id !== alertId));
+    } catch { /* ignore */ }
   };
 
   // Analytics summary
@@ -125,14 +133,12 @@ export default function ClientDashboard({ client }: Props) {
     } else { setAnalyticsLoading(false); }
 
     // GSC
-    const safeGSC = (raw: any) =>
-      raw && raw.summary ? raw : { summary: { avgPosition: null }, daily: [] };
     if (client.gsc_site_url) {
       setGscLoading(true);
       try {
         const [curr, prevG] = await Promise.all([
-          fetch(`/api/search-console/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()).then(safeGSC),
-          fetch(`/api/search-console/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()).then(safeGSC),
+          fetch(`/api/search-console/${client.slug}?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`).then(r => r.json()),
+          fetch(`/api/search-console/${client.slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()),
         ]);
         const pos = curr.summary?.avgPosition ?? null;
         if (pos !== null) {
@@ -173,14 +179,14 @@ export default function ClientDashboard({ client }: Props) {
       {/* Health Score + AI header row */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          {healthScore != null && (
+          {healthScore != null && Number.isFinite(healthScore) && (
             <div className="flex items-center gap-3">
               <div className="relative w-16 h-16">
                 <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
                   <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#374151" strokeWidth="3"/>
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={getHealthScoreColor(healthScore)} strokeWidth="3" strokeDasharray={`${healthScore}, 100`}/>
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={getHealthScoreColor(healthScore)} strokeWidth="3" strokeDasharray={`${Math.max(0, Math.min(100, healthScore))}, 100`}/>
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">{healthScore}</span>
+                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">{Math.round(healthScore)}</span>
               </div>
               <div>
                 <div className="text-white text-sm font-semibold">Health Score</div>
@@ -195,19 +201,19 @@ export default function ClientDashboard({ client }: Props) {
       </div>
 
       {/* Active Alerts */}
-      {alerts.filter(a => !a.is_resolved).length > 0 && (
+      {(alerts || []).filter(a => a && !a.is_resolved).length > 0 && (
         <div className="bg-red-900/10 border border-red-800 rounded-xl p-4 mb-6">
-          <h3 className="text-red-400 font-semibold mb-3 text-sm">⚠ Active Alerts ({alerts.filter(a => !a.is_resolved).length})</h3>
-          {alerts.filter(a => !a.is_resolved).slice(0, 5).map((alert: any) => (
-            <div key={alert.id} className="flex justify-between items-start py-2 border-b border-red-900/30 last:border-0">
+          <h3 className="text-red-400 font-semibold mb-3 text-sm">⚠ Active Alerts ({(alerts || []).filter(a => a && !a.is_resolved).length})</h3>
+          {(alerts || []).filter(a => a && !a.is_resolved).slice(0, 5).map((alert: any) => (
+            <div key={alert?.id ?? Math.random()} className="flex justify-between items-start py-2 border-b border-red-900/30 last:border-0">
               <div>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded mr-2 ${alert.severity === 'critical' ? 'bg-red-800 text-red-200' : 'bg-amber-800 text-amber-200'}`}>
-                  {alert.severity.toUpperCase()}
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded mr-2 ${alert?.severity === 'critical' ? 'bg-red-800 text-red-200' : 'bg-amber-800 text-amber-200'}`}>
+                  {(alert?.severity ?? 'warning').toUpperCase()}
                 </span>
-                <span className="text-white text-sm font-medium">{alert.title}</span>
-                <p className="text-gray-400 text-xs mt-0.5">{alert.description}</p>
+                <span className="text-white text-sm font-medium">{alert?.title ?? 'Alert'}</span>
+                <p className="text-gray-400 text-xs mt-0.5">{alert?.description ?? ''}</p>
               </div>
-              <button onClick={() => resolveAlert(alert.id)} className="text-xs text-gray-500 hover:text-white ml-4 flex-shrink-0">Resolve</button>
+              <button onClick={() => resolveAlert(alert?.id)} className="text-xs text-gray-500 hover:text-white ml-4 flex-shrink-0">Resolve</button>
             </div>
           ))}
         </div>
@@ -221,17 +227,17 @@ export default function ClientDashboard({ client }: Props) {
             {insightsLoading ? 'Generating...' : insights.length > 0 ? 'Regenerate' : 'Generate Insights'}
           </button>
         </div>
-        {insights.length === 0 ? (
+        {(insights || []).length === 0 ? (
           <p className="text-gray-400 text-sm">No insights yet. Click "Generate Insights" to analyze this month's performance.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {insights.map((insight: any, i: number) => (
-              <div key={i} className={`p-4 rounded-lg border ${insight.type === 'positive' ? 'bg-green-900/20 border-green-800' : insight.type === 'negative' ? 'bg-red-900/20 border-red-800' : 'bg-blue-900/20 border-blue-800'}`}>
+            {(insights || []).map((insight: any, i: number) => (
+              <div key={i} className={`p-4 rounded-lg border ${insight?.type === 'positive' ? 'bg-green-900/20 border-green-800' : insight?.type === 'negative' ? 'bg-red-900/20 border-red-800' : 'bg-blue-900/20 border-blue-800'}`}>
                 <div className="flex items-center gap-2 mb-2">
-                  <span>{insight.type === 'positive' ? '✅' : insight.type === 'negative' ? '🚨' : 'ℹ️'}</span>
-                  <span className="font-semibold text-sm text-white">{insight.title}</span>
+                  <span>{insight?.type === 'positive' ? '✅' : insight?.type === 'negative' ? '🚨' : 'ℹ️'}</span>
+                  <span className="font-semibold text-sm text-white">{insight?.title ?? 'Insight'}</span>
                 </div>
-                <p className="text-gray-300 text-sm">{insight.body}</p>
+                <p className="text-gray-300 text-sm">{insight?.body ?? ''}</p>
               </div>
             ))}
           </div>

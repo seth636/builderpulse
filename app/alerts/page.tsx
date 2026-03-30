@@ -40,26 +40,40 @@ export default function AlertsPage() {
       else if (filterStatus === 'unread') { params.set('isRead', 'false'); params.set('isResolved', 'false'); }
 
       const res = await fetch(`/api/alerts?${params.toString()}`);
+      if (!res.ok) {
+        setAlerts([]);
+        setLoading(false);
+        return;
+      }
       const d = await res.json();
-      setAlerts(d.alerts || []);
-    } catch { /* ignore */ }
+      setAlerts(Array.isArray(d?.alerts) ? d.alerts : []);
+    } catch { setAlerts([]); }
     setLoading(false);
   }, [filterSeverity, filterClient, filterStatus]);
 
   useEffect(() => {
-    fetch('/api/clients').then(r => r.json()).then(d => setClients(d.clients || d || [])).catch(() => {});
+    fetch('/api/clients')
+      .then(r => r.ok ? r.json() : { clients: [] })
+      .then(d => setClients(Array.isArray(d?.clients) ? d.clients : (Array.isArray(d) ? d : [])))
+      .catch(() => setClients([]));
   }, []);
 
   useEffect(() => { fetchAlerts(); }, [fetchAlerts]);
 
-  const markRead = async (id: number) => {
-    await fetch(`/api/alerts/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isRead: true }) });
-    setAlerts(prev => prev.map(a => a.id === id ? { ...a, is_read: true } : a));
+  const markRead = async (id: number | undefined) => {
+    if (id == null) return;
+    try {
+      await fetch(`/api/alerts/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isRead: true }) });
+      setAlerts(prev => (prev || []).map(a => a?.id === id ? { ...a, is_read: true } : a));
+    } catch { /* ignore */ }
   };
 
-  const resolve = async (id: number) => {
-    await fetch(`/api/alerts/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isResolved: true, isRead: true }) });
-    setAlerts(prev => prev.filter(a => a.id !== id));
+  const resolve = async (id: number | undefined) => {
+    if (id == null) return;
+    try {
+      await fetch(`/api/alerts/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isResolved: true, isRead: true }) });
+      setAlerts(prev => (prev || []).filter(a => a?.id !== id));
+    } catch { /* ignore */ }
   };
 
   return (
@@ -110,43 +124,48 @@ export default function AlertsPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {alerts.map((alert: any) => (
-                <div key={alert.id} className={`border rounded-xl p-5 ${!alert.is_read ? 'bg-gray-800/80 border-gray-600' : 'bg-gray-900/50 border-gray-700'}`}>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span>{TYPE_ICONS[alert.alert_type] || '⚠️'}</span>
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${SEVERITY_COLORS[alert.severity] || 'bg-gray-700 text-gray-300'}`}>
-                          {alert.severity?.toUpperCase()}
-                        </span>
-                        {alert.client && (
-                          <Link href={`/client/${alert.client.slug}`} className="text-xs text-teal-400 hover:underline">
-                            {alert.client.name}
-                          </Link>
+              {(alerts || []).map((alert: any) => {
+                if (!alert) return null;
+                const severity = alert?.severity ?? 'warning';
+                const alertType = alert?.alert_type ?? 'unknown';
+                return (
+                  <div key={alert?.id ?? Math.random()} className={`border rounded-xl p-5 ${!alert?.is_read ? 'bg-gray-800/80 border-gray-600' : 'bg-gray-900/50 border-gray-700'}`}>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span>{TYPE_ICONS[alertType] || '⚠️'}</span>
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded ${SEVERITY_COLORS[severity] || 'bg-gray-700 text-gray-300'}`}>
+                            {severity.toUpperCase()}
+                          </span>
+                          {alert?.client && (
+                            <Link href={`/client/${alert.client?.slug ?? ''}`} className="text-xs text-teal-400 hover:underline">
+                              {alert.client?.name ?? 'Client'}
+                            </Link>
+                          )}
+                          {!alert?.is_read && (
+                            <span className="text-xs bg-blue-900 text-blue-300 px-1.5 py-0.5 rounded">NEW</span>
+                          )}
+                        </div>
+                        <p className="text-white font-semibold text-sm mb-1">{alert?.title ?? 'Alert'}</p>
+                        <p className="text-gray-400 text-xs">{alert?.description ?? ''}</p>
+                        <p className="text-gray-600 text-xs mt-1">{alert?.created_at ? new Date(alert.created_at).toLocaleString() : ''}</p>
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        {!alert?.is_read && (
+                          <button onClick={() => markRead(alert?.id)} className="text-xs text-gray-400 hover:text-white border border-gray-600 px-2 py-1 rounded transition-colors">
+                            Mark Read
+                          </button>
                         )}
-                        {!alert.is_read && (
-                          <span className="text-xs bg-blue-900 text-blue-300 px-1.5 py-0.5 rounded">NEW</span>
+                        {!alert?.is_resolved && (
+                          <button onClick={() => resolve(alert?.id)} className="text-xs text-gray-400 hover:text-white border border-gray-600 px-2 py-1 rounded transition-colors">
+                            Resolve
+                          </button>
                         )}
                       </div>
-                      <p className="text-white font-semibold text-sm mb-1">{alert.title}</p>
-                      <p className="text-gray-400 text-xs">{alert.description}</p>
-                      <p className="text-gray-600 text-xs mt-1">{new Date(alert.created_at).toLocaleString()}</p>
-                    </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      {!alert.is_read && (
-                        <button onClick={() => markRead(alert.id)} className="text-xs text-gray-400 hover:text-white border border-gray-600 px-2 py-1 rounded transition-colors">
-                          Mark Read
-                        </button>
-                      )}
-                      {!alert.is_resolved && (
-                        <button onClick={() => resolve(alert.id)} className="text-xs text-gray-400 hover:text-white border border-gray-600 px-2 py-1 rounded transition-colors">
-                          Resolve
-                        </button>
-                      )}
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

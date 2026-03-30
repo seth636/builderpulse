@@ -102,7 +102,14 @@ Return as a valid JSON array ONLY (no markdown, no explanation):
     const json = await res.json();
     const text: string = json.content?.[0]?.text || '[]';
     const match = text.match(/\[[\s\S]*\]/);
-    const insights: Insight[] = match ? JSON.parse(match[0]) : [];
+    let insights: Insight[] = [];
+    try {
+      insights = match ? JSON.parse(match[0]) : [];
+      if (!Array.isArray(insights)) insights = [];
+    } catch (parseError) {
+      console.error('Failed to parse insights JSON:', parseError);
+      insights = [];
+    }
 
     try {
       await prisma.aiInsight.upsert({

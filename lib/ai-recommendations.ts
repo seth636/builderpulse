@@ -85,7 +85,14 @@ Return as a valid JSON array ONLY (no markdown, no explanation):
     const json = await res.json();
     const text: string = json.content?.[0]?.text || '[]';
     const match = text.match(/\[[\s\S]*\]/);
-    const recs: Recommendation[] = match ? JSON.parse(match[0]) : [];
+    let recs: Recommendation[] = [];
+    try {
+      recs = match ? JSON.parse(match[0]) : [];
+      if (!Array.isArray(recs)) recs = [];
+    } catch (parseError) {
+      console.error('Failed to parse recommendations JSON:', parseError);
+      recs = [];
+    }
 
     try {
       await prisma.aiRecommendation.upsert({
@@ -106,8 +113,15 @@ Return as a valid JSON array ONLY (no markdown, no explanation):
 }
 
 export async function getRecommendations(clientId: number, month: string): Promise<Recommendation[]> {
-  const record = await prisma.aiRecommendation.findUnique({
-    where: { client_id_month: { client_id: clientId, month } },
-  });
-  return (record?.recommendations_json as unknown as Recommendation[]) || [];
+  try {
+    const record = await prisma.aiRecommendation.findUnique({
+      where: { client_id_month: { client_id: clientId, month } },
+    });
+    const recs = record?.recommendations_json as unknown as Recommendation[] | undefined;
+    return Array.isArray(recs) ? recs : [];
+  } catch (error) {
+    // Table may not exist yet
+    console.error('Failed to get recommendations (table may not exist):', error);
+    return [];
+  }
 }

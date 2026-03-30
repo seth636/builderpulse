@@ -46,14 +46,15 @@ export default function RecommendationsPage() {
     fetch(`/api/clients`)
       .then(r => r.ok ? r.json() : { clients: [] })
       .then((d: any) => {
-        const c = (d.clients || d || []).find((cl: any) => cl.slug === slug);
-        if (c) setClientName(c.name);
+        const clients = Array.isArray(d?.clients) ? d.clients : (Array.isArray(d) ? d : []);
+        const c = clients.find((cl: any) => cl?.slug === slug);
+        if (c?.name) setClientName(c.name);
       }).catch(() => {});
 
     fetch(`/api/clients/${slug}/recommendations?month=${currentMonth}`)
       .then(r => r.ok ? r.json() : { recommendations: [] })
-      .then(d => { setRecommendations(d.recommendations || []); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then(d => { setRecommendations(Array.isArray(d?.recommendations) ? d.recommendations : []); setLoading(false); })
+      .catch(() => { setRecommendations([]); setLoading(false); });
   }, [slug, currentMonth]);
 
   const handleGenerate = async () => {
@@ -64,9 +65,14 @@ export default function RecommendationsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ month: currentMonth }),
       });
+      if (!res.ok) {
+        setRecommendations([]);
+        setGenerating(false);
+        return;
+      }
       const d = await res.json();
-      setRecommendations(d.recommendations || []);
-    } catch { /* ignore */ }
+      setRecommendations(Array.isArray(d?.recommendations) ? d.recommendations : []);
+    } catch { setRecommendations([]); }
     setGenerating(false);
   };
 
