@@ -93,10 +93,10 @@ export default function LeadsSection({ slug, startDate, endDate, hasGHL }: Props
           <h3 className="text-white font-semibold mb-4">New Leads Over Time</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={data?.weekly || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="week" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} tickFormatter={v => v.slice(5)} />
-              <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-              <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 8 }} />
+              <CartesianGrid strokeDasharray="0" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey="week" stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} tickFormatter={v => v.slice(5)} />
+              <YAxis stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
+              <Tooltip contentStyle={{ backgroundColor: '#1E293B', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 8, border: '1px solid' }} />
               <Bar dataKey="count" fill="#10b981" radius={[3, 3, 0, 0]} name="Leads" />
             </BarChart>
           </ResponsiveContainer>
@@ -114,7 +114,7 @@ export default function LeadsSection({ slug, startDate, endDate, hasGHL }: Props
                   <Pie data={data?.sources || []} dataKey="count" nameKey="source" cx="50%" cy="50%" innerRadius={40} outerRadius={70}>
                     {(data?.sources || []).map((_, i) => <Cell key={i} fill={SOURCE_COLORS[i % SOURCE_COLORS.length]} />)}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 8 }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#1E293B', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 8, border: '1px solid' }} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="mt-2 space-y-1">
@@ -138,23 +138,23 @@ export default function LeadsSection({ slug, startDate, endDate, hasGHL }: Props
         <h3 className="text-white font-semibold mb-4">Recent Leads</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead><tr className="text-slate-400 text-left">
-              <th className="pb-3 pr-4">Name</th>
-              <th className="pb-3 pr-4">Source</th>
-              <th className="pb-3 pr-4">Status</th>
-              <th className="pb-3 text-right">Date</th>
+            <thead><tr className="text-slate-500 text-left border-b border-border-light">
+              <th className="pb-3 pr-4 text-axis-label font-medium uppercase">Name</th>
+              <th className="pb-3 pr-4 text-axis-label font-medium uppercase">Source</th>
+              <th className="pb-3 pr-4 text-axis-label font-medium uppercase">Status</th>
+              <th className="pb-3 text-right text-axis-label font-medium uppercase">Date</th>
             </tr></thead>
             <tbody>
               {(data?.leads || []).slice(0, 20).map((lead, i) => (
-                <tr key={i} className={`${i % 2 === 0 ? 'bg-[#0f172a]' : 'bg-[#1e293b]'} hover:bg-[#334155] transition-colors`}>
-                  <td className="py-2 px-2 text-slate-300">{lead.name}</td>
-                  <td className="py-2 px-2 text-slate-400 capitalize">{lead.source || '—'}</td>
-                  <td className="py-2 px-2">
+                <tr key={i} className="hover:bg-white/[0.03] transition-colors border-b border-border-light last:border-0">
+                  <td className="py-3 px-2 text-white">{lead.name}</td>
+                  <td className="py-3 px-2 text-slate-300 capitalize">{lead.source || '—'}</td>
+                  <td className="py-3 px-2">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusStyle(lead.status)}`}>
                       {lead.status || 'New'}
                     </span>
                   </td>
-                  <td className="py-2 px-2 text-right text-slate-400 text-xs">
+                  <td className="py-3 px-2 text-right text-slate-400 text-xs">
                     {new Date(lead.created_date).toLocaleDateString()}
                   </td>
                 </tr>

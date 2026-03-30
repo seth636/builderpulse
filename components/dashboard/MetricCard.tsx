@@ -53,12 +53,12 @@ export default function MetricCard({
   const sparkPoints = sparklineData.map((v, i) => ({ v }));
 
   return (
-    <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
-      <p className="text-sm text-slate-400 mb-2">{title}</p>
+    <div className="bg-[#1e293b] border border-border-light rounded-xl p-6 card-fade-in">
+      <p className="text-card-title font-semibold uppercase tracking-card-title text-slate-500 mb-3">{title}</p>
 
       {value === null ? (
         <div>
-          <p className="text-3xl font-bold text-white mb-1">—</p>
+          <p className="text-hero font-bold text-white mb-1 number-count-up">—</p>
           <Link
             href="/settings/clients"
             className="text-xs text-[#0ea5e9] hover:underline"
@@ -68,7 +68,7 @@ export default function MetricCard({
         </div>
       ) : (
         <>
-          <p className="text-3xl font-bold text-white mb-1">
+          <p className="text-hero font-bold text-white mb-1 number-count-up">
             {formatValue(value, format)}
           </p>
           {trend !== null && (
@@ -85,7 +85,7 @@ export default function MetricCard({
                     type="monotone"
                     dataKey="v"
                     stroke="#0ea5e9"
-                    strokeWidth={1.5}
+                    strokeWidth={2}
                     dot={false}
                   />
                 </LineChart>

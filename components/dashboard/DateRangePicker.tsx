@@ -96,17 +96,31 @@ export default function DateRangePicker({ onChange }: Props) {
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <select
-        value={preset}
-        onChange={(e) => setPreset(e.target.value)}
-        className="bg-[#1e293b] border border-[#334155] text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-[#0ea5e9] cursor-pointer"
-      >
-        {PRESETS.map((p) => (
-          <option key={p.value} value={p.value}>
+      <div className="flex items-center gap-2">
+        {PRESETS.slice(0, 5).map((p) => (
+          <button
+            key={p.value}
+            onClick={() => setPreset(p.value)}
+            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              preset === p.value
+                ? 'bg-[#3B82F6] text-white'
+                : 'bg-[#1e293b] text-slate-400 hover:bg-[#334155] hover:text-white'
+            }`}
+          >
             {p.label}
-          </option>
+          </button>
         ))}
-      </select>
+        <button
+          onClick={() => setPreset('custom')}
+          className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+            preset === 'custom'
+              ? 'bg-[#3B82F6] text-white'
+              : 'bg-[#1e293b] text-slate-400 hover:bg-[#334155] hover:text-white'
+          }`}
+        >
+          Custom
+        </button>
+      </div>
       {showCustom && (
         <div className="flex items-center gap-2">
           <input

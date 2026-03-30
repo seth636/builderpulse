@@ -98,15 +98,15 @@ export default function SEOSection({ slug, startDate, endDate }: Props) {
         ) : (
           <ResponsiveContainer width="100%" height={260}>
             <ComposedChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="date" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-              <YAxis yAxisId="clicks" orientation="left" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-              <YAxis yAxisId="impressions" orientation="right" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="0" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey="date" stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
+              <YAxis yAxisId="clicks" orientation="left" stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
+              <YAxis yAxisId="impressions" orientation="right" stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 8 }}
+                contentStyle={{ backgroundColor: '#1E293B', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 8, border: '1px solid' }}
                 labelStyle={{ color: '#fff' }}
               />
-              <Legend wrapperStyle={{ color: '#94a3b8', fontSize: 12 }} />
+              <Legend wrapperStyle={{ color: '#64748b', fontSize: 11 }} />
               <Line yAxisId="clicks" type="monotone" dataKey="clicks" stroke="#0ea5e9" strokeWidth={2} dot={false} name="Clicks" />
               <Line yAxisId="impressions" type="monotone" dataKey="impressions" stroke="#8b5cf6" strokeWidth={2} dot={false} name="Impressions" />
             </ComposedChart>
@@ -125,13 +125,13 @@ export default function SEOSection({ slug, startDate, endDate }: Props) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-slate-400 text-left">
-                  <th className="pb-3 pr-4">Keyword</th>
-                  <th className="pb-3 pr-4 text-right">Position</th>
-                  <th className="pb-3 pr-4 text-right">Change</th>
-                  <th className="pb-3 pr-4 text-right">Clicks</th>
-                  <th className="pb-3 pr-4 text-right">Impressions</th>
-                  <th className="pb-3 text-right">CTR</th>
+                <tr className="text-slate-500 text-left border-b border-border-light">
+                  <th className="pb-3 pr-4 text-axis-label font-medium uppercase">Keyword</th>
+                  <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Position</th>
+                  <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Change</th>
+                  <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Clicks</th>
+                  <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Impressions</th>
+                  <th className="pb-3 text-right text-axis-label font-medium uppercase">CTR</th>
                 </tr>
               </thead>
               <tbody>
@@ -152,13 +152,13 @@ export default function SEOSection({ slug, startDate, endDate }: Props) {
                     }
                   }
                   return (
-                    <tr key={i} className={`${i % 2 === 0 ? 'bg-[#0f172a]' : 'bg-[#1e293b]'} hover:bg-[#334155] transition-colors`}>
-                      <td className="py-2 px-2 text-slate-300 truncate max-w-[200px]">{q.query}</td>
-                      <td className="py-2 px-2 text-right text-slate-300">{q.position.toFixed(1)}</td>
-                      <td className="py-2 px-2 text-right">{changeEl}</td>
-                      <td className="py-2 px-2 text-right text-slate-300">{q.clicks.toLocaleString()}</td>
-                      <td className="py-2 px-2 text-right text-slate-300">{q.impressions.toLocaleString()}</td>
-                      <td className="py-2 px-2 text-right text-slate-300">{(q.ctr * 100).toFixed(1)}%</td>
+                    <tr key={i} className="hover:bg-white/[0.03] transition-colors border-b border-border-light last:border-0">
+                      <td className="py-3 px-2 text-white truncate max-w-[200px]">{q.query}</td>
+                      <td className="py-3 px-2 text-right text-slate-300">{q.position.toFixed(1)}</td>
+                      <td className="py-3 px-2 text-right">{changeEl}</td>
+                      <td className="py-3 px-2 text-right text-slate-300">{q.clicks.toLocaleString()}</td>
+                      <td className="py-3 px-2 text-right text-slate-300">{q.impressions.toLocaleString()}</td>
+                      <td className="py-3 px-2 text-right text-slate-300">{(q.ctr * 100).toFixed(1)}%</td>
                     </tr>
                   );
                 })}
@@ -177,22 +177,22 @@ export default function SEOSection({ slug, startDate, endDate }: Props) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-slate-400 text-left">
-                  <th className="pb-3 pr-4">Page URL</th>
-                  <th className="pb-3 pr-4 text-right">Clicks</th>
-                  <th className="pb-3 pr-4 text-right">Impressions</th>
-                  <th className="pb-3 pr-4 text-right">Avg Position</th>
-                  <th className="pb-3 text-right">CTR</th>
+                <tr className="text-slate-500 text-left border-b border-border-light">
+                  <th className="pb-3 pr-4 text-axis-label font-medium uppercase">Page URL</th>
+                  <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Clicks</th>
+                  <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Impressions</th>
+                  <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Avg Position</th>
+                  <th className="pb-3 text-right text-axis-label font-medium uppercase">CTR</th>
                 </tr>
               </thead>
               <tbody>
                 {(data?.pages || []).slice(0, 10).map((p, i) => (
-                  <tr key={i} className={`${i % 2 === 0 ? 'bg-[#0f172a]' : 'bg-[#1e293b]'} hover:bg-[#334155] transition-colors`}>
-                    <td className="py-2 px-2 text-slate-300 font-mono text-xs truncate max-w-[280px]">{p.page}</td>
-                    <td className="py-2 px-2 text-right text-slate-300">{p.clicks.toLocaleString()}</td>
-                    <td className="py-2 px-2 text-right text-slate-300">{p.impressions.toLocaleString()}</td>
-                    <td className="py-2 px-2 text-right text-slate-300">{p.position.toFixed(1)}</td>
-                    <td className="py-2 px-2 text-right text-slate-300">{(p.ctr * 100).toFixed(1)}%</td>
+                  <tr key={i} className="hover:bg-white/[0.03] transition-colors border-b border-border-light last:border-0">
+                    <td className="py-3 px-2 text-white font-mono text-xs truncate max-w-[280px]">{p.page}</td>
+                    <td className="py-3 px-2 text-right text-slate-300">{p.clicks.toLocaleString()}</td>
+                    <td className="py-3 px-2 text-right text-slate-300">{p.impressions.toLocaleString()}</td>
+                    <td className="py-3 px-2 text-right text-slate-300">{p.position.toFixed(1)}</td>
+                    <td className="py-3 px-2 text-right text-slate-300">{(p.ctr * 100).toFixed(1)}%</td>
                   </tr>
                 ))}
               </tbody>

@@ -98,10 +98,10 @@ export default function ReviewsSection({ slug, hasGHL }: Props) {
         <h3 className="text-white font-semibold mb-4">Reviews Over Time</h3>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data?.monthly || []}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-            <XAxis dataKey="month" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 8 }} />
+            <CartesianGrid strokeDasharray="0" stroke="rgba(255,255,255,0.05)" vertical={false} />
+            <XAxis dataKey="month" stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
+            <YAxis stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
+            <Tooltip contentStyle={{ backgroundColor: '#1E293B', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 8, border: '1px solid' }} />
             <Bar dataKey="count" fill="#f97316" radius={[3, 3, 0, 0]} name="Reviews" />
           </BarChart>
         </ResponsiveContainer>
@@ -111,7 +111,7 @@ export default function ReviewsSection({ slug, hasGHL }: Props) {
       <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
         <h3 className="text-white font-semibold mb-4">Recent Reviews</h3>
         <div className="space-y-0">
-          <div className="grid grid-cols-12 text-slate-400 text-xs pb-3 border-b border-[#334155]">
+          <div className="grid grid-cols-12 text-slate-500 text-axis-label font-medium uppercase pb-3 border-b border-border-light">
             <div className="col-span-4">Reviewer</div>
             <div className="col-span-3">Rating</div>
             <div className="col-span-3 text-right">Date</div>
@@ -120,10 +120,10 @@ export default function ReviewsSection({ slug, hasGHL }: Props) {
           {(data?.reviews || []).slice(0, 20).map((review, i) => (
             <div key={review.id}>
               <div
-                className={`grid grid-cols-12 items-center py-3 cursor-pointer ${i % 2 === 0 ? 'bg-[#0f172a]' : 'bg-[#1e293b]'} hover:bg-[#334155] transition-colors px-2 rounded`}
+                className={`grid grid-cols-12 items-center py-3 cursor-pointer hover:bg-white/[0.03] transition-colors px-2 rounded border-b border-border-light last:border-0`}
                 onClick={() => review.text && toggleExpand(review.id)}
               >
-                <div className="col-span-4 text-slate-300 text-sm truncate">{review.author_name}</div>
+                <div className="col-span-4 text-white text-sm truncate">{review.author_name}</div>
                 <div className="col-span-3"><StarRating rating={review.rating} /></div>
                 <div className="col-span-3 text-right text-slate-400 text-xs">
                   {new Date(review.review_date).toLocaleDateString()}

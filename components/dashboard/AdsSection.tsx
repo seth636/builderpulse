@@ -84,10 +84,10 @@ export default function AdsSection({ slug, startDate, endDate, hasMetaAccount }:
         <h3 className="text-white font-semibold mb-4">Ad Spend Over Time</h3>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-            <XAxis dataKey="date" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} tickFormatter={v => `$${v}`} />
-            <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 8 }} formatter={(v: any) => [`$${Number(v).toFixed(2)}`, 'Spend']} />
+            <CartesianGrid strokeDasharray="0" stroke="rgba(255,255,255,0.05)" vertical={false} />
+            <XAxis dataKey="date" stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
+            <YAxis stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} tickFormatter={v => `$${v}`} />
+            <Tooltip contentStyle={{ backgroundColor: '#1E293B', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 8, border: '1px solid' }} formatter={(v: any) => [`$${Number(v).toFixed(2)}`, 'Spend']} />
             <Bar dataKey="spend" fill="#0ea5e9" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
@@ -98,25 +98,25 @@ export default function AdsSection({ slug, startDate, endDate, hasMetaAccount }:
         <h3 className="text-white font-semibold mb-4">Campaign Performance</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead><tr className="text-slate-400 text-left">
-              <th className="pb-3 pr-4">Campaign</th>
-              <th className="pb-3 pr-4 text-right">Spend</th>
-              <th className="pb-3 pr-4 text-right">Impressions</th>
-              <th className="pb-3 pr-4 text-right">Clicks</th>
-              <th className="pb-3 pr-4 text-right">CTR</th>
-              <th className="pb-3 pr-4 text-right">Conv.</th>
-              <th className="pb-3 text-right">Cost/Conv</th>
+            <thead><tr className="text-slate-500 text-left border-b border-border-light">
+              <th className="pb-3 pr-4 text-axis-label font-medium uppercase">Campaign</th>
+              <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Spend</th>
+              <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Impressions</th>
+              <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Clicks</th>
+              <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">CTR</th>
+              <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Conv.</th>
+              <th className="pb-3 text-right text-axis-label font-medium uppercase">Cost/Conv</th>
             </tr></thead>
             <tbody>
               {(data?.campaigns || []).map((c, i) => (
-                <tr key={i} className={`${i % 2 === 0 ? 'bg-[#0f172a]' : 'bg-[#1e293b]'} hover:bg-[#334155] transition-colors`}>
-                  <td className="py-2 px-2 text-slate-300 truncate max-w-[180px]">{c.campaign_name}</td>
-                  <td className="py-2 px-2 text-right text-slate-300">${c.spend.toFixed(2)}</td>
-                  <td className="py-2 px-2 text-right text-slate-300">{c.impressions.toLocaleString()}</td>
-                  <td className="py-2 px-2 text-right text-slate-300">{c.clicks.toLocaleString()}</td>
-                  <td className="py-2 px-2 text-right text-slate-300">{c.ctr.toFixed(2)}%</td>
-                  <td className="py-2 px-2 text-right text-slate-300">{c.conversions}</td>
-                  <td className="py-2 px-2 text-right text-slate-300">{c.conversions > 0 ? `$${c.cost_per_conv.toFixed(2)}` : '—'}</td>
+                <tr key={i} className="hover:bg-white/[0.03] transition-colors border-b border-border-light last:border-0">
+                  <td className="py-3 px-2 text-white truncate max-w-[180px]">{c.campaign_name}</td>
+                  <td className="py-3 px-2 text-right text-slate-300">${c.spend.toFixed(2)}</td>
+                  <td className="py-3 px-2 text-right text-slate-300">{c.impressions.toLocaleString()}</td>
+                  <td className="py-3 px-2 text-right text-slate-300">{c.clicks.toLocaleString()}</td>
+                  <td className="py-3 px-2 text-right text-slate-300">{c.ctr.toFixed(2)}%</td>
+                  <td className="py-3 px-2 text-right text-slate-300">{c.conversions}</td>
+                  <td className="py-3 px-2 text-right text-slate-300">{c.conversions > 0 ? `$${c.cost_per_conv.toFixed(2)}` : '—'}</td>
                 </tr>
               ))}
             </tbody>

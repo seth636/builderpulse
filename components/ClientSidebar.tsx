@@ -16,23 +16,23 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
   const linkClass = (href: string) =>
-    `block px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+    `flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all ${
       isActive(href)
-        ? 'bg-accent/10 text-accent'
-        : 'text-slate-400 hover:bg-white/5 hover:text-white'
+        ? 'text-white bg-white/[0.03] border-l-4 border-accent pl-[12px]'
+        : 'text-slate-400 hover:bg-white/[0.03] hover:text-white border-l-4 border-transparent'
     }`;
 
   const subLinkClass = (href: string) =>
-    `block pl-8 pr-4 py-1.5 rounded-lg text-sm transition-colors ${
+    `block pl-12 pr-4 py-1.5 text-sm transition-colors ${
       isActive(href)
         ? 'text-accent'
         : 'text-slate-500 hover:text-white'
     }`;
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-60 bg-card border-r border-border flex flex-col">
-      <div className="p-6 border-b border-border">
-        <h1 className="text-lg font-bold text-white mb-1">BuilderPulse</h1>
+    <div className="fixed left-0 top-0 h-screen w-[220px] bg-card-dark border-r border-border-divider flex flex-col">
+      <div className="p-6 border-b border-border-divider">
+        <h1 className="text-base font-semibold text-white mb-1">BuilderPulse</h1>
         <Link
           href="/dashboard"
           className="flex items-center gap-1 text-slate-400 hover:text-white text-sm transition-colors"
@@ -83,14 +83,19 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         </Link>
       </nav>
 
-      <div className="p-4 border-t border-border">
-        <div className="mb-3">
-          <p className="text-sm font-medium text-white">{session?.user?.name}</p>
-          <p className="text-xs text-muted">{session?.user?.email}</p>
+      <div className="p-4 border-t border-border-divider">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-sm">
+            {session?.user?.name?.charAt(0) || 'U'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white truncate">{session?.user?.name}</p>
+            <p className="text-xs text-slate-400 truncate">{session?.user?.email}</p>
+          </div>
         </div>
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
-          className="w-full px-4 py-2 text-sm font-medium text-muted hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+          className="w-full px-4 py-2 text-sm font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
         >
           Logout
         </button>

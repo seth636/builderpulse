@@ -158,15 +158,21 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
         ) : (
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={sessionChartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="date" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-              <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} />
+              <defs>
+                <linearGradient id="sessionGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.1} />
+                  <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="0" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey="date" stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
+              <YAxis stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 8 }}
+                contentStyle={{ backgroundColor: '#1E293B', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 8, border: '1px solid' }}
                 labelStyle={{ color: '#fff' }}
                 itemStyle={{ color: '#0ea5e9' }}
               />
-              <Line type="monotone" dataKey="current" stroke="#0ea5e9" strokeWidth={2} dot={false} name="Sessions" />
+              <Line type="monotone" dataKey="current" stroke="#0ea5e9" strokeWidth={2} dot={false} name="Sessions" fill="url(#sessionGradient)" />
             </LineChart>
           </ResponsiveContainer>
         )}
@@ -189,7 +195,7 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 8 }}
+                    contentStyle={{ backgroundColor: '#1E293B', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 8, border: '1px solid' }}
                     formatter={(val: any) => [typeof val === 'number' ? val.toLocaleString() : String(val), 'Sessions']}
                   />
                 </PieChart>
@@ -220,22 +226,22 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-slate-400 text-left">
-                    <th className="pb-3 pr-4">Source / Medium</th>
-                    <th className="pb-3 pr-4 text-right">Sessions</th>
-                    <th className="pb-3 pr-4 text-right">Conv.</th>
-                    <th className="pb-3 text-right">Conv. Rate</th>
+                  <tr className="text-slate-500 text-left border-b border-border-light">
+                    <th className="pb-3 pr-4 text-axis-label font-medium uppercase">Source / Medium</th>
+                    <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Sessions</th>
+                    <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Conv.</th>
+                    <th className="pb-3 text-right text-axis-label font-medium uppercase">Conv. Rate</th>
                   </tr>
                 </thead>
                 <tbody>
                   {(data?.sources || []).slice(0, 10).map((s, i) => {
                     const convRate = s.sessions > 0 ? (s.conversions / s.sessions) * 100 : 0;
                     return (
-                      <tr key={i} className={`${i % 2 === 0 ? 'bg-[#0f172a]' : 'bg-[#1e293b]'} hover:bg-[#334155] transition-colors`}>
-                        <td className="py-2 px-2 text-slate-300 truncate max-w-[140px]">{s.source} / {s.medium}</td>
-                        <td className="py-2 px-2 text-right text-slate-300">{s.sessions.toLocaleString()}</td>
-                        <td className="py-2 px-2 text-right text-slate-300">{s.conversions.toLocaleString()}</td>
-                        <td className="py-2 px-2 text-right text-slate-300">{convRate.toFixed(1)}%</td>
+                      <tr key={i} className="hover:bg-white/[0.03] transition-colors border-b border-border-light last:border-0">
+                        <td className="py-3 px-2 text-white truncate max-w-[140px]">{s.source} / {s.medium}</td>
+                        <td className="py-3 px-2 text-right text-slate-300">{s.sessions.toLocaleString()}</td>
+                        <td className="py-3 px-2 text-right text-slate-300">{s.conversions.toLocaleString()}</td>
+                        <td className="py-3 px-2 text-right text-slate-300">{convRate.toFixed(1)}%</td>
                       </tr>
                     );
                   })}
@@ -256,26 +262,26 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-slate-400 text-left">
-                    <th className="pb-3 pr-4">Page Path</th>
-                    <th className="pb-3 pr-4 text-right cursor-pointer hover:text-white" onClick={() => handleSort('page_views')}>
+                  <tr className="text-slate-500 text-left border-b border-border-light">
+                    <th className="pb-3 pr-4 text-axis-label font-medium uppercase">Page Path</th>
+                    <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase cursor-pointer hover:text-white" onClick={() => handleSort('page_views')}>
                       Page Views <SortIcon k="page_views" />
                     </th>
-                    <th className="pb-3 pr-4 text-right cursor-pointer hover:text-white" onClick={() => handleSort('avg_time_on_page')}>
+                    <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase cursor-pointer hover:text-white" onClick={() => handleSort('avg_time_on_page')}>
                       Avg Time <SortIcon k="avg_time_on_page" />
                     </th>
-                    <th className="pb-3 text-right cursor-pointer hover:text-white" onClick={() => handleSort('bounce_rate')}>
+                    <th className="pb-3 text-right text-axis-label font-medium uppercase cursor-pointer hover:text-white" onClick={() => handleSort('bounce_rate')}>
                       Bounce Rate <SortIcon k="bounce_rate" />
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {visiblePages.map((p, i) => (
-                    <tr key={i} className={`${i % 2 === 0 ? 'bg-[#0f172a]' : 'bg-[#1e293b]'} hover:bg-[#334155] transition-colors`}>
-                      <td className="py-2 px-2 text-slate-300 font-mono text-xs truncate max-w-[280px]">{p.page_path}</td>
-                      <td className="py-2 px-2 text-right text-slate-300">{(p.page_views || 0).toLocaleString()}</td>
-                      <td className="py-2 px-2 text-right text-slate-300">{fmtDuration(p.avg_time_on_page || 0)}</td>
-                      <td className="py-2 px-2 text-right text-slate-300">{((p.bounce_rate || 0) * 100).toFixed(1)}%</td>
+                    <tr key={i} className="hover:bg-white/[0.03] transition-colors border-b border-border-light last:border-0">
+                      <td className="py-3 px-2 text-white font-mono text-xs truncate max-w-[280px]">{p.page_path}</td>
+                      <td className="py-3 px-2 text-right text-slate-300">{(p.page_views || 0).toLocaleString()}</td>
+                      <td className="py-3 px-2 text-right text-slate-300">{fmtDuration(p.avg_time_on_page || 0)}</td>
+                      <td className="py-3 px-2 text-right text-slate-300">{((p.bounce_rate || 0) * 100).toFixed(1)}%</td>
                     </tr>
                   ))}
                 </tbody>

@@ -23,31 +23,35 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-60 bg-card border-r border-border flex flex-col">
+    <div className="fixed left-0 top-0 h-screen w-[220px] bg-card-dark border-r border-border-divider flex flex-col">
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-white">BuilderPulse</h1>
+        <h1 className="text-base font-semibold text-white">BuilderPulse</h1>
       </div>
 
       <nav className="flex-1 px-4 space-y-1">
         <Link
           href="/dashboard"
-          className={`block px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all ${
             isActive('/dashboard')
-              ? 'bg-accent/10 text-accent'
-              : 'text-muted hover:bg-white/5 hover:text-white'
+              ? 'text-white bg-white/[0.03] border-l-4 border-accent pl-[12px]'
+              : 'text-slate-400 hover:bg-white/[0.03] hover:text-white border-l-4 border-transparent'
           }`}
         >
-          Dashboard
+          <span className="text-xl">📊</span>
+          <span>Dashboard</span>
         </Link>
         <Link
           href="/alerts"
-          className={`flex items-center justify-between px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-all ${
             isActive('/alerts')
-              ? 'bg-accent/10 text-accent'
-              : 'text-muted hover:bg-white/5 hover:text-white'
+              ? 'text-white bg-white/[0.03] border-l-4 border-accent pl-[12px]'
+              : 'text-slate-400 hover:bg-white/[0.03] hover:text-white border-l-4 border-transparent'
           }`}
         >
-          <span>Alerts</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xl">🔔</span>
+            <span>Alerts</span>
+          </div>
           {alertCount > 0 && (
             <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
               {alertCount}
@@ -56,42 +60,49 @@ export default function Sidebar() {
         </Link>
 
         {isAdmin && (
-          <div className="pt-4">
-            <p className="px-4 py-2 text-xs font-semibold text-muted uppercase tracking-wider">
+          <div className="pt-4 border-t border-border-divider mt-4">
+            <p className="px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">
               Settings
             </p>
             <Link
               href="/settings/clients"
-              className={`block px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all ${
                 isActive('/settings/clients')
-                  ? 'bg-accent/10 text-accent'
-                  : 'text-muted hover:bg-white/5 hover:text-white'
+                  ? 'text-white bg-white/[0.03] border-l-4 border-accent pl-[12px]'
+                  : 'text-slate-400 hover:bg-white/[0.03] hover:text-white border-l-4 border-transparent'
               }`}
             >
-              Clients
+              <span className="text-xl">👥</span>
+              <span>Clients</span>
             </Link>
             <Link
               href="/settings/team"
-              className={`block px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all ${
                 isActive('/settings/team')
-                  ? 'bg-accent/10 text-accent'
-                  : 'text-muted hover:bg-white/5 hover:text-white'
+                  ? 'text-white bg-white/[0.03] border-l-4 border-accent pl-[12px]'
+                  : 'text-slate-400 hover:bg-white/[0.03] hover:text-white border-l-4 border-transparent'
               }`}
             >
-              Team
+              <span className="text-xl">⚙️</span>
+              <span>Team</span>
             </Link>
           </div>
         )}
       </nav>
 
-      <div className="p-4 border-t border-border">
-        <div className="mb-3">
-          <p className="text-sm font-medium text-white">{session?.user?.name}</p>
-          <p className="text-xs text-muted">{session?.user?.email}</p>
+      <div className="p-4 border-t border-border-divider">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-sm">
+            {session?.user?.name?.charAt(0) || 'U'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white truncate">{session?.user?.name}</p>
+            <p className="text-xs text-slate-400 truncate">{session?.user?.email}</p>
+          </div>
         </div>
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
-          className="w-full px-4 py-2 text-sm font-medium text-muted hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+          className="w-full px-4 py-2 text-sm font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
         >
           Logout
         </button>
