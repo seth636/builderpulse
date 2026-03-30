@@ -51,7 +51,8 @@ export async function POST(
     results.ghl = await pullGHLData(client.id, client.ghl_location_id, startDate, endDate, ghlKey).catch(e => ({ success: false, error: e.message }));
   }
   if (runReviews && client.ghl_location_id) {
-    results.reviews = await pullGoogleReviews(client.id, client.ghl_location_id).catch(e => ({ success: false, error: e.message }));
+    const reviewsGhlKey = bodyGhlApiKey || (client as any).ghl_api_key || process.env.GHL_API_KEY;
+    results.reviews = await pullGoogleReviews(client.id, client.ghl_location_id, reviewsGhlKey).catch(e => ({ success: false, error: e.message }));
   }
 
   return NextResponse.json(results);

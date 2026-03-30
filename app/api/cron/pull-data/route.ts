@@ -83,7 +83,8 @@ export async function GET(request: NextRequest) {
     // GHL
     if (client.ghl_location_id) {
       try {
-        const result = await pullGHLData(client.id, client.ghl_location_id, startDate, endDate);
+        const ghlKey = client.ghl_api_key || process.env.GHL_API_KEY;
+        const result = await pullGHLData(client.id, client.ghl_location_id, startDate, endDate, ghlKey);
         if (!result.success) {
           results.errors.push(`[GHL] ${client.name}: ${result.error}`);
           console.error(`[CRON] GHL failed for ${client.name}: ${result.error}`);
@@ -98,7 +99,8 @@ export async function GET(request: NextRequest) {
     // Google Reviews (via GHL)
     if (client.ghl_location_id) {
       try {
-        const result = await pullGoogleReviews(client.id, client.ghl_location_id);
+        const ghlKey = client.ghl_api_key || process.env.GHL_API_KEY;
+        const result = await pullGoogleReviews(client.id, client.ghl_location_id, ghlKey);
         if (!result.success) {
           results.errors.push(`[Reviews] ${client.name}: ${result.error}`);
           console.error(`[CRON] Reviews failed for ${client.name}: ${result.error}`);
@@ -116,3 +118,4 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json(results);
 }
+// Mon Mar 30 14:35:45 PDT 2026

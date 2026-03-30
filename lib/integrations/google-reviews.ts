@@ -6,9 +6,10 @@ const GHL_BASE = 'https://services.leadconnectorhq.com';
 
 export async function pullGoogleReviews(
   clientId: number,
-  locationId: string
+  locationId: string,
+  clientApiKey?: string
 ): Promise<{ success: boolean; rowsInserted: number; error?: string }> {
-  const apiKey = process.env.GHL_API_KEY;
+  const apiKey = clientApiKey || process.env.GHL_API_KEY;
   if (!apiKey) {
     return { success: false, rowsInserted: 0, error: 'GHL_API_KEY not set' };
   }
