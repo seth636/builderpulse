@@ -8,20 +8,24 @@ datasource db {
 }
 
 model Client {
-  id                  Int       @id @default(autoincrement())
-  name                String
-  slug                String    @unique
-  website_url         String?
-  pm_name             String?
-  package             String    @default("essentials")
-  ghl_location_id     String?
-  ga4_property_id     String?
-  gsc_site_url        String?
-  meta_ad_account_id  String?
-  google_business_id  String?
-  auto_send_reports   Boolean   @default(false)
-  report_email        String?
-  created_at          DateTime  @default(now())
+  id                    Int       @id @default(autoincrement())
+  name                  String
+  slug                  String    @unique
+  website_url           String?
+  pm_name               String?
+  package               String    @default("essentials")
+  ghl_location_id       String?
+  ga4_property_id       String?
+  gsc_site_url          String?
+  meta_ad_account_id    String?
+  google_business_id    String?
+  auto_send_reports     Boolean   @default(false)
+  report_email          String?
+  portal_enabled        Boolean   @default(false)
+  portal_token          String?   @unique
+  portal_token_regen_at DateTime?
+  client_login_enabled  Boolean   @default(false)
+  created_at            DateTime  @default(now())
   users               User[]
   seo_rankings        SeoRanking[]
   seo_backlinks       SeoBacklink[]

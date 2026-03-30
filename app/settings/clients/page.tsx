@@ -19,6 +19,11 @@ interface Client {
   meta_ad_account_id: string | null;
   ghl_location_id: string | null;
   google_business_id: string | null;
+  auto_send_reports?: boolean;
+  report_email?: string | null;
+  portal_enabled?: boolean;
+  portal_token?: string | null;
+  client_login_enabled?: boolean;
 }
 
 export default function ClientsSettingsPage() {
