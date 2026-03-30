@@ -15,6 +15,7 @@ model Client {
   pm_name               String?
   package               String    @default("essentials")
   ghl_location_id       String?
+  ghl_api_key           String?
   ga4_property_id       String?
   gsc_site_url          String?
   meta_ad_account_id    String?

@@ -4,10 +4,7 @@ const prisma = new PrismaClient();
 
 const GHL_BASE = 'https://services.leadconnectorhq.com';
 
-async function ghlFetch(path: string, locationId?: string): Promise<any> {
-  const apiKey = process.env.GHL_API_KEY;
-  if (!apiKey) throw new Error('GHL_API_KEY not set');
-
+async function ghlFetch(path: string, apiKey: string, locationId?: string): Promise<any> {
   const headers: Record<string, string> = {
     Authorization: `Bearer ${apiKey}`,
     Version: '2021-07-28',
@@ -29,9 +26,10 @@ export async function pullGHLData(
   clientId: number,
   locationId: string,
   startDate: string,
-  endDate: string
+  endDate: string,
+  clientApiKey?: string
 ): Promise<{ success: boolean; leadsInserted: number; appointmentsInserted: number; error?: string }> {
-  const apiKey = process.env.GHL_API_KEY;
+  const apiKey = clientApiKey || process.env.GHL_API_KEY;
   if (!apiKey) {
     return { success: false, leadsInserted: 0, appointmentsInserted: 0, error: 'GHL_API_KEY not set' };
   }
@@ -50,6 +48,7 @@ export async function pullGHLData(
     while (hasMore) {
       const data = await ghlFetch(
         `/contacts/?locationId=${locationId}&startAfter=${startMs}&startAfterId=&limit=100&query=`,
+        apiKey,
         locationId
       ).catch(() => ({ contacts: [] }));
 
@@ -91,6 +90,7 @@ export async function pullGHLData(
     // Pull appointments
     const apptData = await ghlFetch(
       `/calendars/events?locationId=${locationId}&startTime=${startMs}&endTime=${endMs}&includeAll=true`,
+      apiKey,
       locationId
     ).catch(() => ({ events: [] }));
 

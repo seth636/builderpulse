@@ -25,6 +25,7 @@ export async function POST(
 
   const body = await request.json().catch(() => ({}));
   const integration = (body as any).integration as string | undefined; // 'ga4'|'gsc'|'meta'|'ghl'|'reviews'
+  const bodyGhlApiKey = (body as any).ghl_api_key as string | undefined; // allow passing key in body
 
   const { startDate, endDate } = getDateRange(30);
   const results: Record<string, any> = {};
@@ -45,7 +46,8 @@ export async function POST(
     results.meta = await pullMetaAds(client.id, client.meta_ad_account_id, startDate, endDate).catch(e => ({ success: false, error: e.message }));
   }
   if (runGHL && client.ghl_location_id) {
-    results.ghl = await pullGHLData(client.id, client.ghl_location_id, startDate, endDate).catch(e => ({ success: false, error: e.message }));
+    const ghlKey = bodyGhlApiKey || (client as any).ghl_api_key || process.env.GHL_API_KEY;
+    results.ghl = await pullGHLData(client.id, client.ghl_location_id, startDate, endDate, ghlKey).catch(e => ({ success: false, error: e.message }));
   }
   if (runReviews && client.ghl_location_id) {
     results.reviews = await pullGoogleReviews(client.id, client.ghl_location_id).catch(e => ({ success: false, error: e.message }));

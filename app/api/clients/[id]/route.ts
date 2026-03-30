@@ -25,7 +25,7 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const { name, website_url, pm_name, package: pkg, ga4_property_id, gsc_site_url, meta_ad_account_id, ghl_location_id, google_business_id, auto_send_reports, report_email, portal_enabled, client_login_enabled } = body;
+    const { name, website_url, pm_name, package: pkg, ga4_property_id, gsc_site_url, meta_ad_account_id, ghl_location_id, ghl_api_key, google_business_id, auto_send_reports, report_email, portal_enabled, client_login_enabled } = body;
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
@@ -45,6 +45,7 @@ export async function PUT(
         gsc_site_url: gsc_site_url || null,
         meta_ad_account_id: meta_ad_account_id || null,
         ghl_location_id: ghl_location_id || null,
+        ghl_api_key: ghl_api_key || null,
         google_business_id: google_business_id || null,
         auto_send_reports: auto_send_reports ?? false,
         report_email: report_email || null,
