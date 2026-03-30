@@ -2,8 +2,8 @@
 builder = "NIXPACKS"
 
 [variables]
-NIXPACKS_NODE_VERSION = "18"
-BUST_CACHE = "v4"
+NIXPACKS_NODE_VERSION = "20"
+BUST_CACHE = "v5"
 
 [phases.build]
 cmds = ["npm ci", "npm run build"]
