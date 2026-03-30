@@ -106,14 +106,8 @@ Return as a valid JSON array ONLY (no markdown, no explanation):
 }
 
 export async function getRecommendations(clientId: number, month: string): Promise<Recommendation[]> {
-  try {
-    const record = await prisma.aiRecommendation.findUnique({
-      where: { client_id_month: { client_id: clientId, month } },
-    });
-    return (record?.recommendations_json as unknown as Recommendation[]) || [];
-  } catch (error) {
-    // Table may not exist yet
-    console.error('Failed to get recommendations (table may not exist):', error);
-    return [];
-  }
+  const record = await prisma.aiRecommendation.findUnique({
+    where: { client_id_month: { client_id: clientId, month } },
+  });
+  return (record?.recommendations_json as unknown as Recommendation[]) || [];
 }
