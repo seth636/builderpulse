@@ -26,6 +26,28 @@ interface Client {
   client_login_enabled?: boolean;
 }
 
+const integrationBadgeStyle = (key: string): React.CSSProperties => {
+  const map: Record<string, { color: string; background: string; border: string }> = {
+    GA4:    { color: '#F59E0B', background: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.3)' },
+    GSC:    { color: '#926BD9', background: 'rgba(147,107,218,0.12)', border: 'rgba(147,107,218,0.3)' },
+    Meta:   { color: '#818CF8', background: 'rgba(129,140,248,0.12)', border: 'rgba(129,140,248,0.3)' },
+    GHL:    { color: '#00FFD4', background: 'rgba(0,255,212,0.12)',   border: 'rgba(0,255,212,0.3)' },
+    Reviews:{ color: '#F472B6', background: 'rgba(244,114,182,0.12)', border: 'rgba(244,114,182,0.3)' },
+  };
+  const c = map[key] ?? { color: '#8b8b9e', background: 'rgba(139,139,158,0.1)', border: 'rgba(139,139,158,0.3)' };
+  return {
+    fontSize: 10,
+    fontWeight: 500,
+    padding: '3px 8px',
+    borderRadius: 999,
+    display: 'inline-flex',
+    alignItems: 'center',
+    border: `1px solid ${c.border}`,
+    color: c.color,
+    background: c.background,
+  };
+};
+
 export default function ClientsSettingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -34,6 +56,7 @@ export default function ClientsSettingsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [syncing, setSyncing] = useState<number | null>(null);
+  const [hoveredRow, setHoveredRow] = useState<number | null>(null);
 
   useEffect(() => {
     fetchClients();
@@ -53,7 +76,6 @@ export default function ClientsSettingsPage() {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this client?')) return;
-
     try {
       await fetch(`/api/clients/${id}`, { method: 'DELETE' });
       fetchClients();
@@ -127,101 +149,78 @@ export default function ClientsSettingsPage() {
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-semibold text-white">Manage Clients</h3>
-            <button
-              onClick={handleAdd}
-              className="btn-teal"
-            >
+            <button onClick={handleAdd} className="btn-teal">
               Add Client
             </button>
           </div>
 
-          <div style={{ background: 'linear-gradient(135deg, rgba(147, 107, 218, 0.08) 0%, rgba(13, 17, 23, 0.95) 50%, rgba(0, 0, 0, 0.98) 100%)', border: '1px solid rgba(147, 107, 218, 0.15)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(147,107,218,0.08) 0%, rgba(13,17,23,0.95) 50%, rgba(0,0,0,0.98) 100%)',
+            border: '1px solid rgba(147,107,218,0.15)',
+            borderRadius: 16,
+            overflow: 'hidden',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+          }}>
             <table className="w-full">
-              <thead className="bg-background border-b border-border">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                    Website
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                    PM
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                    Package
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                    Integrations
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
-                    Actions
-                  </th>
+              <thead>
+                <tr style={{ background: 'rgba(0,0,0,0.4)', borderBottom: '1px solid rgba(147,107,218,0.1)' }}>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Website</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>PM</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Package</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Integrations</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody>
                 {clients.map((client) => (
-                  <tr key={client.id} className="hover:bg-background/50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                      {client.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted">
-                      {client.website_url || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted">
-                      {client.pm_name || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted capitalize">
-                      {client.package}
-                    </td>
+                  <tr
+                    key={client.id}
+                    style={{
+                      borderBottom: '1px solid rgba(147,107,218,0.06)',
+                      background: hoveredRow === client.id ? 'rgba(147,107,218,0.04)' : 'transparent',
+                      transition: 'background 0.15s ease',
+                    }}
+                    onMouseEnter={() => setHoveredRow(client.id)}
+                    onMouseLeave={() => setHoveredRow(null)}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{client.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#8b8b9e' }}>{client.website_url || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#8b8b9e' }}>{client.pm_name || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm capitalize" style={{ color: '#8b8b9e' }}>{client.package}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="flex gap-1">
-                        {client.ga4_property_id && (
-                          <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded">
-                            GA4
-                          </span>
-                        )}
-                        {client.gsc_site_url && (
-                          <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded">
-                            GSC
-                          </span>
-                        )}
-                        {!client.ga4_property_id && !client.gsc_site_url && (
-                          <span className="text-muted text-xs">-</span>
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                        {client.ga4_property_id && <span style={integrationBadgeStyle('GA4')}>GA4</span>}
+                        {client.gsc_site_url && <span style={integrationBadgeStyle('GSC')}>GSC</span>}
+                        {client.meta_ad_account_id && <span style={integrationBadgeStyle('Meta')}>Meta</span>}
+                        {client.ghl_location_id && <span style={integrationBadgeStyle('GHL')}>GHL</span>}
+                        {client.ghl_location_id && <span style={integrationBadgeStyle('Reviews')}>Reviews</span>}
+                        {!client.ga4_property_id && !client.gsc_site_url && !client.meta_ad_account_id && !client.ghl_location_id && (
+                          <span style={{ color: '#8b8b9e', fontSize: 13 }}>-</span>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right text-sm">
-                      <div className="flex flex-wrap justify-end gap-1 mb-2">
+                      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 4, marginBottom: 8 }}>
                         {client.ga4_property_id && (
-                          <button onClick={() => handleSync(client, 'ga4')} disabled={syncing === client.id} className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 rounded disabled:opacity-50">GA4</button>
+                          <button onClick={() => handleSync(client, 'ga4')} disabled={syncing === client.id} style={integrationBadgeStyle('GA4')} className="cursor-pointer disabled:opacity-50">GA4</button>
                         )}
                         {client.gsc_site_url && (
-                          <button onClick={() => handleSync(client, 'gsc')} disabled={syncing === client.id} className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 rounded disabled:opacity-50">GSC</button>
+                          <button onClick={() => handleSync(client, 'gsc')} disabled={syncing === client.id} style={integrationBadgeStyle('GSC')} className="cursor-pointer disabled:opacity-50">GSC</button>
                         )}
                         {client.meta_ad_account_id && (
-                          <button onClick={() => handleSync(client, 'meta')} disabled={syncing === client.id} className="text-xs px-2 py-1 bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 rounded disabled:opacity-50">Meta</button>
+                          <button onClick={() => handleSync(client, 'meta')} disabled={syncing === client.id} style={integrationBadgeStyle('Meta')} className="cursor-pointer disabled:opacity-50">Meta</button>
                         )}
                         {client.ghl_location_id && (
-                          <button onClick={() => handleSync(client, 'ghl')} disabled={syncing === client.id} className="text-xs px-2 py-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded disabled:opacity-50">GHL</button>
+                          <button onClick={() => handleSync(client, 'ghl')} disabled={syncing === client.id} style={integrationBadgeStyle('GHL')} className="cursor-pointer disabled:opacity-50">GHL</button>
                         )}
                         {client.ghl_location_id && (
-                          <button onClick={() => handleSync(client, 'reviews')} disabled={syncing === client.id} className="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 rounded disabled:opacity-50">Reviews</button>
+                          <button onClick={() => handleSync(client, 'reviews')} disabled={syncing === client.id} style={integrationBadgeStyle('Reviews')} className="cursor-pointer disabled:opacity-50">Reviews</button>
                         )}
                       </div>
-                      <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleEdit(client)}
-                        className="text-accent hover:text-accent/80 font-medium"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(client.id)}
-                        className="text-red-400 hover:text-red-300 font-medium"
-                      >
-                        Delete
-                      </button>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+                        <button onClick={() => handleEdit(client)} className="text-accent hover:text-accent/80 font-medium text-sm">Edit</button>
+                        <button onClick={() => handleDelete(client.id)} className="text-red-400 hover:text-red-300 font-medium text-sm">Delete</button>
                       </div>
                     </td>
                   </tr>

@@ -4,6 +4,78 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 
+// SVG Icon components — 18x18, same stroke style as Sidebar.tsx
+const IconOverview = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" />
+    <rect x="14" y="3" width="7" height="7" />
+    <rect x="3" y="14" width="7" height="7" />
+    <rect x="14" y="14" width="7" height="7" />
+  </svg>
+);
+
+const IconTraffic = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="20" x2="18" y2="10" />
+    <line x1="12" y1="20" x2="12" y2="4" />
+    <line x1="6" y1="20" x2="6" y2="14" />
+  </svg>
+);
+
+const IconSEO = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
+const IconAds = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+    <polyline points="17 6 23 6 23 12" />
+  </svg>
+);
+
+const IconLeads = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
+const IconReviews = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+const IconAI = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <rect x="9" y="9" width="6" height="6" />
+    <line x1="9" y1="1" x2="9" y2="4" />
+    <line x1="15" y1="1" x2="15" y2="4" />
+    <line x1="9" y1="20" x2="9" y2="23" />
+    <line x1="15" y1="20" x2="15" y2="23" />
+    <line x1="20" y1="9" x2="23" y2="9" />
+    <line x1="20" y1="14" x2="23" y2="14" />
+    <line x1="1" y1="9" x2="4" y2="9" />
+    <line x1="1" y1="14" x2="4" y2="14" />
+  </svg>
+);
+
+const IconReports = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+    <polyline points="10 9 9 9 8 9" />
+  </svg>
+);
+
 type Props = {
   clientName: string;
   clientSlug: string;
@@ -15,19 +87,33 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
-  const linkClass = (href: string) =>
-    `flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all ${
-      isActive(href)
-        ? 'text-white bg-[rgba(147,107,218,0.12)] border-l-2 border-[#00FFD4] pl-[14px]'
-        : 'text-[#8b8b9e] hover:bg-[rgba(255,255,255,0.03)] hover:text-white border-l-2 border-transparent'
-    }`;
+  const navLinkStyle = (active: boolean): React.CSSProperties => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    padding: '10px 16px',
+    paddingLeft: active ? 14 : 16,
+    borderRadius: 6,
+    fontSize: 14,
+    fontWeight: 500,
+    color: active ? '#FFFFFF' : '#8b8b9e',
+    textDecoration: 'none',
+    background: active ? 'rgba(147,107,218,0.12)' : 'transparent',
+    borderLeft: active ? '2px solid #00FFD4' : '2px solid transparent',
+    transition: 'all 0.15s ease',
+  });
 
-  const subLinkClass = (href: string) =>
-    `block pl-12 pr-4 py-1.5 text-sm transition-colors ${
-      isActive(href)
-        ? 'text-[#00FFD4]'
-        : 'text-[#6b6b7e] hover:text-white'
-    }`;
+  const subLinkStyle = (active: boolean): React.CSSProperties => ({
+    display: 'block',
+    paddingLeft: 48,
+    paddingRight: 16,
+    paddingTop: 6,
+    paddingBottom: 6,
+    fontSize: 13,
+    color: active ? '#00FFD4' : '#6b6b7e',
+    textDecoration: 'none',
+    transition: 'color 0.15s ease',
+  });
 
   return (
     <div style={{
@@ -35,7 +121,7 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
       left: 0,
       top: 0,
       height: '100vh',
-      width: '220px',
+      width: '240px',
       backgroundColor: '#050508',
       borderRight: '1px solid rgba(147, 107, 218, 0.1)',
       display: 'flex',
@@ -91,69 +177,100 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
       </div>
 
       <nav style={{ flex: 1, padding: '12px 8px', overflow: 'auto' }}>
-        <a href="#overview" className={linkClass(`/client/${clientSlug}`)}>Overview</a>
-        <a href="#traffic" style={{
-          display: 'block',
-          padding: '10px 16px',
-          borderRadius: '6px',
-          fontSize: '14px',
-          fontWeight: '500',
-          color: '#8b8b9e',
-          textDecoration: 'none',
-          transition: 'all 0.15s ease',
-        }}>Traffic</a>
+        {/* Overview */}
+        <a
+          href="#overview"
+          style={navLinkStyle(isActive(`/client/${clientSlug}`) && !pathname.includes('/seo/') && !pathname.includes('/recommendations') && !pathname.includes('/reports'))}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}`)) e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}`)) e.currentTarget.style.color = '#8b8b9e'; }}
+        >
+          <IconOverview />
+          Overview
+        </a>
 
-        {/* SEO section with sub-links */}
-        <a href="#seo" style={{
-          display: 'block',
-          padding: '10px 16px',
-          borderRadius: '6px',
-          fontSize: '14px',
-          fontWeight: '500',
-          color: '#8b8b9e',
-          textDecoration: 'none',
-          transition: 'all 0.15s ease',
-        }}>SEO</a>
-        <Link href={`/client/${clientSlug}/seo/keywords`} className={subLinkClass(`/client/${clientSlug}/seo/keywords`)}>
+        {/* Traffic */}
+        <a
+          href="#traffic"
+          style={navLinkStyle(false)}
+          onMouseEnter={e => { e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = '#8b8b9e'; }}
+        >
+          <IconTraffic />
+          Traffic
+        </a>
+
+        {/* SEO */}
+        <a
+          href="#seo"
+          style={navLinkStyle(pathname.includes('/seo/'))}
+          onMouseEnter={e => { if (!pathname.includes('/seo/')) e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { if (!pathname.includes('/seo/')) e.currentTarget.style.color = '#8b8b9e'; }}
+        >
+          <IconSEO />
+          SEO
+        </a>
+        <Link href={`/client/${clientSlug}/seo/keywords`} style={subLinkStyle(isActive(`/client/${clientSlug}/seo/keywords`))}>
           ↳ Keywords
         </Link>
-        <Link href={`/client/${clientSlug}/seo/audit`} className={subLinkClass(`/client/${clientSlug}/seo/audit`)}>
+        <Link href={`/client/${clientSlug}/seo/audit`} style={subLinkStyle(isActive(`/client/${clientSlug}/seo/audit`))}>
           ↳ Site Audit
         </Link>
-        <Link href={`/client/${clientSlug}/seo/backlinks`} className={subLinkClass(`/client/${clientSlug}/seo/backlinks`)}>
+        <Link href={`/client/${clientSlug}/seo/backlinks`} style={subLinkStyle(isActive(`/client/${clientSlug}/seo/backlinks`))}>
           ↳ Backlinks
         </Link>
 
-        {/* Disabled items */}
-        {[
-          { label: 'Ads', phase: 4 },
-          { label: 'Leads', phase: 4 },
-          { label: 'Reviews', phase: 4 },
-        ].map(s => (
-          <div key={s.label} style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '10px 16px',
-            borderRadius: '6px',
-            fontSize: '14px',
-            cursor: 'not-allowed',
-          }}>
-            <span style={{ color: '#4a4a5a' }}>{s.label}</span>
-            <span style={{
-              fontSize: '10px',
-              color: '#4a4a5a',
-              background: 'rgba(147, 107, 218, 0.1)',
-              padding: '2px 6px',
-              borderRadius: '4px',
-            }}>P{s.phase}</span>
-          </div>
-        ))}
+        {/* Ads */}
+        <a
+          href="#ads"
+          style={navLinkStyle(false)}
+          onMouseEnter={e => { e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = '#8b8b9e'; }}
+        >
+          <IconAds />
+          Ads
+        </a>
 
-        <Link href={`/client/${clientSlug}/recommendations`} className={linkClass(`/client/${clientSlug}/recommendations`)}>
+        {/* Leads */}
+        <a
+          href="#leads"
+          style={navLinkStyle(false)}
+          onMouseEnter={e => { e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = '#8b8b9e'; }}
+        >
+          <IconLeads />
+          Leads
+        </a>
+
+        {/* Reviews */}
+        <a
+          href="#reviews"
+          style={navLinkStyle(false)}
+          onMouseEnter={e => { e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = '#8b8b9e'; }}
+        >
+          <IconReviews />
+          Reviews
+        </a>
+
+        {/* AI Recommendations */}
+        <Link
+          href={`/client/${clientSlug}/recommendations`}
+          style={navLinkStyle(isActive(`/client/${clientSlug}/recommendations`))}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/recommendations`)) e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/recommendations`)) e.currentTarget.style.color = '#8b8b9e'; }}
+        >
+          <IconAI />
           AI Recommendations
         </Link>
-        <Link href={`/client/${clientSlug}/reports`} className={linkClass(`/client/${clientSlug}/reports`)}>
+
+        {/* Reports */}
+        <Link
+          href={`/client/${clientSlug}/reports`}
+          style={navLinkStyle(isActive(`/client/${clientSlug}/reports`))}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/reports`)) e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/reports`)) e.currentTarget.style.color = '#8b8b9e'; }}
+        >
+          <IconReports />
           Reports
         </Link>
       </nav>

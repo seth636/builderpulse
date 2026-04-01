@@ -3,7 +3,7 @@ builder = "NIXPACKS"
 
 [variables]
 NIXPACKS_NODE_VERSION = "20"
-BUST_CACHE = "v7-clean"
+BUST_CACHE = "v8-searchatlas-final"
 
 [phases.build]
 cmds = ["npm ci", "rm -rf .next", "npm run build"]
