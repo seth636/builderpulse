@@ -3,8 +3,8 @@ builder = "NIXPACKS"
 
 [variables]
 NIXPACKS_NODE_VERSION = "20"
-BUST_CACHE = "v6"
+BUST_CACHE = "v7-clean"
 
 [phases.build]
-cmds = ["npm ci", "npm run build"]
+cmds = ["npm ci", "rm -rf .next", "npm run build"]
 cacheDirectories = []
