@@ -18,16 +18,13 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       const res = await fetch('/api/portal/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await res.json();
-
       if (res.ok && data.success) {
         router.push(redirect || `/portal/${data.clientSlug}`);
       } else {
@@ -43,42 +40,47 @@ function LoginForm() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#0B1120',
       display: 'flex',
-      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '24px',
+      fontFamily: 'Inter, sans-serif',
     }}>
-      {/* Logo */}
-      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-          <span style={{ fontSize: '28px', fontWeight: '800', color: '#0ea5e9', letterSpacing: '-0.5px' }}>HBM</span>
-          <span style={{ width: '1px', height: '28px', backgroundColor: '#e2e8f0', display: 'inline-block' }} />
-          <span style={{ fontSize: '15px', fontWeight: '600', color: '#374151' }}>Home Builder Marketers</span>
-        </div>
-      </div>
-
-      {/* Card */}
       <div style={{
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        border: '1px solid #e5e7eb',
-        boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+        backgroundColor: '#111827',
+        borderRadius: '20px',
+        border: '1px solid rgba(255,255,255,0.06)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
         padding: '40px',
         width: '100%',
-        maxWidth: '420px',
+        maxWidth: '400px',
       }}>
-        <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#111827', marginBottom: '8px', textAlign: 'center' }}>
-          Sign In to Your Dashboard
-        </h1>
-        <p style={{ fontSize: '14px', color: '#6b7280', textAlign: 'center', marginBottom: '28px' }}>
-          Enter your credentials to access your marketing dashboard
-        </p>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <h1 style={{
+            fontSize: '22px',
+            fontWeight: '700',
+            color: '#FFFFFF',
+            letterSpacing: '-0.3px',
+            marginBottom: '8px',
+          }}>
+            BuilderPulse
+          </h1>
+          <p style={{ fontSize: '14px', color: '#94A3B8' }}>
+            Sign in to your dashboard
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '6px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: '500',
+              color: '#CBD5E1',
+              marginBottom: '6px',
+            }}>
               Email Address
             </label>
             <input
@@ -90,19 +92,28 @@ function LoginForm() {
               style={{
                 width: '100%',
                 padding: '10px 14px',
-                borderRadius: '8px',
-                border: '1px solid #d1d5db',
-                fontSize: '15px',
-                color: '#111827',
+                backgroundColor: '#1E293B',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '12px',
+                fontSize: '14px',
+                color: '#FFFFFF',
                 outline: 'none',
                 boxSizing: 'border-box',
-                backgroundColor: 'white',
+                transition: 'border-color 0.15s ease',
               }}
+              onFocus={e => (e.target.style.borderColor = '#3B82F6')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '6px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: '500',
+              color: '#CBD5E1',
+              marginBottom: '6px',
+            }}>
               Password
             </label>
             <input
@@ -114,25 +125,28 @@ function LoginForm() {
               style={{
                 width: '100%',
                 padding: '10px 14px',
-                borderRadius: '8px',
-                border: '1px solid #d1d5db',
-                fontSize: '15px',
-                color: '#111827',
+                backgroundColor: '#1E293B',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '12px',
+                fontSize: '14px',
+                color: '#FFFFFF',
                 outline: 'none',
                 boxSizing: 'border-box',
-                backgroundColor: 'white',
+                transition: 'border-color 0.15s ease',
               }}
+              onFocus={e => (e.target.style.borderColor = '#3B82F6')}
+              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
             />
           </div>
 
           {error && (
             <div style={{
-              backgroundColor: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: '8px',
-              padding: '12px 14px',
-              fontSize: '14px',
-              color: '#dc2626',
+              backgroundColor: 'rgba(239,68,68,0.1)',
+              border: '1px solid rgba(239,68,68,0.25)',
+              borderRadius: '10px',
+              padding: '10px 14px',
+              fontSize: '13px',
+              color: '#EF4444',
             }}>
               {error}
             </div>
@@ -142,37 +156,44 @@ function LoginForm() {
             type="submit"
             disabled={loading}
             style={{
-              backgroundColor: '#0ea5e9',
-              color: 'white',
+              width: '100%',
+              padding: '11px 24px',
+              backgroundColor: loading ? '#2563EB' : '#3B82F6',
+              color: '#FFFFFF',
               border: 'none',
-              borderRadius: '8px',
-              padding: '12px 24px',
-              fontSize: '15px',
+              borderRadius: '12px',
+              fontSize: '14px',
               fontWeight: '600',
               cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1,
+              opacity: loading ? 0.8 : 1,
               marginTop: '4px',
-              width: '100%',
+              transition: 'background-color 0.15s ease',
+            }}
+            onMouseEnter={e => {
+              if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#2563EB';
+            }}
+            onMouseLeave={e => {
+              if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#3B82F6';
             }}
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
-      </div>
 
-      <p style={{ fontSize: '13px', color: '#9ca3af', marginTop: '24px', textAlign: 'center' }}>
-        Need help?{' '}
-        <a href="https://homebuildermarketers.com" style={{ color: '#0ea5e9', textDecoration: 'none' }}>
-          Contact your account manager.
-        </a>
-      </p>
+        <p style={{ fontSize: '12px', color: '#475569', marginTop: '24px', textAlign: 'center' }}>
+          Need help?{' '}
+          <a href="https://homebuildermarketers.com" style={{ color: '#3B82F6', textDecoration: 'none' }}>
+            Contact your account manager.
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
 
 export default function PortalLoginPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }} />}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: '#0B1120' }} />}>
       <LoginForm />
     </Suspense>
   );
