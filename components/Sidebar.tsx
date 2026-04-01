@@ -4,13 +4,141 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import {
-  LayoutDashboard,
-  Bell,
-  Users,
-  Settings,
-  LogOut,
-} from 'lucide-react';
+
+// Inline SVGs — no external dep, zero cache risk
+const IconDashboard = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" rx="1"/>
+    <rect x="14" y="3" width="7" height="7" rx="1"/>
+    <rect x="14" y="14" width="7" height="7" rx="1"/>
+    <rect x="3" y="14" width="7" height="7" rx="1"/>
+  </svg>
+);
+
+const IconBell = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+  </svg>
+);
+
+const IconUsers = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
+const IconUserCog = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+    <circle cx="19" cy="11" r="2"/>
+    <path d="M19 9V7"/>
+    <path d="M19 13v-2"/>
+  </svg>
+);
+
+const IconLogout = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/>
+    <line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+);
+
+function NavItem({
+  href,
+  Icon,
+  label,
+  active,
+  badge,
+}: {
+  href: string;
+  Icon: () => JSX.Element;
+  label: string;
+  active: boolean;
+  badge?: number;
+}) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <Link
+      href={href}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        padding: '8px 12px',
+        borderRadius: '6px',
+        fontSize: '14px',
+        fontWeight: active ? '500' : '400',
+        color: active ? '#FFFFFF' : hovered ? '#CBD5E1' : '#94A3B8',
+        background: active
+          ? 'rgba(59,130,246,0.08)'
+          : hovered
+          ? 'rgba(255,255,255,0.04)'
+          : 'transparent',
+        borderLeft: active ? '3px solid #3B82F6' : '3px solid transparent',
+        transition: 'all 0.15s ease',
+        textDecoration: 'none',
+        marginBottom: '2px',
+      }}
+    >
+      <span style={{ color: active ? '#3B82F6' : hovered ? '#CBD5E1' : '#64748B', display: 'flex', flexShrink: 0 }}>
+        <Icon />
+      </span>
+      <span style={{ flex: 1 }}>{label}</span>
+      {badge != null && badge > 0 && (
+        <span style={{
+          background: '#EF4444',
+          color: '#FFFFFF',
+          fontSize: '11px',
+          fontWeight: '700',
+          padding: '1px 6px',
+          borderRadius: '999px',
+          minWidth: '20px',
+          textAlign: 'center',
+        }}>
+          {badge}
+        </span>
+      )}
+    </Link>
+  );
+}
+
+function LogoutButton({ onLogout }: { onLogout: () => void }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      onClick={onLogout}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '8px',
+        padding: '8px 12px',
+        borderRadius: '8px',
+        border: 'none',
+        background: hovered ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+        color: hovered ? '#FFFFFF' : '#94A3B8',
+        fontSize: '13px',
+        fontWeight: '500',
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+      }}
+    >
+      <IconLogout />
+      Logout
+    </button>
+  );
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -27,80 +155,21 @@ export default function Sidebar() {
   const isActive = (path: string) =>
     pathname === path || pathname.startsWith(path + '/');
 
-  const navItem = (
-    href: string,
-    Icon: React.ElementType,
-    label: string,
-    badge?: number
-  ) => {
-    const active = isActive(href);
-    return (
-      <Link
-        key={href}
-        href={href}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          padding: '9px 16px',
-          borderRadius: '8px',
-          fontSize: '14px',
-          fontWeight: active ? '500' : '400',
-          color: active ? '#FFFFFF' : '#94A3B8',
-          background: active ? 'rgba(59,130,246,0.08)' : 'transparent',
-          borderLeft: active ? '3px solid #3B82F6' : '3px solid transparent',
-          transition: 'all 0.15s ease',
-          textDecoration: 'none',
-          position: 'relative',
-          marginBottom: '2px',
-        }}
-        onMouseEnter={e => {
-          if (!active) {
-            (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
-            (e.currentTarget as HTMLElement).style.color = '#FFFFFF';
-          }
-        }}
-        onMouseLeave={e => {
-          if (!active) {
-            (e.currentTarget as HTMLElement).style.background = 'transparent';
-            (e.currentTarget as HTMLElement).style.color = '#94A3B8';
-          }
-        }}
-      >
-        <Icon size={20} strokeWidth={1.75} />
-        <span style={{ flex: 1 }}>{label}</span>
-        {badge != null && badge > 0 && (
-          <span style={{
-            background: '#EF4444',
-            color: '#FFFFFF',
-            fontSize: '11px',
-            fontWeight: '700',
-            padding: '1px 6px',
-            borderRadius: '999px',
-            minWidth: '20px',
-            textAlign: 'center',
-          }}>
-            {badge}
-          </span>
-        )}
-      </Link>
-    );
-  };
+  const userInitial = session?.user?.name?.charAt(0)?.toUpperCase() || 'U';
 
   const sectionLabel = (text: string) => (
-    <p style={{
+    <p key={text} style={{
       fontSize: '11px',
       fontWeight: '600',
       color: '#64748B',
       textTransform: 'uppercase',
       letterSpacing: '0.08em',
-      padding: '16px 16px 6px',
+      padding: '16px 12px 6px',
+      margin: 0,
     }}>
       {text}
     </p>
   );
-
-  const userInitial = session?.user?.name?.charAt(0)?.toUpperCase() || 'U';
 
   return (
     <div style={{
@@ -117,13 +186,8 @@ export default function Sidebar() {
       zIndex: 40,
     }}>
       {/* Logo */}
-      <div style={{ padding: '24px 20px 20px' }}>
-        <span style={{
-          fontSize: '18px',
-          fontWeight: '600',
-          color: '#FFFFFF',
-          letterSpacing: '-0.3px',
-        }}>
+      <div style={{ padding: '24px 20px 16px' }}>
+        <span style={{ fontSize: '18px', fontWeight: '600', color: '#FFFFFF', letterSpacing: '-0.3px' }}>
           BuilderPulse
         </span>
       </div>
@@ -131,74 +195,35 @@ export default function Sidebar() {
       {/* Nav */}
       <nav style={{ flex: 1, padding: '0 8px', overflowY: 'auto' }}>
         {sectionLabel('Main')}
-        {navItem('/dashboard', LayoutDashboard, 'Dashboard')}
-        {navItem('/alerts', Bell, 'Alerts', alertCount)}
+        <NavItem href="/dashboard" Icon={IconDashboard} label="Dashboard" active={isActive('/dashboard')} />
+        <NavItem href="/alerts" Icon={IconBell} label="Alerts" active={isActive('/alerts')} badge={alertCount} />
 
-        {sectionLabel('Admin')}
-        {navItem('/settings/clients', Users, 'Clients')}
-        {navItem('/settings/team', Settings, 'Team')}
+        {sectionLabel('Settings')}
+        <NavItem href="/settings/clients" Icon={IconUsers} label="Clients" active={isActive('/settings/clients')} />
+        <NavItem href="/settings/team" Icon={IconUserCog} label="Team" active={isActive('/settings/team')} />
       </nav>
 
       {/* User footer */}
-      <div style={{
-        padding: '16px',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+      <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
           <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: 'rgba(59,130,246,0.2)',
-            color: '#3B82F6',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '14px',
-            fontWeight: '600',
-            flexShrink: 0,
+            width: '34px', height: '34px', borderRadius: '50%',
+            background: 'rgba(59,130,246,0.2)', color: '#3B82F6',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '13px', fontWeight: '600', flexShrink: 0,
           }}>
             {userInitial}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: '13px', fontWeight: '500', color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p style={{ fontSize: '13px', fontWeight: '500', color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
               {session?.user?.name || 'User'}
             </p>
-            <p style={{ fontSize: '11px', color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p style={{ fontSize: '11px', color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
               {session?.user?.email || ''}
             </p>
           </div>
         </div>
-        <button
-          onClick={() => signOut({ callbackUrl: '/login' })}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            padding: '8px 12px',
-            borderRadius: '8px',
-            border: 'none',
-            background: 'rgba(255,255,255,0.04)',
-            color: '#94A3B8',
-            fontSize: '13px',
-            fontWeight: '500',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.08)';
-            (e.currentTarget as HTMLButtonElement).style.color = '#FFFFFF';
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)';
-            (e.currentTarget as HTMLButtonElement).style.color = '#94A3B8';
-          }}
-        >
-          <LogOut size={14} strokeWidth={2} />
-          Logout
-        </button>
+        <LogoutButton onLogout={() => signOut({ callbackUrl: '/login' })} />
       </div>
     </div>
   );
