@@ -36,26 +36,26 @@ export default function AdsSection({ slug, startDate, endDate, hasMetaAccount }:
   useEffect(() => { fetchData(); }, [fetchData]);
 
   if (!hasMetaAccount) return (
-    <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-center">
+    <div className="bp-card text-center">
       <p className="text-slate-400 text-sm">No ad data yet. Add Meta Ad Account ID in Settings.</p>
     </div>
   );
 
   if (loading) return <div className="space-y-6"><SkeletonCard height="h-24" /><SkeletonCard height="h-64" /><SkeletonCard height="h-48" /></div>;
-  if (error) return <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-slate-400 text-center">Failed to load — try refreshing</div>;
+  if (error) return <div className="bp-card text-slate-400 text-center">Failed to load — try refreshing</div>;
 
   const s = data?.summary;
   const noData = !data || data.campaigns.length === 0;
 
   if (noData) return (
-    <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-center">
+    <div className="bp-card text-center">
       <p className="text-slate-400 text-sm">No ad data for this period</p>
     </div>
   );
 
   const metaTokenExpired = (data as any)?.error?.includes('token expired');
   if (metaTokenExpired) return (
-    <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-center">
+    <div className="bp-card text-center">
       <p className="text-amber-400 text-sm">Meta token expired — regenerate in Settings</p>
     </div>
   );
@@ -80,7 +80,7 @@ export default function AdsSection({ slug, startDate, endDate, hasMetaAccount }:
       </div>
 
       {/* Spend over time */}
-      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+      <div className="bp-card">
         <h3 className="text-white font-semibold mb-4">Ad Spend Over Time</h3>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={chartData}>
@@ -94,7 +94,7 @@ export default function AdsSection({ slug, startDate, endDate, hasMetaAccount }:
       </div>
 
       {/* Campaign table */}
-      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+      <div className="bp-card">
         <h3 className="text-white font-semibold mb-4">Campaign Performance</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

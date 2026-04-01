@@ -29,7 +29,7 @@ export default function ClientCard({
 }: ClientCardProps) {
   return (
     <Link href={`/client/${slug}`}>
-      <div className="bg-card border border-border rounded-xl p-6 hover:border-accent/50 hover:-translate-y-0.5 transition-all cursor-pointer">
+      <div className="bp-card cursor-pointer">
         <div className="flex items-start justify-between mb-3">
           <h3 className="text-lg font-semibold text-white">{name}</h3>
           <div className="flex items-center gap-2">

@@ -66,7 +66,7 @@ export default function SEOSection({ slug, startDate, endDate }: Props) {
   );
 
   if (error) return (
-    <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-slate-400 text-center">
+    <div className="bp-card text-slate-400 text-center">
       Failed to load — try refreshing
     </div>
   );
@@ -89,7 +89,7 @@ export default function SEOSection({ slug, startDate, endDate }: Props) {
   return (
     <div className="space-y-6">
       {/* Clicks + Impressions chart */}
-      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+      <div className="bp-card">
         <h3 className="text-white font-semibold mb-4">Clicks & Impressions Over Time</h3>
         {noGSC ? (
           <p className="text-slate-400 text-sm text-center py-8">
@@ -115,7 +115,7 @@ export default function SEOSection({ slug, startDate, endDate }: Props) {
       </div>
 
       {/* Top Keywords */}
-      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+      <div className="bp-card">
         <h3 className="text-white font-semibold mb-4">Top Keywords</h3>
         {(data?.queries || []).length === 0 ? (
           <p className="text-slate-400 text-sm text-center py-8">
@@ -169,7 +169,7 @@ export default function SEOSection({ slug, startDate, endDate }: Props) {
       </div>
 
       {/* Top Pages by Search */}
-      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+      <div className="bp-card">
         <h3 className="text-white font-semibold mb-4">Top Pages by Search</h3>
         {(data?.pages || []).length === 0 ? (
           <p className="text-slate-400 text-sm text-center py-8">No data for this period</p>

@@ -89,7 +89,7 @@ export default function AnalyticsCard({ clientSlug, hasGA4 }: AnalyticsCardProps
 
   if (!hasGA4) {
     return (
-      <div className="bg-card border border-border rounded-xl p-6 col-span-1 md:col-span-2">
+      <div className="bp-card col-span-1 md:col-span-2">
         <h3 className="text-lg font-semibold text-white mb-2">Analytics</h3>
         <p className="text-muted text-sm mb-4">GA4 traffic and user metrics</p>
         <div className="bg-background/50 rounded-lg p-8 text-center">
@@ -101,7 +101,7 @@ export default function AnalyticsCard({ clientSlug, hasGA4 }: AnalyticsCardProps
 
   if (loading) {
     return (
-      <div className="bg-card border border-border rounded-xl p-6 col-span-1 md:col-span-2">
+      <div className="bp-card col-span-1 md:col-span-2">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-semibold text-white">Analytics</h3>
@@ -119,7 +119,7 @@ export default function AnalyticsCard({ clientSlug, hasGA4 }: AnalyticsCardProps
 
   if (!data || data.daily.length === 0) {
     return (
-      <div className="bg-card border border-border rounded-xl p-6 col-span-1 md:col-span-2">
+      <div className="bp-card col-span-1 md:col-span-2">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold text-white">Analytics</h3>
           <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded">Connected</span>
@@ -143,7 +143,7 @@ export default function AnalyticsCard({ clientSlug, hasGA4 }: AnalyticsCardProps
     .map((s: any) => ({ name: s.channel, value: s.sessions }));
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6 col-span-1 md:col-span-2">
+    <div className="bp-card col-span-1 md:col-span-2">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>

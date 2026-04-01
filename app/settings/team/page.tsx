@@ -106,7 +106,7 @@ export default function TeamSettingsPage() {
             </button>
           </div>
 
-          <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <div className="bg-[#111827] border border-[rgba(255,255,255,0.06)] rounded-[16px] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
             <table className="w-full">
               <thead className="bg-background border-b border-border">
                 <tr>

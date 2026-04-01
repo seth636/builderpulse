@@ -193,7 +193,7 @@ export default function SiteAuditPage() {
           {currentAudit && !running && (
             <div className="space-y-6 mb-8">
               {/* Health score card */}
-              <div className="bg-card border border-border rounded-xl p-6">
+              <div className="bp-card">
                 <div className="flex flex-col sm:flex-row items-center gap-8">
                   <HealthGauge score={currentAudit.healthScore} />
                   <div className="flex-1">
@@ -218,7 +218,7 @@ export default function SiteAuditPage() {
 
               {/* Issues list */}
               {currentAudit.issues.length > 0 && (
-                <div className="bg-card border border-border rounded-xl p-6">
+                <div className="bp-card">
                   <div className="flex items-center gap-3 mb-4">
                     <h3 className="text-lg font-semibold text-white">Issues Found</h3>
                     <div className="flex gap-1.5 ml-auto">

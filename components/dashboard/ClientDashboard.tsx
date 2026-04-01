@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import DateRangePicker, { DateRange, getDateRange, getPreviousPeriod } from './DateRangePicker';
-const MetricCard = dynamic(() => import('./MetricCard'), { ssr: false, loading: () => <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 animate-pulse h-32" /> });
+const MetricCard = dynamic(() => import('./MetricCard'), { ssr: false, loading: () => <div className="bp-card animate-pulse h-32" /> });
 import SkeletonCard from './SkeletonCard';
 
 const TrafficSection = dynamic(() => import('./TrafficSection'), { ssr: false, loading: () => <div className="space-y-6"><SkeletonCard height="h-64" /><SkeletonCard height="h-64" /></div> });

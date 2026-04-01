@@ -55,19 +55,19 @@ export default function ReviewsSection({ slug, hasGHL }: Props) {
   };
 
   if (!hasGHL) return (
-    <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-center">
+    <div className="bp-card text-center">
       <p className="text-slate-400 text-sm">No review data yet. Connect via GHL integration.</p>
     </div>
   );
 
   if (loading) return <div className="space-y-6"><SkeletonCard height="h-24" /><SkeletonCard height="h-48" /></div>;
-  if (error) return <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-slate-400 text-center">Failed to load — try refreshing</div>;
+  if (error) return <div className="bp-card text-slate-400 text-center">Failed to load — try refreshing</div>;
 
   const s = data?.summary;
   const noData = !data || data.reviews.length === 0;
 
   if (noData) return (
-    <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-center">
+    <div className="bp-card text-center">
       <p className="text-slate-400 text-sm">No review data yet. Connect via GHL integration.</p>
     </div>
   );
@@ -94,7 +94,7 @@ export default function ReviewsSection({ slug, hasGHL }: Props) {
       </div>
 
       {/* Monthly chart */}
-      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+      <div className="bp-card">
         <h3 className="text-white font-semibold mb-4">Reviews Over Time</h3>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data?.monthly || []}>
@@ -108,7 +108,7 @@ export default function ReviewsSection({ slug, hasGHL }: Props) {
       </div>
 
       {/* Reviews table */}
-      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+      <div className="bp-card">
         <h3 className="text-white font-semibold mb-4">Recent Reviews</h3>
         <div className="space-y-0">
           <div className="grid grid-cols-12 text-slate-500 text-axis-label font-medium uppercase pb-3 border-b border-border-light">
@@ -137,7 +137,7 @@ export default function ReviewsSection({ slug, hasGHL }: Props) {
                 </div>
               </div>
               {expanded.has(review.id) && (
-                <div className="bg-[#0f172a] border-l-2 border-[#0ea5e9] px-4 py-3 mb-1 rounded-b">
+                <div className="bg-background border-l-2 border-accent px-4 py-3 mb-1 rounded-b">
                   {review.text && (
                     <p className="text-slate-300 text-sm mb-2">"{review.text}"</p>
                   )}

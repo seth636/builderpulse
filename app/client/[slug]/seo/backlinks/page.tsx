@@ -146,7 +146,7 @@ export default function BacklinksPage() {
               </div>
 
               {/* Monthly chart */}
-              <div className="bg-card border border-border rounded-xl p-6 mb-6">
+              <div className="bp-card mb-6">
                 <h3 className="text-white font-semibold mb-4">Referring Domains by Month</h3>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={monthlyData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>

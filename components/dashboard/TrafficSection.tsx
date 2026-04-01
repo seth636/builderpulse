@@ -103,7 +103,7 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
   );
 
   if (error) return (
-    <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 text-slate-400 text-center">
+    <div className="bp-card text-slate-400 text-center">
       Failed to load — try refreshing
     </div>
   );
@@ -149,7 +149,7 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
   return (
     <div className="space-y-6">
       {/* Sessions over time */}
-      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+      <div className="bp-card">
         <h3 className="text-white font-semibold mb-4">Sessions Over Time</h3>
         {noGA4 ? (
           <p className="text-slate-400 text-sm text-center py-8">
@@ -181,7 +181,7 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
       {/* Source + Pages grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Traffic by source donut */}
-        <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+        <div className="bp-card">
           <h3 className="text-white font-semibold mb-4">Traffic by Source</h3>
           {pieData.length === 0 ? (
             <p className="text-slate-400 text-sm text-center py-8">No data for this period</p>
@@ -218,7 +218,7 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
         </div>
 
         {/* Top Sources table */}
-        <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+        <div className="bp-card">
           <h3 className="text-white font-semibold mb-4">Top Sources</h3>
           {(data?.sources || []).length === 0 ? (
             <p className="text-slate-400 text-sm text-center py-8">No data for this period</p>
@@ -253,7 +253,7 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
       </div>
 
       {/* Top Pages table */}
-      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
+      <div className="bp-card">
         <h3 className="text-white font-semibold mb-4">Top Pages</h3>
         {pages.length === 0 ? (
           <p className="text-slate-400 text-sm text-center py-8">No page data for this period</p>

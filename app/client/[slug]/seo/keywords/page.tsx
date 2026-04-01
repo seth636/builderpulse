@@ -305,7 +305,7 @@ export default function KeywordsPage() {
       {/* Add Keywords Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md">
+          <div className="bp-card w-full max-w-md">
             <h3 className="text-xl font-bold text-white mb-4">Add Keywords</h3>
             <p className="text-muted text-sm mb-4">Enter one keyword per line. Rankings will populate automatically from Google Search Console.</p>
             <textarea

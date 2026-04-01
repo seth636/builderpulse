@@ -40,7 +40,7 @@ export default function MetricCard({
 }: Props) {
   if (loading) {
     return (
-      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6 animate-pulse">
+      <div className="bp-card animate-pulse">
         <div className="h-4 bg-slate-700 rounded w-24 mb-3" />
         <div className="h-8 bg-slate-700 rounded w-32 mb-2" />
         <div className="h-3 bg-slate-700 rounded w-20 mb-4" />
@@ -53,7 +53,7 @@ export default function MetricCard({
   const sparkPoints = sparklineData.map((v, i) => ({ v }));
 
   return (
-    <div className="bg-[#1e293b] border border-border-light rounded-xl p-6 card-fade-in">
+    <div className="bp-card card-fade-in">
       <p className="text-card-title font-semibold uppercase tracking-card-title text-slate-500 mb-3">{title}</p>
 
       {value === null ? (
@@ -84,7 +84,7 @@ export default function MetricCard({
                   <Line
                     type="monotone"
                     dataKey="v"
-                    stroke="#0ea5e9"
+                    stroke="#3B82F6"
                     strokeWidth={2}
                     dot={false}
                   />
