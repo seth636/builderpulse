@@ -14,10 +14,10 @@ const LeadsSection = dynamic(() => import('./LeadsSection'), { ssr: false, loadi
 const ReviewsSection = dynamic(() => import('./ReviewsSection'), { ssr: false, loading: () => <SkeletonCard height="h-48" /> });
 
 function getHealthScoreColor(score: number): string {
-  if (score >= 90) return '#16a34a';
-  if (score >= 70) return '#0ea5e9';
-  if (score >= 50) return '#f59e0b';
-  return '#ef4444';
+  if (score >= 90) return '#00FFD4';
+  if (score >= 70) return '#926BD9';
+  if (score >= 50) return '#F59E0B';
+  return '#EF4444';
 }
 function getHealthScoreLabel(score: number): string {
   if (score >= 90) return 'Excellent';
@@ -186,7 +186,7 @@ export default function ClientDashboard({ client }: Props) {
             <div className="flex items-center gap-3">
               <div className="relative w-16 h-16">
                 <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#374151" strokeWidth="3"/>
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(147, 107, 218, 0.15)" strokeWidth="3"/>
                   <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={getHealthScoreColor(healthScore)} strokeWidth="3" strokeDasharray={`${Math.max(0, Math.min(100, healthScore))}, 100`}/>
                 </svg>
                 <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">{Math.round(healthScore)}</span>
@@ -198,7 +198,7 @@ export default function ClientDashboard({ client }: Props) {
             </div>
           )}
         </div>
-        <Link href={`/client/${client.slug}/recommendations`} className="text-sm px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-border transition-colors">
+        <Link href={`/client/${client.slug}/recommendations`} style={{ fontSize: '13px', padding: '8px 16px', background: 'rgba(147, 107, 218, 0.1)', color: '#FFFFFF', borderRadius: '8px', border: '1px solid rgba(147, 107, 218, 0.2)', textDecoration: 'none', transition: 'all 0.2s ease' }}>
           View Recommendations
         </Link>
       </div>
@@ -223,10 +223,10 @@ export default function ClientDashboard({ client }: Props) {
       )}
 
       {/* AI Insights Card */}
-      <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 mb-6">
+      <div style={{ background: 'linear-gradient(135deg, rgba(147, 107, 218, 0.08) 0%, rgba(13, 17, 23, 0.95) 50%, rgba(0, 0, 0, 0.98) 100%)', border: '1px solid rgba(147, 107, 218, 0.15)', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-white font-semibold text-base">AI Insights — {currentMonth}</h2>
-          <button onClick={handleGenerateInsights} disabled={insightsLoading} className="text-sm bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg transition-colors">
+          <button onClick={handleGenerateInsights} disabled={insightsLoading} className="btn-teal text-sm disabled:opacity-50">
             {insightsLoading ? 'Generating...' : insights.length > 0 ? 'Regenerate' : 'Generate Insights'}
           </button>
         </div>
@@ -252,7 +252,7 @@ export default function ClientDashboard({ client }: Props) {
         <div>
           <h2 className="text-2xl font-bold text-white">{client.name}</h2>
           {client.website_url && (
-            <a href={client.website_url} target="_blank" rel="noopener noreferrer" className="text-[#0ea5e9] text-sm hover:underline">
+            <a href={client.website_url} target="_blank" rel="noopener noreferrer" style={{ color: '#00FFD4', fontSize: '14px', textDecoration: 'none' }}>
               {client.website_url}
             </a>
           )}

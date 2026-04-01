@@ -11,21 +11,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Phase 1 design tokens — exact values from Hammad's spec
-        background: "#0B1120",
-        card: "#111827",
-        'card-dark': "#070d1a",
-        'input-bg': "#1E293B",
-        accent: "#3B82F6",
+        // SearchAtlas-inspired design tokens
+        background: "#000000",
+        'background-secondary': "#0d1117",
+        card: "#0d1117",
+        'card-dark': "#050508",
+        'input-bg': "#1a1a2e",
+        accent: "#00FFD4", // Teal - primary SearchAtlas accent
+        'accent-purple': "#926BD9", // Purple - secondary SearchAtlas accent
         'accent-green': "#10B981",
         'accent-amber': "#F59E0B",
         'accent-red': "#EF4444",
-        muted: "#94A3B8",
-        secondary: "#CBD5E1",
-        border: "rgba(255,255,255,0.06)",
-        'border-hover': "rgba(255,255,255,0.12)",
+        muted: "#8b8b9e",
+        secondary: "#c4c4d4",
+        border: "rgba(147, 107, 218, 0.15)", // Subtle purple border
+        'border-hover': "rgba(147, 107, 218, 0.3)",
         'border-light': "rgba(255,255,255,0.06)",
-        'border-divider': "rgba(255,255,255,0.06)",
+        'border-divider': "rgba(147, 107, 218, 0.1)",
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

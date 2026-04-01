@@ -44,9 +44,9 @@ export default async function DashboardPage({
   );
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen" style={{ backgroundColor: '#000000' }}>
       <Sidebar />
-      <div className="flex-1 ml-60">
+      <div className="flex-1 ml-60" style={{ backgroundColor: '#000000' }}>
         <TopBar title="Dashboard">
           <SearchBar />
         </TopBar>
@@ -62,6 +62,13 @@ export default async function DashboardPage({
                 package={client.package}
                 healthScore={healthMap[client.id] ?? null}
                 alertCount={alertMap[client.id] ?? 0}
+                connectedServices={{
+                  ga4: !!client.ga4_property_id,
+                  gsc: !!client.gsc_site_url,
+                  ghl: !!client.ghl_api_key,
+                  meta: !!client.meta_ad_account_id,
+                  reviews: !!client.google_business_id,
+                }}
               />
             ))}
           </div>

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 
-// Inline SVGs — no external dep, zero cache risk
+// Inline SVGs — SearchAtlas style icons
 const IconDashboard = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="3" width="7" height="7" rx="1"/>
@@ -72,23 +72,23 @@ function NavItem({
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
-        padding: '8px 12px',
-        borderRadius: '6px',
+        padding: '10px 14px',
+        borderRadius: '8px',
         fontSize: '14px',
         fontWeight: active ? '500' : '400',
-        color: active ? '#FFFFFF' : hovered ? '#CBD5E1' : '#94A3B8',
+        color: active ? '#FFFFFF' : hovered ? '#c4c4d4' : '#8b8b9e',
         background: active
-          ? 'rgba(59,130,246,0.08)'
+          ? 'rgba(147, 107, 218, 0.12)'
           : hovered
-          ? 'rgba(255,255,255,0.04)'
+          ? 'rgba(255,255,255,0.03)'
           : 'transparent',
-        borderLeft: active ? '3px solid #3B82F6' : '3px solid transparent',
+        borderLeft: active ? '2px solid #00FFD4' : '2px solid transparent',
         transition: 'all 0.15s ease',
         textDecoration: 'none',
         marginBottom: '2px',
       }}
     >
-      <span style={{ color: active ? '#3B82F6' : hovered ? '#CBD5E1' : '#64748B', display: 'flex', flexShrink: 0 }}>
+      <span style={{ color: active ? '#00FFD4' : hovered ? '#c4c4d4' : '#6b6b7e', display: 'flex', flexShrink: 0 }}>
         <Icon />
       </span>
       <span style={{ flex: 1 }}>{label}</span>
@@ -98,7 +98,7 @@ function NavItem({
           color: '#FFFFFF',
           fontSize: '11px',
           fontWeight: '700',
-          padding: '1px 6px',
+          padding: '2px 7px',
           borderRadius: '999px',
           minWidth: '20px',
           textAlign: 'center',
@@ -123,11 +123,11 @@ function LogoutButton({ onLogout }: { onLogout: () => void }) {
         alignItems: 'center',
         justifyContent: 'center',
         gap: '8px',
-        padding: '8px 12px',
+        padding: '10px 14px',
         borderRadius: '8px',
-        border: 'none',
-        background: hovered ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
-        color: hovered ? '#FFFFFF' : '#94A3B8',
+        border: '1px solid rgba(147, 107, 218, 0.15)',
+        background: hovered ? 'rgba(147, 107, 218, 0.1)' : 'rgba(255,255,255,0.02)',
+        color: hovered ? '#FFFFFF' : '#8b8b9e',
         fontSize: '13px',
         fontWeight: '500',
         cursor: 'pointer',
@@ -161,10 +161,10 @@ export default function Sidebar() {
     <p key={text} style={{
       fontSize: '11px',
       fontWeight: '600',
-      color: '#64748B',
+      color: '#6b6b7e',
       textTransform: 'uppercase',
-      letterSpacing: '0.08em',
-      padding: '16px 12px 6px',
+      letterSpacing: '0.1em',
+      padding: '20px 14px 8px',
       margin: 0,
     }}>
       {text}
@@ -178,22 +178,38 @@ export default function Sidebar() {
       top: 0,
       height: '100vh',
       width: '240px',
-      backgroundColor: '#070d1a',
-      borderRight: '1px solid rgba(255,255,255,0.06)',
+      backgroundColor: '#050508',
+      borderRight: '1px solid rgba(147, 107, 218, 0.1)',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: 'Inter, sans-serif',
       zIndex: 40,
     }}>
       {/* Logo */}
-      <div style={{ padding: '24px 20px 16px' }}>
-        <span style={{ fontSize: '18px', fontWeight: '600', color: '#FFFFFF', letterSpacing: '-0.3px' }}>
-          BuilderPulse
-        </span>
+      <div style={{ 
+        padding: '24px 20px 20px',
+        borderBottom: '1px solid rgba(147, 107, 218, 0.08)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '6px',
+            background: 'linear-gradient(135deg, #00FFD4 0%, #926BD9 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <span style={{ fontSize: '14px', fontWeight: '700', color: '#000' }}>B</span>
+          </div>
+          <span style={{ fontSize: '17px', fontWeight: '600', color: '#FFFFFF', letterSpacing: '-0.3px' }}>
+            BuilderPulse
+          </span>
+        </div>
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '0 8px', overflowY: 'auto' }}>
+      <nav style={{ flex: 1, padding: '0 10px', overflowY: 'auto' }}>
         {sectionLabel('Main')}
         <NavItem href="/dashboard" Icon={IconDashboard} label="Dashboard" active={isActive('/dashboard')} />
         <NavItem href="/alerts" Icon={IconBell} label="Alerts" active={isActive('/alerts')} badge={alertCount} />
@@ -204,13 +220,19 @@ export default function Sidebar() {
       </nav>
 
       {/* User footer */}
-      <div style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ 
+        padding: '16px', 
+        borderTop: '1px solid rgba(147, 107, 218, 0.08)',
+        background: 'rgba(147, 107, 218, 0.02)',
+      }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
           <div style={{
-            width: '34px', height: '34px', borderRadius: '50%',
-            background: 'rgba(59,130,246,0.2)', color: '#3B82F6',
+            width: '36px', height: '36px', borderRadius: '8px',
+            background: 'linear-gradient(135deg, rgba(0, 255, 212, 0.2) 0%, rgba(147, 107, 218, 0.2) 100%)', 
+            color: '#00FFD4',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '13px', fontWeight: '600', flexShrink: 0,
+            fontSize: '14px', fontWeight: '600', flexShrink: 0,
+            border: '1px solid rgba(0, 255, 212, 0.2)',
           }}>
             {userInitial}
           </div>
@@ -218,7 +240,7 @@ export default function Sidebar() {
             <p style={{ fontSize: '13px', fontWeight: '500', color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
               {session?.user?.name || 'User'}
             </p>
-            <p style={{ fontSize: '11px', color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+            <p style={{ fontSize: '11px', color: '#6b6b7e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
               {session?.user?.email || ''}
             </p>
           </div>

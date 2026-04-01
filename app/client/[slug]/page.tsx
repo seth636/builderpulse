@@ -20,9 +20,9 @@ export default async function ClientDetailPage({
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen" style={{ backgroundColor: '#000000' }}>
       <ClientSidebar clientName={client.name} clientSlug={client.slug} />
-      <div className="flex-1 ml-60">
+      <div className="flex-1 ml-60" style={{ backgroundColor: '#000000' }}>
         <TopBar title={client.name} />
         <div className="p-8">
           <ClientDashboard client={{

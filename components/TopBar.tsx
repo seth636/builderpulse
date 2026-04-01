@@ -70,35 +70,121 @@ export default function TopBar({ title, children }: TopBarProps) {
   };
 
   return (
-    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border-divider px-8 py-4 transition-colors duration-200">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-white">{title}</h2>
-        <div className="flex items-center gap-2">
+    <div style={{
+      position: 'sticky',
+      top: 0,
+      zIndex: 10,
+      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+      backdropFilter: 'blur(12px)',
+      borderBottom: '1px solid rgba(147, 107, 218, 0.1)',
+      padding: '16px 32px',
+      transition: 'all 0.2s ease',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <h2 style={{ 
+            fontSize: '20px', 
+            fontWeight: '600', 
+            color: '#FFFFFF',
+            margin: 0,
+            letterSpacing: '-0.3px',
+          }}>
+            {title}
+          </h2>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {children}
 
           {/* Dark/light toggle */}
           <button
             onClick={toggleTheme}
-            className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors text-slate-400 hover:text-white"
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'rgba(147, 107, 218, 0.08)',
+              border: '1px solid rgba(147, 107, 218, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              color: '#8b8b9e',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(147, 107, 218, 0.15)';
+              e.currentTarget.style.color = '#FFFFFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(147, 107, 218, 0.08)';
+              e.currentTarget.style.color = '#8b8b9e';
+            }}
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {isDark ? <SunIcon /> : <MoonIcon />}
           </button>
 
           {/* Alerts bell */}
-          <Link href="/alerts" className="relative">
-            <div className="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors text-slate-400 hover:text-white">
+          <Link href="/alerts" style={{ position: 'relative', textDecoration: 'none' }}>
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                background: 'rgba(147, 107, 218, 0.08)',
+                border: '1px solid rgba(147, 107, 218, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                color: '#8b8b9e',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(147, 107, 218, 0.15)';
+                e.currentTarget.style.color = '#FFFFFF';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(147, 107, 218, 0.08)';
+                e.currentTarget.style.color = '#8b8b9e';
+              }}
+            >
               <BellIcon />
             </div>
             {alertCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded-full min-w-[16px] text-center leading-none">
+              <span style={{
+                position: 'absolute',
+                top: '-4px',
+                right: '-4px',
+                background: '#EF4444',
+                color: '#FFFFFF',
+                fontSize: '10px',
+                fontWeight: '700',
+                padding: '2px 5px',
+                borderRadius: '999px',
+                minWidth: '18px',
+                textAlign: 'center',
+                lineHeight: '1',
+              }}>
                 {alertCount > 99 ? '99+' : alertCount}
               </span>
             )}
           </Link>
 
           {/* Avatar */}
-          <div className="w-9 h-9 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-sm">
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, rgba(0, 255, 212, 0.15) 0%, rgba(147, 107, 218, 0.15) 100%)',
+            border: '1px solid rgba(0, 255, 212, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#00FFD4',
+            fontWeight: '600',
+            fontSize: '14px',
+          }}>
             {session?.user?.name?.charAt(0).toUpperCase() || 'U'}
           </div>
         </div>

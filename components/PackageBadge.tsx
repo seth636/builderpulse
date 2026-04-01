@@ -1,15 +1,26 @@
 export default function PackageBadge({ package: pkg }: { package: string }) {
-  const colors = {
-    essentials: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
-    growth: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-    scale: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  const colors: Record<string, { bg: string; text: string; border: string }> = {
+    essentials: { bg: 'rgba(139, 139, 158, 0.1)', text: '#8b8b9e', border: 'rgba(139, 139, 158, 0.2)' },
+    growth: { bg: 'rgba(147, 107, 218, 0.1)', text: '#926BD9', border: 'rgba(147, 107, 218, 0.25)' },
+    scale: { bg: 'rgba(0, 255, 212, 0.1)', text: '#00FFD4', border: 'rgba(0, 255, 212, 0.25)' },
   };
 
   const color = colors[pkg as keyof typeof colors] || colors.essentials;
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${color}`}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '3px 10px',
+        borderRadius: '999px',
+        fontSize: '11px',
+        fontWeight: '600',
+        background: color.bg,
+        color: color.text,
+        border: `1px solid ${color.border}`,
+        letterSpacing: '0.02em',
+      }}
     >
       {pkg.charAt(0).toUpperCase() + pkg.slice(1)}
     </span>

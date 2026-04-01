@@ -77,9 +77,9 @@ export default function AlertsPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen" style={{ backgroundColor: '#000000' }}>
       <Sidebar />
-      <div className="flex-1 ml-60">
+      <div className="flex-1 ml-60" style={{ backgroundColor: '#000000' }}>
         <TopBar title="Alerts" />
         <div className="p-8">
           {/* Filter bar */}
@@ -138,7 +138,7 @@ export default function AlertsPage() {
                             {severity.toUpperCase()}
                           </span>
                           {alert?.client && (
-                            <Link href={`/client/${alert.client?.slug ?? ''}`} className="text-xs text-teal-400 hover:underline">
+                            <Link href={`/client/${alert.client?.slug ?? ''}`} style={{ fontSize: '12px', color: '#00FFD4', textDecoration: 'none' }}>
                               {alert.client?.name ?? 'Client'}
                             </Link>
                           )}

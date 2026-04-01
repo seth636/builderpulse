@@ -41,10 +41,10 @@ export default function MetricCard({
   if (loading) {
     return (
       <div className="bp-card animate-pulse">
-        <div className="h-4 bg-slate-700 rounded w-24 mb-3" />
-        <div className="h-8 bg-slate-700 rounded w-32 mb-2" />
-        <div className="h-3 bg-slate-700 rounded w-20 mb-4" />
-        <div className="h-10 bg-slate-700 rounded" />
+        <div className="h-4 bg-[rgba(147,107,218,0.15)] rounded w-24 mb-3" />
+        <div className="h-8 bg-[rgba(147,107,218,0.15)] rounded w-32 mb-2" />
+        <div className="h-3 bg-[rgba(147,107,218,0.15)] rounded w-20 mb-4" />
+        <div className="h-10 bg-[rgba(147,107,218,0.15)] rounded" />
       </div>
     );
   }
@@ -54,25 +54,53 @@ export default function MetricCard({
 
   return (
     <div className="bp-card card-fade-in">
-      <p className="text-card-title font-semibold uppercase tracking-card-title text-slate-500 mb-3">{title}</p>
+      <p style={{
+        fontSize: '11px',
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        letterSpacing: '0.08em',
+        color: '#6b6b7e',
+        marginBottom: '12px',
+      }}>{title}</p>
 
       {value === null ? (
         <div>
-          <p className="text-hero font-bold text-white mb-1 number-count-up">—</p>
+          <p style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            color: '#FFFFFF',
+            marginBottom: '4px',
+          }}>—</p>
           <Link
             href="/settings/clients"
-            className="text-xs text-[#0ea5e9] hover:underline"
+            style={{
+              fontSize: '12px',
+              color: '#00FFD4',
+              textDecoration: 'none',
+            }}
           >
             Connect in Settings
           </Link>
         </div>
       ) : (
         <>
-          <p className="text-hero font-bold text-white mb-1 number-count-up">
+          <p style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            color: '#FFFFFF',
+            marginBottom: '4px',
+          }} className="number-count-up">
             {formatValue(value, format)}
           </p>
           {trend !== null && (
-            <div className={`flex items-center gap-1 text-xs mb-2 ${trend.isGood ? 'text-[#10b981]' : 'text-red-400'}`}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '12px',
+              marginBottom: '8px',
+              color: trend.isGood ? '#00FFD4' : '#EF4444',
+            }}>
               <span>{trend.isGood ? '↑' : '↓'}</span>
               <span>{Math.abs(trend.change).toFixed(1)}% vs prev period</span>
             </div>
@@ -84,7 +112,7 @@ export default function MetricCard({
                   <Line
                     type="monotone"
                     dataKey="v"
-                    stroke="#3B82F6"
+                    stroke="#926BD9"
                     strokeWidth={2}
                     dot={false}
                   />

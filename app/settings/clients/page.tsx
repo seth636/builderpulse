@@ -109,33 +109,33 @@ export default function ClientsSettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen" style={{ backgroundColor: '#000000' }}>
         <Sidebar />
-        <div className="flex-1 ml-60">
+        <div className="flex-1 ml-60" style={{ backgroundColor: '#000000' }}>
           <TopBar title="Client Settings" />
-          <div className="p-8 text-center text-muted">Loading...</div>
+          <div className="p-8 text-center" style={{ color: '#8b8b9e' }}>Loading...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen" style={{ backgroundColor: '#000000' }}>
       <Sidebar />
-      <div className="flex-1 ml-60">
+      <div className="flex-1 ml-60" style={{ backgroundColor: '#000000' }}>
         <TopBar title="Client Settings" />
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-semibold text-white">Manage Clients</h3>
             <button
               onClick={handleAdd}
-              className="px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg font-medium transition-colors"
+              className="btn-teal"
             >
               Add Client
             </button>
           </div>
 
-          <div className="bg-[#111827] border border-[rgba(255,255,255,0.06)] rounded-[16px] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
+          <div style={{ background: 'linear-gradient(135deg, rgba(147, 107, 218, 0.08) 0%, rgba(13, 17, 23, 0.95) 50%, rgba(0, 0, 0, 0.98) 100%)', border: '1px solid rgba(147, 107, 218, 0.15)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)' }}>
             <table className="w-full">
               <thead className="bg-background border-b border-border">
                 <tr>

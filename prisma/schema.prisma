@@ -8,87 +8,87 @@ datasource db {
 }
 
 model Client {
-  id                    Int       @id @default(autoincrement())
+  id                    Int                 @id @default(autoincrement())
   name                  String
-  slug                  String    @unique
+  slug                  String              @unique
   website_url           String?
   pm_name               String?
-  package               String    @default("essentials")
+  package               String              @default("essentials")
   ghl_location_id       String?
   ghl_api_key           String?
   ga4_property_id       String?
   gsc_site_url          String?
   meta_ad_account_id    String?
   google_business_id    String?
-  auto_send_reports     Boolean   @default(false)
+  auto_send_reports     Boolean             @default(false)
   report_email          String?
-  portal_enabled        Boolean   @default(false)
-  portal_token          String?   @unique
+  portal_enabled        Boolean             @default(false)
+  portal_token          String?             @unique
   portal_token_regen_at DateTime?
-  client_login_enabled  Boolean   @default(false)
-  created_at            DateTime  @default(now())
-  users               User[]
-  seo_rankings        SeoRanking[]
-  seo_backlinks       SeoBacklink[]
-  site_audits         SiteAudit[]
-  ga4_metrics         Ga4Metric[]
-  ga4_pages           Ga4Page[]
-  ga4_sources         Ga4Source[]
-  gsc_metrics         GscMetric[]
-  meta_ads            MetaAd[]
-  ghl_leads           GhlLead[]
-  ghl_appointments    GhlAppointment[]
-  ghl_calls           GhlCall[]
-  google_reviews      GoogleReview[]
-  reports             Report[]
-  dashboards          Dashboard[]
-  ai_insights         AiInsight[]
-  anomaly_alerts      AnomalyAlert[]
-  ai_recommendations  AiRecommendation[]
-  health_scores       ClientHealthScore[]
+  client_login_enabled  Boolean             @default(false)
+  created_at            DateTime            @default(now())
+  users                 User[]
+  seo_rankings          SeoRanking[]
+  seo_backlinks         SeoBacklink[]
+  site_audits           SiteAudit[]
+  ga4_metrics           Ga4Metric[]
+  ga4_pages             Ga4Page[]
+  ga4_sources           Ga4Source[]
+  gsc_metrics           GscMetric[]
+  meta_ads              MetaAd[]
+  ghl_leads             GhlLead[]
+  ghl_appointments      GhlAppointment[]
+  ghl_calls             GhlCall[]
+  google_reviews        GoogleReview[]
+  reports               Report[]
+  dashboards            Dashboard[]
+  ai_insights           AiInsight[]
+  anomaly_alerts        AnomalyAlert[]
+  ai_recommendations    AiRecommendation[]
+  health_scores         ClientHealthScore[]
 
   @@map("clients")
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  email         String    @unique
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
   name          String
-  role          String    @default("pm")
+  role          String   @default("pm")
   client_id     Int?
-  client        Client?   @relation(fields: [client_id], references: [id])
+  client        Client?  @relation(fields: [client_id], references: [id])
   password_hash String
-  created_at    DateTime  @default(now())
+  created_at    DateTime @default(now())
 
   @@map("users")
 }
 
 model SeoRanking {
-  id           Int      @id @default(autoincrement())
-  client_id    Int
-  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  keyword      String
-  position     Int
-  url          String?
+  id            Int      @id @default(autoincrement())
+  client_id     Int
+  client        Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  keyword       String
+  position      Int
+  url           String?
   search_volume Int?
-  date         DateTime
-  created_at   DateTime @default(now())
+  date          DateTime
+  created_at    DateTime @default(now())
 
   @@map("seo_rankings")
 }
 
 model SeoBacklink {
-  id              Int      @id @default(autoincrement())
-  client_id       Int
-  client          Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  source_url      String
-  target_url      String
-  anchor_text     String?
-  domain_rating   Int?
-  first_seen      DateTime
-  last_checked    DateTime
-  status          String   @default("active")
-  created_at      DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  client_id     Int
+  client        Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  source_url    String
+  target_url    String
+  anchor_text   String?
+  domain_rating Int?
+  first_seen    DateTime
+  last_checked  DateTime
+  status        String   @default("active")
+  created_at    DateTime @default(now())
 
   @@map("seo_backlinks")
 }
@@ -111,71 +111,71 @@ model SiteAudit {
 }
 
 model Ga4Metric {
-  id                Int      @id @default(autoincrement())
-  client_id         Int
-  client            Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  date              DateTime @db.Date
-  sessions          Int      @default(0)
-  total_users       Int      @default(0)
-  new_users         Int      @default(0)
-  bounce_rate       Float    @default(0)
-  avg_session_duration Float @default(0)
-  conversions       Int      @default(0)
-  page_views        Int      @default(0)
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  id                   Int      @id @default(autoincrement())
+  client_id            Int
+  client               Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  date                 DateTime @db.Date
+  sessions             Int      @default(0)
+  total_users          Int      @default(0)
+  new_users            Int      @default(0)
+  bounce_rate          Float    @default(0)
+  avg_session_duration Float    @default(0)
+  conversions          Int      @default(0)
+  page_views           Int      @default(0)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
   @@unique([client_id, date])
   @@map("ga4_metrics")
 }
 
 model Ga4Page {
-  id                 Int      @id @default(autoincrement())
-  client_id          Int
-  client             Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  start_date         String
-  end_date           String
-  page_path          String
-  page_views         Int      @default(0)
-  avg_session_duration Float  @default(0)
-  bounce_rate        Float    @default(0)
-  created_at         DateTime @default(now())
-  updated_at         DateTime @updatedAt
+  id                   Int      @id @default(autoincrement())
+  client_id            Int
+  client               Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  start_date           String
+  end_date             String
+  page_path            String
+  page_views           Int      @default(0)
+  avg_session_duration Float    @default(0)
+  bounce_rate          Float    @default(0)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
   @@unique([client_id, start_date, end_date, page_path])
   @@map("ga4_pages")
 }
 
 model Ga4Source {
-  id           Int      @id @default(autoincrement())
-  client_id    Int
-  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  start_date   String
-  end_date     String
-  source       String
-  medium       String
-  sessions     Int      @default(0)
-  conversions  Int      @default(0)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  client_id   Int
+  client      Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  start_date  String
+  end_date    String
+  source      String
+  medium      String
+  sessions    Int      @default(0)
+  conversions Int      @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@unique([client_id, start_date, end_date, source, medium])
   @@map("ga4_sources")
 }
 
 model GscMetric {
-  id           Int      @id @default(autoincrement())
-  client_id    Int
-  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  date         DateTime @db.Date
-  query        String
-  page         String
-  clicks       Int      @default(0)
-  impressions  Int      @default(0)
-  ctr          Float    @default(0)
-  position     Float    @default(0)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  client_id   Int
+  client      Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  date        DateTime @db.Date
+  query       String
+  page        String
+  clicks      Int      @default(0)
+  impressions Int      @default(0)
+  ctr         Float    @default(0)
+  position    Float    @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@unique([client_id, date, query, page])
   @@map("gsc_metrics")
@@ -215,15 +215,15 @@ model GhlLead {
 }
 
 model GhlAppointment {
-  id                Int      @id @default(autoincrement())
-  client_id         Int
-  client            Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  appointment_id    String
-  contact_name      String?
-  calendar_name     String?
-  appointment_date  DateTime
-  status            String?
-  created_at        DateTime @default(now())
+  id               Int      @id @default(autoincrement())
+  client_id        Int
+  client           Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  appointment_id   String
+  contact_name     String?
+  calendar_name    String?
+  appointment_date DateTime
+  status           String?
+  created_at       DateTime @default(now())
 
   @@map("ghl_appointments")
 }
@@ -244,46 +244,46 @@ model GhlCall {
 }
 
 model GoogleReview {
-  id           Int      @id @default(autoincrement())
-  client_id    Int
-  client       Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  review_id    String   @unique
-  author_name  String
-  rating       Int
-  text         String?
-  review_date  DateTime
-  reply_text   String?
-  reply_date   DateTime?
-  created_at   DateTime @default(now())
+  id          Int       @id @default(autoincrement())
+  client_id   Int
+  client      Client    @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  review_id   String    @unique
+  author_name String
+  rating      Int
+  text        String?
+  review_date DateTime
+  reply_text  String?
+  reply_date  DateTime?
+  created_at  DateTime  @default(now())
 
   @@map("google_reviews")
 }
 
 model Report {
-  id                  Int       @id @default(autoincrement())
-  client_id           Int
-  client              Client    @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  period_start        DateTime  @db.Date
-  period_end          DateTime  @db.Date
-  period_label        String
-  status              String    @default("draft")
-  ai_summary          String?   @db.Text
-  ai_recommendations  String?   @db.Text
-  report_html         String?   @db.Text
-  sent_at             DateTime?
-  created_at          DateTime  @default(now())
-  updated_at          DateTime  @updatedAt
+  id                 Int       @id @default(autoincrement())
+  client_id          Int
+  client             Client    @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  period_start       DateTime  @db.Date
+  period_end         DateTime  @db.Date
+  period_label       String
+  status             String    @default("draft")
+  ai_summary         String?   @db.Text
+  ai_recommendations String?   @db.Text
+  report_html        String?   @db.Text
+  sent_at            DateTime?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
 
   @@map("reports")
 }
 
 model Dashboard {
-  id               Int               @id @default(autoincrement())
-  client_id        Int
-  client           Client            @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  name             String
-  layout           String            @db.Text
-  created_at       DateTime          @default(now())
+  id                Int               @id @default(autoincrement())
+  client_id         Int
+  client            Client            @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  name              String
+  layout            String            @db.Text
+  created_at        DateTime          @default(now())
   dashboard_widgets DashboardWidget[]
 
   @@map("dashboards")

@@ -24,7 +24,25 @@ export default function SearchBar() {
       placeholder="Search clients..."
       value={search}
       onChange={(e) => setSearch(e.target.value)}
-      className="px-4 py-2 bg-card border border-border rounded-lg text-white placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent w-64"
+      style={{
+        padding: '10px 16px',
+        background: 'rgba(147, 107, 218, 0.08)',
+        border: '1px solid rgba(147, 107, 218, 0.15)',
+        borderRadius: '8px',
+        color: '#FFFFFF',
+        fontSize: '14px',
+        width: '240px',
+        outline: 'none',
+        transition: 'all 0.2s ease',
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.borderColor = 'rgba(0, 255, 212, 0.4)';
+        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 255, 212, 0.1)';
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.borderColor = 'rgba(147, 107, 218, 0.15)';
+        e.currentTarget.style.boxShadow = 'none';
+      }}
     />
   );
 }

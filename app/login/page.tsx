@@ -37,7 +37,7 @@ export default function LoginPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#0B1120',
+      backgroundColor: '#000000',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -45,39 +45,69 @@ export default function LoginPage() {
       fontFamily: 'Inter, sans-serif',
     }}>
       <div style={{
-        backgroundColor: '#111827',
+        background: 'linear-gradient(135deg, rgba(147, 107, 218, 0.1) 0%, rgba(13, 17, 23, 0.95) 50%, rgba(0, 0, 0, 0.98) 100%)',
         borderRadius: '20px',
-        border: '1px solid rgba(255,255,255,0.06)',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
-        padding: '40px',
+        border: '1px solid rgba(147, 107, 218, 0.2)',
+        boxShadow: '0 4px 40px rgba(0,0,0,0.5), 0 0 80px rgba(147, 107, 218, 0.05)',
+        padding: '48px',
         width: '100%',
         maxWidth: '400px',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
+        {/* Gradient line at top */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '1px',
+          background: 'linear-gradient(90deg, transparent, rgba(147, 107, 218, 0.4), transparent)',
+        }} />
+        
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h1 style={{
-            fontSize: '22px',
-            fontWeight: '700',
-            color: '#FFFFFF',
-            letterSpacing: '-0.3px',
-            marginBottom: '8px',
+        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '10px',
+            marginBottom: '16px',
           }}>
-            BuilderPulse
-          </h1>
-          <p style={{ fontSize: '14px', color: '#94A3B8' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #00FFD4 0%, #926BD9 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <span style={{ fontSize: '18px', fontWeight: '700', color: '#000' }}>B</span>
+            </div>
+            <h1 style={{
+              fontSize: '24px',
+              fontWeight: '700',
+              color: '#FFFFFF',
+              letterSpacing: '-0.3px',
+              margin: 0,
+            }}>
+              BuilderPulse
+            </h1>
+          </div>
+          <p style={{ fontSize: '14px', color: '#8b8b9e' }}>
             Sign in to your account
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           {/* Email */}
           <div>
             <label style={{
               display: 'block',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#CBD5E1',
-              marginBottom: '6px',
+              color: '#c4c4d4',
+              marginBottom: '8px',
             }}>
               Email
             </label>
@@ -89,18 +119,24 @@ export default function LoginPage() {
               placeholder="you@example.com"
               style={{
                 width: '100%',
-                padding: '10px 14px',
-                backgroundColor: '#1E293B',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '12px',
+                padding: '12px 16px',
+                backgroundColor: 'rgba(147, 107, 218, 0.08)',
+                border: '1px solid rgba(147, 107, 218, 0.15)',
+                borderRadius: '10px',
                 fontSize: '14px',
                 color: '#FFFFFF',
                 outline: 'none',
                 boxSizing: 'border-box',
-                transition: 'border-color 0.15s ease',
+                transition: 'all 0.2s ease',
               }}
-              onFocus={e => (e.target.style.borderColor = '#3B82F6')}
-              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+              onFocus={e => {
+                e.target.style.borderColor = 'rgba(0, 255, 212, 0.4)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 212, 0.1)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = 'rgba(147, 107, 218, 0.15)';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 
@@ -110,8 +146,8 @@ export default function LoginPage() {
               display: 'block',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#CBD5E1',
-              marginBottom: '6px',
+              color: '#c4c4d4',
+              marginBottom: '8px',
             }}>
               Password
             </label>
@@ -123,18 +159,24 @@ export default function LoginPage() {
               placeholder="••••••••"
               style={{
                 width: '100%',
-                padding: '10px 14px',
-                backgroundColor: '#1E293B',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '12px',
+                padding: '12px 16px',
+                backgroundColor: 'rgba(147, 107, 218, 0.08)',
+                border: '1px solid rgba(147, 107, 218, 0.15)',
+                borderRadius: '10px',
                 fontSize: '14px',
                 color: '#FFFFFF',
                 outline: 'none',
                 boxSizing: 'border-box',
-                transition: 'border-color 0.15s ease',
+                transition: 'all 0.2s ease',
               }}
-              onFocus={e => (e.target.style.borderColor = '#3B82F6')}
-              onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')}
+              onFocus={e => {
+                e.target.style.borderColor = 'rgba(0, 255, 212, 0.4)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(0, 255, 212, 0.1)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = 'rgba(147, 107, 218, 0.15)';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 
@@ -144,7 +186,7 @@ export default function LoginPage() {
               backgroundColor: 'rgba(239,68,68,0.1)',
               border: '1px solid rgba(239,68,68,0.25)',
               borderRadius: '10px',
-              padding: '10px 14px',
+              padding: '12px 16px',
               fontSize: '13px',
               color: '#EF4444',
             }}>
@@ -158,23 +200,29 @@ export default function LoginPage() {
             disabled={loading}
             style={{
               width: '100%',
-              padding: '11px 24px',
-              backgroundColor: loading ? '#2563EB' : '#3B82F6',
-              color: '#FFFFFF',
+              padding: '14px 24px',
+              backgroundColor: loading ? '#00d4b3' : '#00FFD4',
+              color: '#000000',
               border: 'none',
-              borderRadius: '12px',
+              borderRadius: '9999px',
               fontSize: '14px',
               fontWeight: '600',
               cursor: loading ? 'not-allowed' : 'pointer',
               opacity: loading ? 0.8 : 1,
-              marginTop: '4px',
-              transition: 'background-color 0.15s ease',
+              marginTop: '8px',
+              transition: 'all 0.2s ease',
             }}
             onMouseEnter={e => {
-              if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#2563EB';
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = '#00e6be';
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 255, 212, 0.3)';
+              }
             }}
             onMouseLeave={e => {
-              if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#3B82F6';
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = '#00FFD4';
+                e.currentTarget.style.boxShadow = 'none';
+              }
             }}
           >
             {loading ? 'Signing in...' : 'Sign in'}
@@ -183,9 +231,9 @@ export default function LoginPage() {
 
         <p style={{
           fontSize: '12px',
-          color: '#475569',
+          color: '#4a4a5a',
           textAlign: 'center',
-          marginTop: '24px',
+          marginTop: '28px',
         }}>
           hammad@homebuildermarketers.com · BuilderPulse2026!
         </p>
