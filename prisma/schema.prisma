@@ -46,6 +46,7 @@ model Client {
   anomaly_alerts        AnomalyAlert[]
   ai_recommendations    AiRecommendation[]
   health_scores         ClientHealthScore[]
+  integrations          ClientIntegration[]
 
   @@map("clients")
 }
@@ -350,4 +351,21 @@ model ClientHealthScore {
   calculated_at  DateTime @default(now())
 
   @@map("client_health_scores")
+}
+
+model ClientIntegration {
+  id            Int       @id @default(autoincrement())
+  client_id     Int
+  client        Client    @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  provider      String
+  account_name  String?
+  access_token  String
+  refresh_token String?
+  token_expiry  DateTime?
+  scope         String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  @@unique([client_id, provider])
+  @@map("client_integrations")
 }

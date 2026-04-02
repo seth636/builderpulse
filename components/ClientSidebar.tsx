@@ -76,6 +76,13 @@ const IconReports = () => (
   </svg>
 );
 
+const IconConnections = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </svg>
+);
+
 type Props = {
   clientName: string;
   clientSlug: string;
@@ -272,6 +279,17 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         >
           <IconReports />
           Reports
+        </Link>
+
+        {/* Connections */}
+        <Link
+          href={`/client/${clientSlug}/connections`}
+          style={navLinkStyle(isActive(`/client/${clientSlug}/connections`))}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/connections`)) e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/connections`)) e.currentTarget.style.color = '#8b8b9e'; }}
+        >
+          <IconConnections />
+          Connections
         </Link>
       </nav>
 

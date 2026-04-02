@@ -15,6 +15,34 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { slug: string } }
+) {
+  try {
+    const slug = params.slug;
+
+    const client = await prisma.client.findUnique({
+      where: { slug },
+    });
+
+    if (!client) {
+      return NextResponse.json(
+        { error: 'Client not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(client);
+  } catch (error) {
+    console.error('GET /api/clients/[slug] error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: { slug: string } }
