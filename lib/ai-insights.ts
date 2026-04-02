@@ -93,7 +93,7 @@ Return as a valid JSON array ONLY (no markdown, no explanation):
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-6',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1500,
         messages: [{ role: 'user', content: prompt }],
       }),
