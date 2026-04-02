@@ -76,7 +76,7 @@ Return as a valid JSON array ONLY (no markdown, no explanation):
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-5',
+        model: 'claude-opus-4-6',
         max_tokens: 2000,
         messages: [{ role: 'user', content: prompt }],
       }),
