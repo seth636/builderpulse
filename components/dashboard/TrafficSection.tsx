@@ -2,17 +2,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, Legend,
+  AreaChart, Area, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Cell,
 } from 'recharts';
-import SkeletonCard, { SkeletonRow } from './SkeletonCard';
+import SkeletonCard from './SkeletonCard';
 import { getPreviousPeriod } from './DateRangePicker';
 
-type Props = {
-  slug: string;
-  startDate: string;
-  endDate: string;
-};
+type Props = { slug: string; startDate: string; endDate: string };
 
 type DailyRow = { date: string; sessions: number; total_users: number; bounce_rate: number; conversions: number };
 type PageRow = { page_path: string; page_views: number; avg_time_on_page: number; bounce_rate: number };
@@ -31,7 +28,7 @@ const SOURCE_COLORS: Record<string, string> = {
   direct: '#94a3b8',
   referral: '#f97316',
   email: '#14b8a6',
-  other: '#64748b',
+  other: '#4b5563',
 };
 
 function classifySource(source: string, medium: string): string {
@@ -47,54 +44,79 @@ function classifySource(source: string, medium: string): string {
 
 function fmtDuration(seconds: number): string {
   if (!seconds) return '0s';
-  const m = Math.floor(seconds / 60);
-  const s = Math.round(seconds % 60);
-  if (m === 0) return `${s}s`;
-  return `${m}m ${s}s`;
+  const m = Math.floor(seconds / 60), s = Math.round(seconds % 60);
+  return m === 0 ? `${s}s` : `${m}m ${s}s`;
 }
 
-type SortKey = 'page_views' | 'avg_time_on_page' | 'bounce_rate';
+const ChartTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || payload.length === 0) return null;
+  return (
+    <div style={{
+      background: '#0d0d1a', border: '1px solid rgba(147,107,218,0.25)',
+      borderRadius: '10px', padding: '10px 14px',
+      boxShadow: '0 8px 24px rgba(0,0,0,0.4)', fontSize: '12px',
+    }}>
+      {label && <p style={{ color: '#8b8b9e', marginBottom: '6px', fontWeight: '600' }}>{label}</p>}
+      {payload.map((p: any, i: number) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: p.color, flexShrink: 0 }} />
+          <span style={{ color: '#8b8b9e' }}>{p.name}:</span>
+          <span style={{ color: '#FFFFFF', fontWeight: '600' }}>
+            {typeof p.value === 'number' ? p.value.toLocaleString() : p.value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const ChartCard = ({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) => (
+  <div style={{
+    background: 'rgba(255,255,255,0.025)',
+    border: '1px solid rgba(255,255,255,0.07)',
+    borderRadius: '16px', padding: '22px',
+  }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', margin: 0 }}>{title}</h3>
+      {action}
+    </div>
+    {children}
+  </div>
+);
+
+const AXIS_STYLE = { fill: '#64748b', fontSize: 11, fontFamily: 'Inter, sans-serif' };
+const GRID = { stroke: 'rgba(255,255,255,0.04)', strokeDasharray: '0' };
 
 export default function TrafficSection({ slug, startDate, endDate }: Props) {
   const [data, setData] = useState<AnalyticsData | null>(null);
-  const [prevData, setPrevData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [showAllPages, setShowAllPages] = useState(false);
-  const [sortKey, setSortKey] = useState<SortKey>('page_views');
+  const [sortKey, setSortKey] = useState<'page_views' | 'avg_time_on_page' | 'bounce_rate'>('page_views');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   const fetchData = useCallback(async () => {
     if (!startDate || !endDate) return;
-    setLoading(true);
-    setError(false);
+    setLoading(true); setError(false);
+    const safe = (raw: any) =>
+      raw && Array.isArray(raw.daily)
+        ? raw
+        : { daily: [], summary: { totalSessions: 0, totalUsers: 0, avgBounceRate: 0, totalConversions: 0 }, topPages: [], sources: [] };
     try {
-      const safeAnalytics = (raw: any) =>
-        raw && Array.isArray(raw.daily)
-          ? raw
-          : { daily: [], summary: { totalSessions: 0, totalUsers: 0, avgBounceRate: 0, totalConversions: 0 }, topPages: [], sources: [] };
-      const [curr, prev] = await Promise.all([
-        fetch(`/api/analytics/${slug}?start_date=${startDate}&end_date=${endDate}`).then(r => r.json()).then(safeAnalytics),
-        (() => {
-          const p = getPreviousPeriod(startDate, endDate);
-          return fetch(`/api/analytics/${slug}?start_date=${p.start}&end_date=${p.end}`).then(r => r.json()).then(safeAnalytics);
-        })(),
+      const [curr] = await Promise.all([
+        fetch(`/api/analytics/${slug}?start_date=${startDate}&end_date=${endDate}`).then(r => r.json()).then(safe),
       ]);
       setData(curr);
-      setPrevData(prev);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
+    } catch { setError(true); }
+    finally { setLoading(false); }
   }, [slug, startDate, endDate]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
   if (loading) return (
-    <div className="space-y-6">
-      <SkeletonCard height="h-64" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <SkeletonCard height="h-72" />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
         <SkeletonCard height="h-64" />
         <SkeletonCard height="h-64" />
       </div>
@@ -103,34 +125,30 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
   );
 
   if (error) return (
-    <div className="bp-card text-slate-400 text-center">
+    <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '32px', textAlign: 'center', color: '#64748b' }}>
       Failed to load — try refreshing
     </div>
   );
 
   const noGA4 = !data || data.daily.length === 0;
-  const noRange = data && data.daily.length === 0;
 
-  // Sessions over time — merge current + prev
-  const currentDates = new Map((data?.daily || []).map(r => [r.date?.toString().split('T')[0] || '', r.sessions]));
-  const prevDates = new Map((prevData?.daily || []).map(r => [r.date?.toString().split('T')[0] || '', r.sessions]));
-  const allDates = Array.from(new Set([...currentDates.keys(), ...prevDates.keys()])).sort();
-  const sessionChartData = data?.daily.map(r => ({
-    date: r.date?.toString().split('T')[0]?.slice(5) || '',
-    current: r.sessions,
-  })) || [];
+  // Chart data
+  const sessionChart = (data?.daily || []).map(r => ({
+    date: (r.date?.toString().split('T')[0] || '').slice(5),
+    sessions: r.sessions,
+    users: r.total_users,
+  }));
 
   // Source aggregation
-  const sourceAgg = new Map<string, { name: string; sessions: number; conversions: number }>();
+  const sourceAgg = new Map<string, { name: string; sessions: number; color: string }>();
   for (const s of data?.sources || []) {
     const cat = classifySource(s.source, s.medium);
-    const existing = sourceAgg.get(cat) || { name: cat.charAt(0).toUpperCase() + cat.slice(1), sessions: 0, conversions: 0 };
-    existing.sessions += s.sessions;
-    existing.conversions += s.conversions;
-    sourceAgg.set(cat, existing);
+    const ex = sourceAgg.get(cat) || { name: cat.charAt(0).toUpperCase() + cat.slice(1), sessions: 0, color: SOURCE_COLORS[cat] || '#4b5563' };
+    ex.sessions += s.sessions;
+    sourceAgg.set(cat, ex);
   }
-  const pieData = Array.from(sourceAgg.values()).sort((a, b) => b.sessions - a.sessions);
-  const totalSessions = pieData.reduce((s, r) => s + r.sessions, 0);
+  const sourceData = Array.from(sourceAgg.values()).sort((a, b) => b.sessions - a.sessions);
+  const totalSessions = sourceData.reduce((s, r) => s + r.sessions, 0);
 
   // Pages
   const pages = [...(data?.topPages || [])].sort((a, b) => {
@@ -139,165 +157,213 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
   });
   const visiblePages = showAllPages ? pages.slice(0, 50) : pages.slice(0, 10);
 
-  const handleSort = (key: SortKey) => {
-    if (sortKey === key) setSortDir(d => d === 'desc' ? 'asc' : 'desc');
-    else { setSortKey(key); setSortDir('desc'); }
+  const handleSort = (k: typeof sortKey) => {
+    if (sortKey === k) setSortDir(d => d === 'desc' ? 'asc' : 'desc');
+    else { setSortKey(k); setSortDir('desc'); }
   };
-  const SortIcon = ({ k }: { k: SortKey }) =>
-    sortKey === k ? <span className="ml-1">{sortDir === 'desc' ? '↓' : '↑'}</span> : null;
+
+  const { totalSessions: ts = 0, totalUsers: tu = 0, avgBounceRate: br = 0, totalConversions: tc = 0 } = data?.summary || {};
 
   return (
-    <div className="space-y-6">
-      {/* Sessions over time */}
-      <div className="bp-card">
-        <h3 className="text-white font-semibold mb-4">Sessions Over Time</h3>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+      {/* ── Summary KPIs ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+        {[
+          { label: 'Sessions', value: ts.toLocaleString(), color: '#0ea5e9' },
+          { label: 'Users', value: tu.toLocaleString(), color: '#926BD9' },
+          { label: 'Bounce Rate', value: ((br || 0) * 100).toFixed(1) + '%', color: '#F59E0B' },
+          { label: 'Conversions', value: tc.toLocaleString(), color: '#00FFD4' },
+        ].map(item => (
+          <div key={item.label} style={{
+            background: 'rgba(255,255,255,0.025)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            borderRadius: '12px', padding: '16px',
+          }}>
+            <p style={{ fontSize: '11px', color: '#6b6b7e', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>{item.label}</p>
+            <p style={{ fontSize: '24px', fontWeight: '700', color: item.color, margin: 0 }}>{item.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Sessions over time ── */}
+      <ChartCard title="Sessions & Users Over Time">
         {noGA4 ? (
-          <p className="text-slate-400 text-sm text-center py-8">
-            No analytics data yet. Add GA4 Property ID in Settings and sync.
+          <p style={{ textAlign: 'center', color: '#64748b', fontSize: '13px', padding: '40px 0' }}>
+            No analytics data yet — add GA4 Property ID in Settings to sync.
           </p>
         ) : (
           <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={sessionChartData}>
+            <AreaChart data={sessionChart}>
               <defs>
-                <linearGradient id="sessionGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.1} />
+                <linearGradient id="sessGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.25} />
                   <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0} />
                 </linearGradient>
+                <linearGradient id="usersGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#926BD9" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="#926BD9" stopOpacity={0} />
+                </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="0" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey="date" stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
-              <YAxis stroke="#64748b" tick={{ fill: '#64748b', fontSize: 11 }} />
-              <Tooltip
-                contentStyle={{ backgroundColor: '#1E293B', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 8, border: '1px solid' }}
-                labelStyle={{ color: '#fff' }}
-                itemStyle={{ color: '#0ea5e9' }}
-              />
-              <Line type="monotone" dataKey="current" stroke="#0ea5e9" strokeWidth={2} dot={false} name="Sessions" fill="url(#sessionGradient)" />
-            </LineChart>
+              <CartesianGrid {...GRID} vertical={false} />
+              <XAxis dataKey="date" tick={AXIS_STYLE} axisLine={false} tickLine={false} />
+              <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} width={40} />
+              <Tooltip content={<ChartTooltip />} />
+              <Area type="monotone" dataKey="sessions" stroke="#0ea5e9" strokeWidth={2} fill="url(#sessGrad)" dot={false} name="Sessions" />
+              <Area type="monotone" dataKey="users" stroke="#926BD9" strokeWidth={1.5} fill="url(#usersGrad)" dot={false} name="Users" />
+            </AreaChart>
           </ResponsiveContainer>
         )}
-      </div>
+      </ChartCard>
 
-      {/* Source + Pages grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Traffic by source donut */}
-        <div className="bp-card">
-          <h3 className="text-white font-semibold mb-4">Traffic by Source</h3>
-          {pieData.length === 0 ? (
-            <p className="text-slate-400 text-sm text-center py-8">No data for this period</p>
+      {/* ── Source bar + top sources table ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+
+        {/* Source bar chart */}
+        <ChartCard title="Traffic by Source">
+          {sourceData.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: '13px', padding: '32px 0' }}>No source data</p>
           ) : (
             <>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={pieData} dataKey="sessions" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80}>
-                    {pieData.map((entry, i) => (
-                      <Cell key={i} fill={SOURCE_COLORS[entry.name.toLowerCase()] || '#64748b'} />
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={sourceData} layout="vertical" barSize={16}>
+                  <CartesianGrid {...GRID} horizontal={false} />
+                  <XAxis type="number" tick={AXIS_STYLE} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" tick={AXIS_STYLE} axisLine={false} tickLine={false} width={60} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Bar dataKey="sessions" name="Sessions" radius={[0, 4, 4, 0]}>
+                    {sourceData.map((entry, i) => (
+                      <Cell key={i} fill={entry.color} fillOpacity={0.8} />
                     ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#1E293B', borderColor: 'rgba(255,255,255,0.1)', borderRadius: 8, border: '1px solid' }}
-                    formatter={(val: any) => [typeof val === 'number' ? val.toLocaleString() : String(val), 'Sessions']}
-                  />
-                </PieChart>
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
-              <div className="mt-3 space-y-1">
-                {pieData.map((entry, i) => (
-                  <div key={i} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: SOURCE_COLORS[entry.name.toLowerCase()] || '#64748b' }} />
-                      <span className="text-slate-300">{entry.name}</span>
+
+              {/* Legend breakdown */}
+              <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {sourceData.slice(0, 5).map((s, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
+                    <span style={{ flex: 1, fontSize: '12px', color: '#c4c4d4' }}>{s.name}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{
+                        height: '3px', width: `${totalSessions > 0 ? (s.sessions / totalSessions) * 60 : 0}px`,
+                        background: s.color, borderRadius: '2px', opacity: 0.6, flexShrink: 0,
+                      }} />
+                      <span style={{ fontSize: '12px', color: '#64748b', minWidth: '36px', textAlign: 'right' }}>
+                        {totalSessions > 0 ? ((s.sessions / totalSessions) * 100).toFixed(0) : 0}%
+                      </span>
                     </div>
-                    <span className="text-slate-400">
-                      {totalSessions > 0 ? ((entry.sessions / totalSessions) * 100).toFixed(1) : 0}% · {entry.sessions.toLocaleString()}
-                    </span>
                   </div>
                 ))}
               </div>
             </>
           )}
-        </div>
+        </ChartCard>
 
-        {/* Top Sources table */}
-        <div className="bp-card">
-          <h3 className="text-white font-semibold mb-4">Top Sources</h3>
+        {/* Top sources table */}
+        <ChartCard title="Top Sources">
           {(data?.sources || []).length === 0 ? (
-            <p className="text-slate-400 text-sm text-center py-8">No data for this period</p>
+            <p style={{ textAlign: 'center', color: '#64748b', fontSize: '13px', padding: '32px 0' }}>No data</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-slate-500 text-left border-b border-border-light">
-                    <th className="pb-3 pr-4 text-axis-label font-medium uppercase">Source / Medium</th>
-                    <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Sessions</th>
-                    <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase">Conv.</th>
-                    <th className="pb-3 text-right text-axis-label font-medium uppercase">Conv. Rate</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(data?.sources || []).slice(0, 10).map((s, i) => {
-                    const convRate = s.sessions > 0 ? (s.conversions / s.sessions) * 100 : 0;
-                    return (
-                      <tr key={i} className="hover:bg-white/[0.03] transition-colors border-b border-border-light last:border-0">
-                        <td className="py-3 px-2 text-white truncate max-w-[140px]">{s.source} / {s.medium}</td>
-                        <td className="py-3 px-2 text-right text-slate-300">{s.sessions.toLocaleString()}</td>
-                        <td className="py-3 px-2 text-right text-slate-300">{s.conversions.toLocaleString()}</td>
-                        <td className="py-3 px-2 text-right text-slate-300">{convRate.toFixed(1)}%</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <thead>
+                <tr>
+                  {['Source / Medium', 'Sessions', 'Conv.', 'Rate'].map(h => (
+                    <th key={h} style={{
+                      padding: '0 6px 10px',
+                      textAlign: h === 'Source / Medium' ? 'left' : 'right',
+                      fontSize: '10px', fontWeight: '600', textTransform: 'uppercase',
+                      letterSpacing: '0.08em', color: '#6b6b7e',
+                      borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(data?.sources || []).slice(0, 10).map((s, i) => {
+                  const convRate = s.sessions > 0 ? (s.conversions / s.sessions) * 100 : 0;
+                  const cat = classifySource(s.source, s.medium);
+                  return (
+                    <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                      <td style={{ padding: '9px 6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: SOURCE_COLORS[cat] || '#4b5563', flexShrink: 0 }} />
+                          <span style={{ color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '130px' }}>
+                            {s.source} / {s.medium}
+                          </span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '9px 6px', textAlign: 'right', color: '#0ea5e9', fontWeight: '600' }}>{s.sessions.toLocaleString()}</td>
+                      <td style={{ padding: '9px 6px', textAlign: 'right', color: '#8b8b9e' }}>{s.conversions.toLocaleString()}</td>
+                      <td style={{ padding: '9px 6px', textAlign: 'right', color: '#8b8b9e' }}>{convRate.toFixed(1)}%</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           )}
-        </div>
+        </ChartCard>
       </div>
 
-      {/* Top Pages table */}
-      <div className="bp-card">
-        <h3 className="text-white font-semibold mb-4">Top Pages</h3>
+      {/* ── Top Pages table ── */}
+      <ChartCard title="Top Pages">
         {pages.length === 0 ? (
-          <p className="text-slate-400 text-sm text-center py-8">No page data for this period</p>
+          <p style={{ textAlign: 'center', color: '#64748b', fontSize: '13px', padding: '32px 0' }}>No page data</p>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-slate-500 text-left border-b border-border-light">
-                    <th className="pb-3 pr-4 text-axis-label font-medium uppercase">Page Path</th>
-                    <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase cursor-pointer hover:text-white" onClick={() => handleSort('page_views')}>
-                      Page Views <SortIcon k="page_views" />
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <thead>
+                <tr>
+                  <th style={{ padding: '0 8px 12px', textAlign: 'left', fontSize: '10px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6b6b7e', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    Page Path
+                  </th>
+                  {(['page_views', 'avg_time_on_page', 'bounce_rate'] as const).map(k => (
+                    <th key={k}
+                      onClick={() => handleSort(k)}
+                      style={{
+                        padding: '0 8px 12px', textAlign: 'right', cursor: 'pointer',
+                        fontSize: '10px', fontWeight: '600', textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        color: sortKey === k ? '#FFFFFF' : '#6b6b7e',
+                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {k === 'page_views' ? 'Views' : k === 'avg_time_on_page' ? 'Avg Time' : 'Bounce'}
+                      {sortKey === k && <span style={{ marginLeft: '4px' }}>{sortDir === 'desc' ? '↓' : '↑'}</span>}
                     </th>
-                    <th className="pb-3 pr-4 text-right text-axis-label font-medium uppercase cursor-pointer hover:text-white" onClick={() => handleSort('avg_time_on_page')}>
-                      Avg Time <SortIcon k="avg_time_on_page" />
-                    </th>
-                    <th className="pb-3 text-right text-axis-label font-medium uppercase cursor-pointer hover:text-white" onClick={() => handleSort('bounce_rate')}>
-                      Bounce Rate <SortIcon k="bounce_rate" />
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visiblePages.map((p, i) => (
-                    <tr key={i} className="hover:bg-white/[0.03] transition-colors border-b border-border-light last:border-0">
-                      <td className="py-3 px-2 text-white font-mono text-xs truncate max-w-[280px]">{p.page_path}</td>
-                      <td className="py-3 px-2 text-right text-slate-300">{(p.page_views || 0).toLocaleString()}</td>
-                      <td className="py-3 px-2 text-right text-slate-300">{fmtDuration(p.avg_time_on_page || 0)}</td>
-                      <td className="py-3 px-2 text-right text-slate-300">{((p.bounce_rate || 0) * 100).toFixed(1)}%</td>
-                    </tr>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </tr>
+              </thead>
+              <tbody>
+                {visiblePages.map((p, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <td style={{ padding: '10px 8px', color: '#FFFFFF', fontFamily: 'monospace', fontSize: '12px', maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {p.page_path}
+                    </td>
+                    <td style={{ padding: '10px 8px', textAlign: 'right', color: '#0ea5e9', fontWeight: '600' }}>{(p.page_views || 0).toLocaleString()}</td>
+                    <td style={{ padding: '10px 8px', textAlign: 'right', color: '#8b8b9e' }}>{fmtDuration(p.avg_time_on_page || 0)}</td>
+                    <td style={{ padding: '10px 8px', textAlign: 'right', color: '#8b8b9e' }}>{((p.bounce_rate || 0) * 100).toFixed(1)}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
             {pages.length > 10 && (
               <button
                 onClick={() => setShowAllPages(v => !v)}
-                className="mt-4 text-sm text-[#0ea5e9] hover:underline"
+                style={{
+                  marginTop: '14px', fontSize: '13px', color: '#926BD9',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  padding: '0', fontFamily: 'Inter, sans-serif',
+                }}
               >
-                {showAllPages ? 'Show less' : `Show more (${pages.length - 10} more)`}
+                {showAllPages ? 'Show less' : `Show ${pages.length - 10} more`}
               </button>
             )}
           </>
         )}
-      </div>
+      </ChartCard>
     </div>
   );
 }
