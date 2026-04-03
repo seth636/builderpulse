@@ -76,7 +76,7 @@ function NavItem({
         borderRadius: '8px',
         fontSize: '14px',
         fontWeight: active ? '500' : '400',
-        color: active ? '#FFFFFF' : hovered ? '#c4c4d4' : '#8b8b9e',
+        color: active ? 'var(--text-primary)' : hovered ? 'var(--text-secondary)' : 'var(--text-muted)',
         background: active
           ? 'rgba(147, 107, 218, 0.12)'
           : hovered
@@ -88,7 +88,7 @@ function NavItem({
         marginBottom: '2px',
       }}
     >
-      <span style={{ color: active ? '#00FFD4' : hovered ? '#c4c4d4' : '#6b6b7e', display: 'flex', flexShrink: 0 }}>
+      <span style={{ color: active ? '#00FFD4' : hovered ? 'var(--text-secondary)' : 'var(--text-muted)', display: 'flex', flexShrink: 0 }}>
         <Icon />
       </span>
       <span style={{ flex: 1 }}>{label}</span>
@@ -125,9 +125,9 @@ function LogoutButton({ onLogout }: { onLogout: () => void }) {
         gap: '8px',
         padding: '10px 14px',
         borderRadius: '8px',
-        border: '1px solid rgba(147, 107, 218, 0.15)',
-        background: hovered ? 'rgba(147, 107, 218, 0.1)' : 'rgba(255,255,255,0.02)',
-        color: hovered ? '#FFFFFF' : '#8b8b9e',
+        border: '1px solid var(--border-subtle)',
+        background: hovered ? 'rgba(147, 107, 218, 0.1)' : 'var(--bg-card-subtle)',
+        color: hovered ? 'var(--text-primary)' : 'var(--text-muted)',
         fontSize: '13px',
         fontWeight: '500',
         cursor: 'pointer',
@@ -161,7 +161,7 @@ export default function Sidebar() {
     <p key={text} style={{
       fontSize: '11px',
       fontWeight: '600',
-      color: '#6b6b7e',
+      color: 'var(--text-muted)',
       textTransform: 'uppercase',
       letterSpacing: '0.1em',
       padding: '20px 14px 8px',
@@ -178,8 +178,8 @@ export default function Sidebar() {
       top: 0,
       height: '100vh',
       width: '240px',
-      backgroundColor: '#050508',
-      borderRight: '1px solid rgba(147, 107, 218, 0.1)',
+      backgroundColor: 'var(--bg-card)',
+      borderRight: '1px solid var(--border)',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: 'Inter, sans-serif',
@@ -188,7 +188,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div style={{ 
         padding: '24px 20px 20px',
-        borderBottom: '1px solid rgba(147, 107, 218, 0.08)',
+        borderBottom: '1px solid var(--border)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{
@@ -202,7 +202,7 @@ export default function Sidebar() {
           }}>
             <span style={{ fontSize: '14px', fontWeight: '700', color: '#000' }}>B</span>
           </div>
-          <span style={{ fontSize: '17px', fontWeight: '600', color: '#FFFFFF', letterSpacing: '-0.3px' }}>
+          <span style={{ fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
             BuilderPulse
           </span>
         </div>
@@ -237,10 +237,10 @@ export default function Sidebar() {
             {userInitial}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: '13px', fontWeight: '500', color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+            <p style={{ fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
               {session?.user?.name || 'User'}
             </p>
-            <p style={{ fontSize: '11px', color: '#6b6b7e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
               {session?.user?.email || ''}
             </p>
           </div>

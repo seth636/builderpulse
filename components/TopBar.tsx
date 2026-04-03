@@ -74,18 +74,18 @@ export default function TopBar({ title, children }: TopBarProps) {
       position: 'sticky',
       top: 0,
       zIndex: 10,
-      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+      backgroundColor: 'var(--topbar-bg)',
       backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid rgba(147, 107, 218, 0.1)',
+      borderBottom: '1px solid var(--topbar-border)',
       padding: '16px 32px',
       transition: 'all 0.2s ease',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h2 style={{ 
-            fontSize: '20px', 
-            fontWeight: '600', 
-            color: '#FFFFFF',
+          <h2 style={{
+            fontSize: '20px',
+            fontWeight: '600',
+            color: 'var(--text-primary)',
             margin: 0,
             letterSpacing: '-0.3px',
           }}>
@@ -102,22 +102,22 @@ export default function TopBar({ title, children }: TopBarProps) {
               width: '36px',
               height: '36px',
               borderRadius: '8px',
-              background: 'rgba(147, 107, 218, 0.08)',
-              border: '1px solid rgba(147, 107, 218, 0.15)',
+              background: 'var(--bg-card-subtle)',
+              border: '1px solid var(--border)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              color: '#8b8b9e',
+              color: 'var(--text-muted)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(147, 107, 218, 0.15)';
-              e.currentTarget.style.color = '#FFFFFF';
+              e.currentTarget.style.background = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text-primary)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(147, 107, 218, 0.08)';
-              e.currentTarget.style.color = '#8b8b9e';
+              e.currentTarget.style.background = 'var(--bg-card-subtle)';
+              e.currentTarget.style.color = 'var(--text-muted)';
             }}
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
@@ -131,22 +131,22 @@ export default function TopBar({ title, children }: TopBarProps) {
                 width: '36px',
                 height: '36px',
                 borderRadius: '8px',
-                background: 'rgba(147, 107, 218, 0.08)',
-                border: '1px solid rgba(147, 107, 218, 0.15)',
+                background: 'var(--bg-card-subtle)',
+                border: '1px solid var(--border)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
-                color: '#8b8b9e',
+                color: 'var(--text-muted)',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(147, 107, 218, 0.15)';
-                e.currentTarget.style.color = '#FFFFFF';
+                e.currentTarget.style.background = 'var(--border)';
+                e.currentTarget.style.color = 'var(--text-primary)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(147, 107, 218, 0.08)';
-                e.currentTarget.style.color = '#8b8b9e';
+                e.currentTarget.style.background = 'var(--bg-card-subtle)';
+                e.currentTarget.style.color = 'var(--text-muted)';
               }}
             >
               <BellIcon />

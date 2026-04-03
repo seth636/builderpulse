@@ -47,8 +47,23 @@ model Client {
   ai_recommendations    AiRecommendation[]
   health_scores         ClientHealthScore[]
   integrations          ClientIntegration[]
+  report_schedule       ReportSchedule?
 
   @@map("clients")
+}
+
+model ReportSchedule {
+  id          Int      @id @default(autoincrement())
+  client_id   Int      @unique
+  client      Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  enabled     Boolean  @default(false)
+  recipient   String
+  day_of_week Int      @default(1)
+  hour_utc    Int      @default(14)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("report_schedules")
 }
 
 model User {

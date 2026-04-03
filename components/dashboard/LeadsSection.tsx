@@ -6,6 +6,18 @@ import {
   PieChart, Pie, Cell,
 } from 'recharts';
 import SkeletonCard from './SkeletonCard';
+import { getPreviousPeriod } from './DateRangePicker';
+
+function ChangeBadge({ current, previous, lowerIsBetter = false }: { current: number; previous: number; lowerIsBetter?: boolean }) {
+  if (!previous || previous === 0) return null;
+  const pct = ((current - previous) / previous) * 100;
+  const isGood = lowerIsBetter ? pct < 0 : pct > 0;
+  return (
+    <span style={{ fontSize: '11px', fontWeight: '600', color: isGood ? '#10B981' : '#EF4444', marginLeft: '6px' }}>
+      {pct > 0 ? '↑' : '↓'}{Math.abs(pct).toFixed(1)}%
+    </span>
+  );
+}
 
 type Props = { slug: string; startDate: string; endDate: string; hasGHL: boolean };
 
@@ -36,6 +48,7 @@ function getStatusStyle(status: string | null) {
 
 export default function LeadsSection({ slug, startDate, endDate, hasGHL }: Props) {
   const [data, setData] = useState<LeadsData | null>(null);
+  const [prevData, setPrevData] = useState<LeadsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -43,8 +56,13 @@ export default function LeadsSection({ slug, startDate, endDate, hasGHL }: Props
     if (!startDate || !endDate) return;
     setLoading(true); setError(false);
     try {
-      const res = await fetch(`/api/leads/${slug}?start_date=${startDate}&end_date=${endDate}`);
-      setData(await res.json());
+      const prev = getPreviousPeriod(startDate, endDate);
+      const [curr, prv] = await Promise.all([
+        fetch(`/api/leads/${slug}?start_date=${startDate}&end_date=${endDate}`).then(r => r.json()),
+        fetch(`/api/leads/${slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()),
+      ]);
+      setData(curr);
+      setPrevData(prv);
     } catch { setError(true); }
     finally { setLoading(false); }
   }, [slug, startDate, endDate]);
@@ -61,6 +79,7 @@ export default function LeadsSection({ slug, startDate, endDate, hasGHL }: Props
   if (error) return <div className="bp-card text-slate-400 text-center">Failed to load — try refreshing</div>;
 
   const s = data?.summary;
+  const prevS = prevData?.summary;
   const noData = !data || data.leads.length === 0;
 
   if (noData) return (
@@ -74,14 +93,17 @@ export default function LeadsSection({ slug, startDate, endDate, hasGHL }: Props
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'New Leads', value: (s?.newLeads || 0).toLocaleString() },
-          { label: 'Appointments Booked', value: (s?.appointmentsBooked || 0).toLocaleString() },
-          { label: 'Appointments Completed', value: (s?.appointmentsCompleted || 0).toLocaleString() },
-          { label: 'Lead-to-Appt Rate', value: `${(s?.leadToApptRate || 0).toFixed(1)}%` },
+          { label: 'New Leads', raw: s?.newLeads || 0, prev: prevS?.newLeads || 0, display: (s?.newLeads || 0).toLocaleString(), lower: false },
+          { label: 'Appointments Booked', raw: s?.appointmentsBooked || 0, prev: prevS?.appointmentsBooked || 0, display: (s?.appointmentsBooked || 0).toLocaleString(), lower: false },
+          { label: 'Appointments Completed', raw: s?.appointmentsCompleted || 0, prev: prevS?.appointmentsCompleted || 0, display: (s?.appointmentsCompleted || 0).toLocaleString(), lower: false },
+          { label: 'Lead-to-Appt Rate', raw: s?.leadToApptRate || 0, prev: prevS?.leadToApptRate || 0, display: `${(s?.leadToApptRate || 0).toFixed(1)}%`, lower: false },
         ].map((card, i) => (
-          <div key={i} className="bg-[#1e293b] border border-[#334155] rounded-xl p-4">
-            <p className="text-xs text-slate-400 mb-1">{card.label}</p>
-            <p className="text-xl font-bold text-white">{card.value}</p>
+          <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px' }}>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>{card.label}</p>
+            <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap' }}>
+              <p style={{ fontSize: '22px', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>{card.display}</p>
+              <ChangeBadge current={card.raw} previous={card.prev} lowerIsBetter={card.lower} />
+            </div>
           </div>
         ))}
       </div>

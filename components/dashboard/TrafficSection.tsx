@@ -56,7 +56,7 @@ const ChartTooltip = ({ active, payload, label }: any) => {
       borderRadius: '10px', padding: '10px 14px',
       boxShadow: '0 8px 24px rgba(0,0,0,0.4)', fontSize: '12px',
     }}>
-      {label && <p style={{ color: '#8b8b9e', marginBottom: '6px', fontWeight: '600' }}>{label}</p>}
+      {label && <p style={{ color: 'var(--text-muted)', marginBottom: '6px', fontWeight: '600' }}>{label}</p>}
       {payload.map((p: any, i: number) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
           <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: p.color, flexShrink: 0 }} />
@@ -72,23 +72,35 @@ const ChartTooltip = ({ active, payload, label }: any) => {
 
 const ChartCard = ({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) => (
   <div style={{
-    background: 'rgba(255,255,255,0.025)',
-    border: '1px solid rgba(255,255,255,0.07)',
+    background: 'var(--bg-card)',
+    border: '1px solid var(--border)',
     borderRadius: '16px', padding: '22px',
   }}>
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-      <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#FFFFFF', margin: 0 }}>{title}</h3>
+      <h3 style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', margin: 0 }}>{title}</h3>
       {action}
     </div>
     {children}
   </div>
 );
 
-const AXIS_STYLE = { fill: '#64748b', fontSize: 11, fontFamily: 'Inter, sans-serif' };
-const GRID = { stroke: 'rgba(255,255,255,0.04)', strokeDasharray: '0' };
+const AXIS_STYLE = { fill: 'var(--text-muted)', fontSize: 11, fontFamily: 'Inter, sans-serif' };
+const GRID = { stroke: 'var(--bg-card-subtle)', strokeDasharray: '0' };
+
+function ChangeBadge({ current, previous, lowerIsBetter = false }: { current: number; previous: number; lowerIsBetter?: boolean }) {
+  if (!previous || previous === 0) return null;
+  const pct = ((current - previous) / previous) * 100;
+  const isGood = lowerIsBetter ? pct < 0 : pct > 0;
+  return (
+    <span style={{ fontSize: '11px', fontWeight: '600', color: isGood ? '#10B981' : '#EF4444', marginLeft: '6px' }}>
+      {pct > 0 ? '↑' : '↓'}{Math.abs(pct).toFixed(1)}%
+    </span>
+  );
+}
 
 export default function TrafficSection({ slug, startDate, endDate }: Props) {
   const [data, setData] = useState<AnalyticsData | null>(null);
+  const [prevData, setPrevData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [showAllPages, setShowAllPages] = useState(false);
@@ -103,10 +115,13 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
         ? raw
         : { daily: [], summary: { totalSessions: 0, totalUsers: 0, avgBounceRate: 0, totalConversions: 0 }, topPages: [], sources: [] };
     try {
-      const [curr] = await Promise.all([
+      const prev = getPreviousPeriod(startDate, endDate);
+      const [curr, prv] = await Promise.all([
         fetch(`/api/analytics/${slug}?start_date=${startDate}&end_date=${endDate}`).then(r => r.json()).then(safe),
+        fetch(`/api/analytics/${slug}?start_date=${prev.start}&end_date=${prev.end}`).then(r => r.json()).then(safe),
       ]);
       setData(curr);
+      setPrevData(prv);
     } catch { setError(true); }
     finally { setLoading(false); }
   }, [slug, startDate, endDate]);
@@ -125,7 +140,7 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
   );
 
   if (error) return (
-    <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '32px', textAlign: 'center', color: '#64748b' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '16px', padding: '32px', textAlign: 'center', color: 'var(--text-muted)' }}>
       Failed to load — try refreshing
     </div>
   );
@@ -163,6 +178,17 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
   };
 
   const { totalSessions: ts = 0, totalUsers: tu = 0, avgBounceRate: br = 0, totalConversions: tc = 0 } = data?.summary || {};
+  const prevS = prevData?.summary || { totalSessions: 0, totalUsers: 0, avgBounceRate: 0, totalConversions: 0 };
+
+  // Build comparison chart data (index-aligned)
+  const prevDaily = prevData?.daily || [];
+  const sessionChartWithPrev = (data?.daily || []).map((r, i) => ({
+    date: (r.date?.toString().split('T')[0] || '').slice(5),
+    sessions: r.sessions,
+    users: r.total_users,
+    prevSessions: prevDaily[i]?.sessions ?? null,
+    prevUsers: prevDaily[i]?.total_users ?? null,
+  }));
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -170,18 +196,21 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
       {/* ── Summary KPIs ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
         {[
-          { label: 'Sessions', value: ts.toLocaleString(), color: '#0ea5e9' },
-          { label: 'Users', value: tu.toLocaleString(), color: '#926BD9' },
-          { label: 'Bounce Rate', value: ((br || 0) * 100).toFixed(1) + '%', color: '#F59E0B' },
-          { label: 'Conversions', value: tc.toLocaleString(), color: '#00FFD4' },
+          { label: 'Sessions', value: ts, display: ts.toLocaleString(), prev: prevS.totalSessions, color: '#0ea5e9', lower: false },
+          { label: 'Users', value: tu, display: tu.toLocaleString(), prev: prevS.totalUsers, color: '#926BD9', lower: false },
+          { label: 'Bounce Rate', value: (br||0)*100, display: ((br || 0) * 100).toFixed(1) + '%', prev: (prevS.avgBounceRate||0)*100, color: '#F59E0B', lower: true },
+          { label: 'Conversions', value: tc, display: tc.toLocaleString(), prev: prevS.totalConversions, color: '#00FFD4', lower: false },
         ].map(item => (
           <div key={item.label} style={{
-            background: 'rgba(255,255,255,0.025)',
-            border: '1px solid rgba(255,255,255,0.07)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
             borderRadius: '12px', padding: '16px',
           }}>
-            <p style={{ fontSize: '11px', color: '#6b6b7e', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>{item.label}</p>
-            <p style={{ fontSize: '24px', fontWeight: '700', color: item.color, margin: 0 }}>{item.value}</p>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>{item.label}</p>
+            <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap' }}>
+              <p style={{ fontSize: '24px', fontWeight: '700', color: item.color, margin: 0 }}>{item.display}</p>
+              <ChangeBadge current={item.value} previous={item.prev} lowerIsBetter={item.lower} />
+            </div>
           </div>
         ))}
       </div>
@@ -189,12 +218,12 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
       {/* ── Sessions over time ── */}
       <ChartCard title="Sessions & Users Over Time">
         {noGA4 ? (
-          <p style={{ textAlign: 'center', color: '#64748b', fontSize: '13px', padding: '40px 0' }}>
+          <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px', padding: '40px 0' }}>
             No analytics data yet — add GA4 Property ID in Settings to sync.
           </p>
         ) : (
           <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={sessionChart}>
+            <AreaChart data={sessionChartWithPrev}>
               <defs>
                 <linearGradient id="sessGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.25} />
@@ -211,6 +240,8 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
               <Tooltip content={<ChartTooltip />} />
               <Area type="monotone" dataKey="sessions" stroke="#0ea5e9" strokeWidth={2} fill="url(#sessGrad)" dot={false} name="Sessions" />
               <Area type="monotone" dataKey="users" stroke="#926BD9" strokeWidth={1.5} fill="url(#usersGrad)" dot={false} name="Users" />
+              <Area type="monotone" dataKey="prevSessions" stroke="#0ea5e9" strokeWidth={1.5} strokeDasharray="4 2" fill="none" dot={false} name="Prev Sessions" strokeOpacity={0.4} />
+              <Area type="monotone" dataKey="prevUsers" stroke="#926BD9" strokeWidth={1} strokeDasharray="4 2" fill="none" dot={false} name="Prev Users" strokeOpacity={0.4} />
             </AreaChart>
           </ResponsiveContainer>
         )}
@@ -222,7 +253,7 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
         {/* Source bar chart */}
         <ChartCard title="Traffic by Source">
           {sourceData.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#64748b', fontSize: '13px', padding: '32px 0' }}>No source data</p>
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px', padding: '32px 0' }}>No source data</p>
           ) : (
             <>
               <ResponsiveContainer width="100%" height={180}>
@@ -244,13 +275,13 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
                 {sourceData.slice(0, 5).map((s, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                    <span style={{ flex: 1, fontSize: '12px', color: '#c4c4d4' }}>{s.name}</span>
+                    <span style={{ flex: 1, fontSize: '12px', color: 'var(--text-secondary)' }}>{s.name}</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <div style={{
                         height: '3px', width: `${totalSessions > 0 ? (s.sessions / totalSessions) * 60 : 0}px`,
                         background: s.color, borderRadius: '2px', opacity: 0.6, flexShrink: 0,
                       }} />
-                      <span style={{ fontSize: '12px', color: '#64748b', minWidth: '36px', textAlign: 'right' }}>
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', minWidth: '36px', textAlign: 'right' }}>
                         {totalSessions > 0 ? ((s.sessions / totalSessions) * 100).toFixed(0) : 0}%
                       </span>
                     </div>
@@ -264,7 +295,7 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
         {/* Top sources table */}
         <ChartCard title="Top Sources">
           {(data?.sources || []).length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#64748b', fontSize: '13px', padding: '32px 0' }}>No data</p>
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px', padding: '32px 0' }}>No data</p>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
               <thead>
@@ -274,8 +305,8 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
                       padding: '0 6px 10px',
                       textAlign: h === 'Source / Medium' ? 'left' : 'right',
                       fontSize: '10px', fontWeight: '600', textTransform: 'uppercase',
-                      letterSpacing: '0.08em', color: '#6b6b7e',
-                      borderBottom: '1px solid rgba(255,255,255,0.06)',
+                      letterSpacing: '0.08em', color: 'var(--text-muted)',
+                      borderBottom: '1px solid var(--border)',
                     }}>{h}</th>
                   ))}
                 </tr>
@@ -285,18 +316,18 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
                   const convRate = s.sessions > 0 ? (s.conversions / s.sessions) * 100 : 0;
                   const cat = classifySource(s.source, s.medium);
                   return (
-                    <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <tr key={i} style={{ borderBottom: '1px solid var(--bg-card-subtle)' }}>
                       <td style={{ padding: '9px 6px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: SOURCE_COLORS[cat] || '#4b5563', flexShrink: 0 }} />
-                          <span style={{ color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '130px' }}>
+                          <span style={{ color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '130px' }}>
                             {s.source} / {s.medium}
                           </span>
                         </div>
                       </td>
                       <td style={{ padding: '9px 6px', textAlign: 'right', color: '#0ea5e9', fontWeight: '600' }}>{s.sessions.toLocaleString()}</td>
-                      <td style={{ padding: '9px 6px', textAlign: 'right', color: '#8b8b9e' }}>{s.conversions.toLocaleString()}</td>
-                      <td style={{ padding: '9px 6px', textAlign: 'right', color: '#8b8b9e' }}>{convRate.toFixed(1)}%</td>
+                      <td style={{ padding: '9px 6px', textAlign: 'right', color: 'var(--text-muted)' }}>{s.conversions.toLocaleString()}</td>
+                      <td style={{ padding: '9px 6px', textAlign: 'right', color: 'var(--text-muted)' }}>{convRate.toFixed(1)}%</td>
                     </tr>
                   );
                 })}
@@ -309,13 +340,13 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
       {/* ── Top Pages table ── */}
       <ChartCard title="Top Pages">
         {pages.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#64748b', fontSize: '13px', padding: '32px 0' }}>No page data</p>
+          <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px', padding: '32px 0' }}>No page data</p>
         ) : (
           <>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
               <thead>
                 <tr>
-                  <th style={{ padding: '0 8px 12px', textAlign: 'left', fontSize: '10px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6b6b7e', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <th style={{ padding: '0 8px 12px', textAlign: 'left', fontSize: '10px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', borderBottom: '1px solid var(--border)' }}>
                     Page Path
                   </th>
                   {(['page_views', 'avg_time_on_page', 'bounce_rate'] as const).map(k => (
@@ -325,8 +356,8 @@ export default function TrafficSection({ slug, startDate, endDate }: Props) {
                         padding: '0 8px 12px', textAlign: 'right', cursor: 'pointer',
                         fontSize: '10px', fontWeight: '600', textTransform: 'uppercase',
                         letterSpacing: '0.08em',
-                        color: sortKey === k ? '#FFFFFF' : '#6b6b7e',
-                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                        color: sortKey === k ? 'var(--text-primary)' : 'var(--text-muted)',
+                        borderBottom: '1px solid var(--border)',
                         whiteSpace: 'nowrap',
                       }}
                     >

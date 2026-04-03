@@ -4,6 +4,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import SkeletonCard from './SkeletonCard';
 
+function ChangeBadge({ current, previous, lowerIsBetter = false }: { current: number; previous: number; lowerIsBetter?: boolean }) {
+  if (!previous || previous === 0) return null;
+  const pct = ((current - previous) / previous) * 100;
+  const isGood = lowerIsBetter ? pct < 0 : pct > 0;
+  return (
+    <span style={{ fontSize: '11px', fontWeight: '600', color: isGood ? '#10B981' : '#EF4444', marginLeft: '6px' }}>
+      {pct > 0 ? '↑' : '↓'}{Math.abs(pct).toFixed(1)}%
+    </span>
+  );
+}
+
 type Props = { slug: string; hasGHL: boolean };
 
 type Review = {
@@ -82,13 +93,13 @@ export default function ReviewsSection({ slug, hasGHL }: Props) {
           <StarRating rating={s?.averageRating || 0} />
         </div>
         {[
-          { label: 'Total Reviews', value: (s?.totalReviews || 0).toLocaleString() },
-          { label: 'Reviews This Month', value: (s?.reviewsThisMonth || 0).toLocaleString() },
-          { label: 'Response Rate', value: `${(s?.responseRate || 0).toFixed(1)}%` },
+          { label: 'Total Reviews', raw: s?.totalReviews || 0, prev: 0, display: (s?.totalReviews || 0).toLocaleString(), lower: false },
+          { label: 'Reviews This Month', raw: s?.reviewsThisMonth || 0, prev: 0, display: (s?.reviewsThisMonth || 0).toLocaleString(), lower: false },
+          { label: 'Response Rate', raw: s?.responseRate || 0, prev: 0, display: `${(s?.responseRate || 0).toFixed(1)}%`, lower: false },
         ].map((card, i) => (
-          <div key={i} className="bg-[#1e293b] border border-[#334155] rounded-xl p-4">
-            <p className="text-xs text-slate-400 mb-1">{card.label}</p>
-            <p className="text-xl font-bold text-white">{card.value}</p>
+          <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '16px' }}>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>{card.label}</p>
+            <p style={{ fontSize: '22px', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>{card.display}</p>
           </div>
         ))}
       </div>

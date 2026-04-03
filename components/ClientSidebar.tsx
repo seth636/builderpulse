@@ -103,7 +103,7 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
     borderRadius: 6,
     fontSize: 14,
     fontWeight: 500,
-    color: active ? '#FFFFFF' : '#8b8b9e',
+    color: active ? 'var(--text-primary)' : 'var(--text-muted)',
     textDecoration: 'none',
     background: active ? 'rgba(147,107,218,0.12)' : 'transparent',
     borderLeft: active ? '2px solid #00FFD4' : '2px solid transparent',
@@ -117,7 +117,7 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
     paddingTop: 6,
     paddingBottom: 6,
     fontSize: 13,
-    color: active ? '#00FFD4' : '#6b6b7e',
+    color: active ? '#00FFD4' : 'var(--text-muted)',
     textDecoration: 'none',
     transition: 'color 0.15s ease',
   });
@@ -129,15 +129,15 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
       top: 0,
       height: '100vh',
       width: '240px',
-      backgroundColor: '#050508',
-      borderRight: '1px solid rgba(147, 107, 218, 0.1)',
+      backgroundColor: 'var(--bg-card)',
+      borderRight: '1px solid var(--border)',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: 'Inter, sans-serif',
     }}>
       <div style={{
         padding: '20px 16px',
-        borderBottom: '1px solid rgba(147, 107, 218, 0.08)',
+        borderBottom: '1px solid var(--border)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
           <div style={{
@@ -176,7 +176,7 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
 
       <div style={{
         padding: '16px',
-        borderBottom: '1px solid rgba(147, 107, 218, 0.08)',
+        borderBottom: '1px solid var(--border)',
         background: 'rgba(147, 107, 218, 0.03)',
       }}>
         <p style={{ fontSize: '10px', color: '#6b6b7e', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>Client</p>

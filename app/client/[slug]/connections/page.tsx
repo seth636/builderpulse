@@ -104,6 +104,10 @@ function IntegrationCard({
       padding: '24px',
       transition: 'box-shadow 0.2s ease',
       position: 'relative',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      overflow: 'hidden',
     }}
     onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)')}
     onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
@@ -160,7 +164,7 @@ function IntegrationCard({
         </div>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: 'auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
           <div style={{
             width: '7px',
@@ -464,8 +468,9 @@ export default function ConnectionsPage() {
             </p>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
               gap: '16px',
+              alignItems: 'stretch',
             }}>
               <GoogleGroupBanner
                 connected={googleConnected}
@@ -527,8 +532,9 @@ export default function ConnectionsPage() {
             </p>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
               gap: '16px',
+              alignItems: 'stretch',
             }}>
               <IntegrationCard
                 provider="ghl"
