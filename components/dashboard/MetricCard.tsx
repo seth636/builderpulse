@@ -64,7 +64,7 @@ export default function MetricCard({
 
   const trend = getTrend(value, previousValue, format);
   const sparkPoints = sparklineData.map((v) => ({ v }));
-  const trendColor = trend === null ? '#64748b' : trend.isGood ? '#00FFD4' : '#EF4444';
+  const trendColor = trend === null ? 'var(--text-muted)' : trend.isGood ? '#00FFD4' : '#EF4444';
 
   return (
     <div style={{
@@ -107,7 +107,7 @@ export default function MetricCard({
 
           {/* Subtitle (optional override for trend area) */}
           {subtitle && (
-            <div style={{ fontSize: '12px', color: '#8b8b9e', marginBottom: '4px' }}>{subtitle}</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>{subtitle}</div>
           )}
 
           {/* Trend badge */}

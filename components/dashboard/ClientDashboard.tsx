@@ -262,7 +262,7 @@ export default function ClientDashboard({ client }: { client: Client }) {
                 <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '3px' }}>{alert?.description}</p>
               </div>
               <button onClick={() => resolveAlert(alert?.id)}
-                style={{ fontSize: '12px', color: '#6b6b7e', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, marginLeft: '16px', padding: '4px 8px', borderRadius: '6px' }}>
+                style={{ fontSize: '12px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, marginLeft: '16px', padding: '4px 8px', borderRadius: '6px' }}>
                 Resolve
               </button>
             </div>
