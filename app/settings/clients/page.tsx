@@ -131,9 +131,9 @@ export default function ClientsSettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen" style={{ backgroundColor: '#000000' }}>
+      <div className="flex min-h-screen" style={{ backgroundColor: 'var(--bg-page)' }}>
         <Sidebar />
-        <div className="flex-1 ml-60" style={{ backgroundColor: '#000000' }}>
+        <div className="flex-1 ml-60" style={{ backgroundColor: 'var(--bg-page)' }}>
           <TopBar title="Client Settings" />
           <div className="p-8 text-center" style={{ color: '#8b8b9e' }}>Loading...</div>
         </div>
@@ -142,9 +142,9 @@ export default function ClientsSettingsPage() {
   }
 
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: '#000000' }}>
+    <div className="flex min-h-screen" style={{ backgroundColor: 'var(--bg-page)' }}>
       <Sidebar />
-      <div className="flex-1 ml-60" style={{ backgroundColor: '#000000' }}>
+      <div className="flex-1 ml-60" style={{ backgroundColor: 'var(--bg-page)' }}>
         <TopBar title="Client Settings" />
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">

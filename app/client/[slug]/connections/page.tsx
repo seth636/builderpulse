@@ -98,8 +98,8 @@ function IntegrationCard({
 
   return (
     <div style={{
-      background: '#FFFFFF',
-      border: '1px solid #E5E7EB',
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border)',
       borderRadius: '12px',
       padding: '24px',
       transition: 'box-shadow 0.2s ease',
@@ -132,7 +132,7 @@ function IntegrationCard({
           <h3 style={{
             fontSize: '15px',
             fontWeight: '600',
-            color: '#111827',
+            color: 'var(--text-primary)',
             margin: 0,
             marginBottom: '4px',
           }}>
@@ -140,7 +140,7 @@ function IntegrationCard({
           </h3>
           <p style={{
             fontSize: '13px',
-            color: '#6B7280',
+            color: 'var(--text-secondary)',
             margin: 0,
             lineHeight: '1.5',
           }}>
@@ -174,13 +174,13 @@ function IntegrationCard({
           }} />
           <span style={{
             fontSize: '13px',
-            color: connected ? '#059669' : '#9CA3AF',
+            color: connected ? '#059669' : 'var(--text-muted)',
             fontWeight: '500',
           }}>
             {connected ? 'Connected' : 'Not connected'}
           </span>
           {connected && accountName && (
-            <span style={{ fontSize: '12px', color: '#9CA3AF', marginLeft: '2px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: '2px' }}>
               · {accountName}
             </span>
           )}
@@ -248,9 +248,9 @@ function IntegrationCard({
                 fontWeight: '500',
                 borderRadius: '6px',
                 cursor: 'pointer',
-                color: '#6B7280',
-                background: '#F9FAFB',
-                border: '1px solid #E5E7EB',
+                color: 'var(--text-secondary)',
+                background: 'var(--bg-page)',
+                border: '1px solid var(--border)',
               }}
             >
               Cancel
@@ -270,8 +270,8 @@ function GoogleGroupBanner({ connected, onConnect }: { connected: boolean; onCon
     <div style={{
       gridColumn: '1 / -1',
       padding: '14px 18px',
-      background: '#EFF6FF',
-      border: '1px solid #BFDBFE',
+      background: 'var(--bg-card-subtle)',
+      border: '1px solid var(--border-subtle)',
       borderRadius: '10px',
       display: 'flex',
       alignItems: 'center',
@@ -279,10 +279,10 @@ function GoogleGroupBanner({ connected, onConnect }: { connected: boolean; onCon
       gap: '16px',
     }}>
       <div>
-        <p style={{ margin: 0, fontSize: '13px', fontWeight: '600', color: '#1E40AF' }}>
+        <p style={{ margin: 0, fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
           Connect all three Google services at once
         </p>
-        <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#3B82F6' }}>
+        <p style={{ margin: '2px 0 0', fontSize: '12px', color: 'var(--text-secondary)' }}>
           One Google sign-in grants access to Analytics 4, Search Console, and Business Profile simultaneously.
         </p>
       </div>
@@ -395,12 +395,12 @@ export default function ConnectionsPage() {
 
   if (loading || !client) {
     return (
-      <div className="flex min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
+      <div className="flex min-h-screen" style={{ backgroundColor: 'var(--bg-page)' }}>
         <ClientSidebar clientName={client?.name || 'Loading...'} clientSlug={slug} />
-        <div className="flex-1 ml-60" style={{ backgroundColor: '#F9FAFB' }}>
+        <div className="flex-1 ml-60" style={{ backgroundColor: 'var(--bg-page)' }}>
           <TopBar title="Integrations & Connections" />
           <div className="p-8">
-            <p style={{ color: '#6B7280' }}>Loading...</p>
+            <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
           </div>
         </div>
       </div>
@@ -408,9 +408,9 @@ export default function ConnectionsPage() {
   }
 
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
+    <div className="flex min-h-screen" style={{ backgroundColor: 'var(--bg-page)' }}>
       <ClientSidebar clientName={client.name} clientSlug={client.slug} />
-      <div className="flex-1 ml-60" style={{ backgroundColor: '#F9FAFB' }}>
+      <div className="flex-1 ml-60" style={{ backgroundColor: 'var(--bg-page)' }}>
         <TopBar title="Integrations & Connections" />
         <div className="p-8">
 
@@ -446,10 +446,10 @@ export default function ConnectionsPage() {
 
           {/* Page header */}
           <div style={{ marginBottom: '28px' }}>
-            <h2 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', margin: 0, marginBottom: '6px' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', margin: 0, marginBottom: '6px' }}>
               Connect Your Services
             </h2>
-            <p style={{ fontSize: '14px', color: '#6B7280', margin: 0 }}>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
               Authorize BuilderPulse to pull data from your marketing and analytics platforms.
             </p>
           </div>
@@ -461,7 +461,7 @@ export default function ConnectionsPage() {
               fontWeight: '600',
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: '#9CA3AF',
+              color: 'var(--text-muted)',
               margin: '0 0 12px 2px',
             }}>
               Google
@@ -525,7 +525,7 @@ export default function ConnectionsPage() {
               fontWeight: '600',
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: '#9CA3AF',
+              color: 'var(--text-muted)',
               margin: '0 0 12px 2px',
             }}>
               Advertising & CRM

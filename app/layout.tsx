@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-black text-white antialiased`} style={{ backgroundColor: '#000000' }}>
+      <body className={`${inter.className} antialiased`} style={{ backgroundColor: 'var(--bg-page)', color: 'var(--text-primary)' }}>
         <SessionProvider session={null}>{children}</SessionProvider>
       </body>
     </html>

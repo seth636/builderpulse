@@ -143,9 +143,9 @@ export default function AlertsPage() {
   };
 
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: '#000000' }}>
+    <div className="flex min-h-screen" style={{ backgroundColor: 'var(--bg-page)' }}>
       <Sidebar />
-      <div className="flex-1 ml-60" style={{ backgroundColor: '#000000' }}>
+      <div className="flex-1 ml-60" style={{ backgroundColor: 'var(--bg-page)' }}>
         <TopBar title="Alerts" />
         <div className="p-8">
           {/* Filter bar */}

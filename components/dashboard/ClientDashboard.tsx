@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import DateRangePicker, { DateRange, getDateRange, getPreviousPeriod } from './DateRangePicker';
-const MetricCard = dynamic(() => import('./MetricCard'), { ssr: false, loading: () => <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', height: '130px', animation: 'pulse 1.5s infinite' }} /> });
+const MetricCard = dynamic(() => import('./MetricCard'), { ssr: false, loading: () => <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid var(--border)', borderRadius: '14px', height: '130px', animation: 'pulse 1.5s infinite' }} /> });
 import SkeletonCard from './SkeletonCard';
 
 const TrafficSection = dynamic(() => import('./TrafficSection'), { ssr: false, loading: () => <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}><SkeletonCard height="h-72" /><SkeletonCard height="h-64" /></div> });
@@ -159,8 +159,8 @@ export default function ClientDashboard({ client }: { client: Client }) {
       <div style={{
         display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
         gap: '20px', flexWrap: 'wrap', marginBottom: '24px',
-        background: 'rgba(255,255,255,0.015)',
-        border: '1px solid rgba(255,255,255,0.07)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
         borderRadius: '16px', padding: '22px 24px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
@@ -177,12 +177,12 @@ export default function ClientDashboard({ client }: { client: Client }) {
               </svg>
               <span style={{
                 position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#FFFFFF', fontWeight: '700', fontSize: '13px',
+                color: 'var(--text-primary)', fontWeight: '700', fontSize: '13px',
               }}>{Math.round(healthScore)}</span>
             </div>
           )}
           <div>
-            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#FFFFFF', margin: '0 0 4px' }}>{client.name}</h2>
+            <h2 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 4px' }}>{client.name}</h2>
             {client.website_url && (
               <a href={client.website_url} target="_blank" rel="noopener noreferrer"
                 style={{ color: '#00FFD4', fontSize: '13px', textDecoration: 'none' }}>
@@ -208,7 +208,7 @@ export default function ClientDashboard({ client }: { client: Client }) {
           <Link href={`/client/${client.slug}/recommendations`}
             style={{
               padding: '8px 16px', borderRadius: '8px',
-              background: 'rgba(147,107,218,0.1)', color: '#FFFFFF',
+              background: 'rgba(147,107,218,0.1)', color: 'var(--text-primary)',
               border: '1px solid rgba(147,107,218,0.2)',
               fontSize: '13px', fontWeight: '500', textDecoration: 'none',
               transition: 'all 0.2s',
@@ -244,8 +244,8 @@ export default function ClientDashboard({ client }: { client: Client }) {
                 }}>
                   {(alert?.severity ?? 'warning').toUpperCase()}
                 </span>
-                <span style={{ color: '#FFFFFF', fontSize: '13px', fontWeight: '500' }}>{alert?.title}</span>
-                <p style={{ color: '#8b8b9e', fontSize: '12px', marginTop: '3px' }}>{alert?.description}</p>
+                <span style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500' }}>{alert?.title}</span>
+                <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '3px' }}>{alert?.description}</p>
               </div>
               <button onClick={() => resolveAlert(alert?.id)}
                 style={{ fontSize: '12px', color: '#6b6b7e', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, marginLeft: '16px', padding: '4px 8px', borderRadius: '6px' }}>
@@ -301,7 +301,7 @@ export default function ClientDashboard({ client }: { client: Client }) {
         padding: '22px', marginBottom: '28px',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h2 style={{ color: '#FFFFFF', fontWeight: '600', fontSize: '14px', margin: 0 }}>
+          <h2 style={{ color: 'var(--text-primary)', fontWeight: '600', fontSize: '14px', margin: 0 }}>
             AI Insights — {currentMonth}
           </h2>
           <button
@@ -318,7 +318,7 @@ export default function ClientDashboard({ client }: { client: Client }) {
           </button>
         </div>
         {insights.length === 0 ? (
-          <p style={{ color: '#64748b', fontSize: '13px' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
             No insights yet — click "Generate Insights" to analyze this month's performance.
           </p>
         ) : (
@@ -333,9 +333,9 @@ export default function ClientDashboard({ client }: { client: Client }) {
                   <span style={{ fontSize: '13px' }}>
                     {insight?.type === 'positive' ? '✅' : insight?.type === 'negative' ? '🚨' : 'ℹ️'}
                   </span>
-                  <span style={{ color: '#FFFFFF', fontWeight: '600', fontSize: '13px' }}>{insight?.title}</span>
+                  <span style={{ color: 'var(--text-primary)', fontWeight: '600', fontSize: '13px' }}>{insight?.title}</span>
                 </div>
-                <p style={{ color: '#c4c4d4', fontSize: '12px', margin: 0, lineHeight: '1.5' }}>{insight?.body}</p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '12px', margin: 0, lineHeight: '1.5' }}>{insight?.body}</p>
               </div>
             ))}
           </div>
@@ -345,7 +345,7 @@ export default function ClientDashboard({ client }: { client: Client }) {
       {/* ── Traffic Section ── */}
       <section id="traffic" style={{ marginBottom: '40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#FFFFFF', margin: 0 }}>Website Traffic</h2>
+          <h2 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>Website Traffic</h2>
         </div>
         <TrafficSection slug={client.slug} startDate={dateRange.startDate} endDate={dateRange.endDate} />
       </section>
@@ -353,7 +353,7 @@ export default function ClientDashboard({ client }: { client: Client }) {
       {/* ── SEO Section ── */}
       <section id="seo" style={{ marginBottom: '40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#FFFFFF', margin: 0 }}>SEO Performance</h2>
+          <h2 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>SEO Performance</h2>
           <div style={{ display: 'flex', gap: '8px' }}>
             {[
               { href: `/client/${client.slug}/seo/keywords`, label: 'Keywords' },
@@ -362,8 +362,8 @@ export default function ClientDashboard({ client }: { client: Client }) {
             ].map(link => (
               <Link key={link.href} href={link.href} style={{
                 padding: '6px 14px', borderRadius: '7px', fontSize: '12px', fontWeight: '500',
-                background: 'rgba(255,255,255,0.04)', color: '#c4c4d4',
-                border: '1px solid rgba(255,255,255,0.08)', textDecoration: 'none',
+                background: 'rgba(255,255,255,0.04)', color: 'var(--text-secondary)',
+                border: '1px solid var(--border)', textDecoration: 'none',
                 transition: 'all 0.15s',
               }}>
                 {link.label}
@@ -376,19 +376,19 @@ export default function ClientDashboard({ client }: { client: Client }) {
 
       {/* ── Ads Section ── */}
       <section id="ads" style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#FFFFFF', marginBottom: '16px' }}>Advertising</h2>
+        <h2 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '16px' }}>Advertising</h2>
         <AdsSection slug={client.slug} startDate={dateRange.startDate} endDate={dateRange.endDate} hasMetaAccount={!!client.meta_ad_account_id} />
       </section>
 
       {/* ── Leads Section ── */}
       <section id="leads" style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#FFFFFF', marginBottom: '16px' }}>Leads & CRM</h2>
+        <h2 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '16px' }}>Leads & CRM</h2>
         <LeadsSection slug={client.slug} startDate={dateRange.startDate} endDate={dateRange.endDate} hasGHL={!!client.ghl_location_id} />
       </section>
 
       {/* ── Reviews Section ── */}
       <section id="reviews" style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontSize: '16px', fontWeight: '700', color: '#FFFFFF', marginBottom: '16px' }}>Reviews</h2>
+        <h2 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '16px' }}>Reviews</h2>
         <ReviewsSection slug={client.slug} hasGHL={!!client.ghl_location_id} />
       </section>
     </div>
