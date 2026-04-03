@@ -127,6 +127,14 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    // Trigger immediate data pull in background
+    const appUrlGHL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    fetch(`${appUrlGHL}/api/clients/${clientSlug}/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider: 'ghl' }),
+    }).catch((e) => console.error('[GHL connect] Background sync failed:', e));
+
     return NextResponse.redirect(
       `${process.env.NEXT_PUBLIC_APP_URL}/client/${clientSlug}/connections?connected=ghl`
     );
