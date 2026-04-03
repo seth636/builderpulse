@@ -185,37 +185,37 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
 
       <nav style={{ flex: 1, padding: '12px 8px', overflow: 'auto' }}>
         {/* Overview */}
-        <a
-          href="#overview"
-          style={navLinkStyle(isActive(`/client/${clientSlug}`) && !pathname.includes('/seo/') && !pathname.includes('/recommendations') && !pathname.includes('/reports'))}
-          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}`)) e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}`)) e.currentTarget.style.color = '#8b8b9e'; }}
+        <Link
+          href={`/client/${clientSlug}`}
+          style={navLinkStyle(isActive(`/client/${clientSlug}`) && !pathname.includes('/seo/') && !pathname.includes('/recommendations') && !pathname.includes('/reports') && !pathname.includes('/traffic') && !pathname.includes('/ads') && !pathname.includes('/leads') && !pathname.includes('/reviews') && !pathname.includes('/connections'))}
+          onMouseEnter={e => { const active = isActive(`/client/${clientSlug}`) && !pathname.includes('/seo/'); if (!active) e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { const active = isActive(`/client/${clientSlug}`) && !pathname.includes('/seo/'); if (!active) e.currentTarget.style.color = '#8b8b9e'; }}
         >
           <IconOverview />
           Overview
-        </a>
+        </Link>
 
         {/* Traffic */}
-        <a
-          href="#traffic"
-          style={navLinkStyle(false)}
-          onMouseEnter={e => { e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = '#8b8b9e'; }}
+        <Link
+          href={`/client/${clientSlug}/traffic`}
+          style={navLinkStyle(isActive(`/client/${clientSlug}/traffic`))}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/traffic`)) e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/traffic`)) e.currentTarget.style.color = '#8b8b9e'; }}
         >
           <IconTraffic />
           Traffic
-        </a>
+        </Link>
 
         {/* SEO */}
-        <a
-          href="#seo"
+        <Link
+          href={`/client/${clientSlug}/seo/keywords`}
           style={navLinkStyle(pathname.includes('/seo/'))}
           onMouseEnter={e => { if (!pathname.includes('/seo/')) e.currentTarget.style.color = '#FFFFFF'; }}
           onMouseLeave={e => { if (!pathname.includes('/seo/')) e.currentTarget.style.color = '#8b8b9e'; }}
         >
           <IconSEO />
           SEO
-        </a>
+        </Link>
         <Link href={`/client/${clientSlug}/seo/keywords`} style={subLinkStyle(isActive(`/client/${clientSlug}/seo/keywords`))}>
           ↳ Keywords
         </Link>
@@ -227,37 +227,37 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         </Link>
 
         {/* Ads */}
-        <a
-          href="#ads"
-          style={navLinkStyle(false)}
-          onMouseEnter={e => { e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = '#8b8b9e'; }}
+        <Link
+          href={`/client/${clientSlug}/ads`}
+          style={navLinkStyle(isActive(`/client/${clientSlug}/ads`))}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/ads`)) e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/ads`)) e.currentTarget.style.color = '#8b8b9e'; }}
         >
           <IconAds />
           Ads
-        </a>
+        </Link>
 
         {/* Leads */}
-        <a
-          href="#leads"
-          style={navLinkStyle(false)}
-          onMouseEnter={e => { e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = '#8b8b9e'; }}
+        <Link
+          href={`/client/${clientSlug}/leads`}
+          style={navLinkStyle(isActive(`/client/${clientSlug}/leads`))}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/leads`)) e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/leads`)) e.currentTarget.style.color = '#8b8b9e'; }}
         >
           <IconLeads />
           Leads
-        </a>
+        </Link>
 
         {/* Reviews */}
-        <a
-          href="#reviews"
-          style={navLinkStyle(false)}
-          onMouseEnter={e => { e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = '#8b8b9e'; }}
+        <Link
+          href={`/client/${clientSlug}/reviews`}
+          style={navLinkStyle(isActive(`/client/${clientSlug}/reviews`))}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/reviews`)) e.currentTarget.style.color = '#FFFFFF'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/reviews`)) e.currentTarget.style.color = '#8b8b9e'; }}
         >
           <IconReviews />
           Reviews
-        </a>
+        </Link>
 
         {/* AI Recommendations */}
         <Link
