@@ -38,7 +38,7 @@ export default function TrafficPage() {
         <TopBar title={clientName ? `${clientName} — Traffic` : 'Traffic'} />
         <div style={{ padding: '32px' }}>
           <div style={{ marginBottom: '24px' }}>
-            <DateRangePicker value={dateRange} onChange={setDateRange} />
+            <DateRangePicker onChange={setDateRange} />
           </div>
           <TrafficSection
             slug={slug}

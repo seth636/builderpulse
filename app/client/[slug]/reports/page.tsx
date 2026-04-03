@@ -107,6 +107,7 @@ export default function ClientReportsPage() {
   const lastMonth = getLastMonth();
   const [selectedMonth, setSelectedMonth] = useState(lastMonth.month);
   const [selectedYear, setSelectedYear] = useState(lastMonth.year);
+  const [generateError, setGenerateError] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login');
@@ -162,6 +163,7 @@ export default function ClientReportsPage() {
   const handleGenerate = async () => {
     if (!client) return;
     setGenerating(true);
+    setGenerateError(null);
     const periodStart = new Date(selectedYear, selectedMonth, 1);
     const periodEnd = new Date(selectedYear, selectedMonth + 1, 0);
     try {
@@ -176,13 +178,14 @@ export default function ClientReportsPage() {
       });
       if (res.ok) {
         setShowModal(false);
+        setGenerateError(null);
         await fetchReports(client.id);
       } else {
         const err = await res.json();
-        alert(`Failed to generate report: ${err.error || 'Unknown error'}`);
+        setGenerateError(err.error || 'Failed to generate report. Make sure this client has connected integrations with synced data.');
       }
     } catch {
-      alert('Failed to generate report');
+      setGenerateError('Network error — could not reach the server. Please try again.');
     } finally {
       setGenerating(false);
     }

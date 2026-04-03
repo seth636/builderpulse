@@ -37,7 +37,7 @@ export default function LeadsPage() {
         <TopBar title={clientName ? `${clientName} — Leads` : 'Leads'} />
         <div style={{ padding: '32px' }}>
           <div style={{ marginBottom: '24px' }}>
-            <DateRangePicker value={dateRange} onChange={setDateRange} />
+            <DateRangePicker onChange={setDateRange} />
           </div>
           <LeadsSection
             slug={slug}

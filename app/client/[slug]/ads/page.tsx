@@ -34,7 +34,7 @@ export default function AdsPage() {
         <TopBar title={clientName ? `${clientName} — Ads` : 'Ads'} />
         <div style={{ padding: '32px' }}>
           <div style={{ marginBottom: '24px' }}>
-            <DateRangePicker value={dateRange} onChange={setDateRange} />
+            <DateRangePicker onChange={setDateRange} />
           </div>
           <AdsSection
             slug={slug}

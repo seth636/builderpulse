@@ -123,8 +123,8 @@ export async function GET(req: NextRequest) {
     });
 
     // Trigger immediate data pull in background (don't await — let redirect happen fast)
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    fetch(`${appUrl}/api/clients/${clientSlug}/sync`, {
+    const appUrlSync = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    fetch(`${appUrlSync}/api/clients/${clientSlug}/sync`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ provider: 'google' }),
