@@ -52,6 +52,16 @@ function GHLIcon() {
   );
 }
 
+function ClickUpIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M3 12l4.5 4.5L12 9l4.5 4.5L21 6" stroke="#7B68EE" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M3 17l4.5-4.5" stroke="#00C4B4" strokeWidth="2.2" strokeLinecap="round"/>
+      <path d="M21 11l-4.5 4.5" stroke="#00C4B4" strokeWidth="2.2" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
 function MetaIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -331,6 +341,7 @@ export default function ConnectionsPage() {
         google: 'Google',
         ghl: 'GoHighLevel',
         meta: 'Meta Ads',
+        clickup: 'ClickUp',
       };
       setSuccessMessage(`${providerNames[connected] || connected} connected successfully!`);
       setTimeout(() => setSuccessMessage(null), 5000);
@@ -365,7 +376,12 @@ export default function ConnectionsPage() {
   };
 
   const handleConnect = (provider: string) => {
-    window.location.href = `/api/auth/${provider}/initiate?client_slug=${slug}`;
+    if (provider === 'clickup') {
+      // ClickUp uses a different OAuth initiation URL format
+      window.location.href = `/api/auth/clickup/initiate?client_slug=${slug}`;
+    } else {
+      window.location.href = `/api/auth/${provider}/initiate?client_slug=${slug}`;
+    }
   };
 
   const handleDisconnect = async (provider: string) => {
@@ -558,6 +574,38 @@ export default function ConnectionsPage() {
                 accountName={getIntegration('meta')?.account_name}
                 onConnect={() => handleConnect('meta')}
                 onDisconnect={() => handleDisconnect('meta')}
+              />
+            </div>
+          </div>
+
+          {/* ── Project Management ── */}
+          <div style={{ marginTop: '32px' }}>
+            <p style={{
+              fontSize: '11px',
+              fontWeight: '600',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'var(--text-muted)',
+              margin: '0 0 12px 2px',
+            }}>
+              Project Management
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '16px',
+              alignItems: 'stretch',
+            }}>
+              <IntegrationCard
+                provider="clickup"
+                name="ClickUp"
+                description="Task completion, project progress, and weekly delivery metrics per client"
+                icon={<ClickUpIcon />}
+                accentColor="#7B68EE"
+                connected={!!getIntegration('clickup')}
+                accountName={getIntegration('clickup')?.account_name}
+                onConnect={() => handleConnect('clickup')}
+                onDisconnect={() => handleDisconnect('clickup')}
               />
             </div>
           </div>

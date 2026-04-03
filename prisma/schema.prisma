@@ -47,6 +47,7 @@ model Client {
   ai_recommendations    AiRecommendation[]
   health_scores         ClientHealthScore[]
   integrations          ClientIntegration[]
+  clickup_tasks         ClickUpTask[]
   report_schedule       ReportSchedule?
 
   @@map("clients")
@@ -366,6 +367,28 @@ model ClientHealthScore {
   calculated_at  DateTime @default(now())
 
   @@map("client_health_scores")
+}
+
+model ClickUpTask {
+  id              Int      @id @default(autoincrement())
+  client_id       Int
+  client          Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  task_id         String
+  task_name       String
+  status          String
+  status_type     String   // open, in_progress, closed
+  list_id         String?
+  list_name       String?
+  space_id        String?
+  assignee_name   String?
+  due_date        DateTime?
+  completed_date  DateTime?
+  week_start      DateTime // ISO week start (Monday)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@unique([client_id, task_id])
+  @@map("clickup_tasks")
 }
 
 model ClientIntegration {

@@ -6,6 +6,7 @@ import { pullGSCData } from '@/lib/integrations/gsc';
 import { pullMetaAds } from '@/lib/integrations/meta-ads';
 import { pullGHLData } from '@/lib/integrations/ghl';
 import { pullGoogleReviews } from '@/lib/integrations/google-reviews';
+import { pullClickUpData } from '@/lib/integrations/clickup';
 
 const prisma = new PrismaClient();
 
@@ -48,6 +49,7 @@ export async function POST(
     const runGoogle = provider === 'all' || provider === 'google';
     const runGHL = provider === 'all' || provider === 'ghl';
     const runMeta = provider === 'all' || provider === 'meta';
+    const runClickUp = provider === 'all' || provider === 'clickup';
 
     // GA4
     if (runGoogle && client.ga4_property_id) {
@@ -98,6 +100,21 @@ export async function POST(
         results.reviews = r;
       } catch (e: any) {
         results.reviews = { success: false, error: e.message };
+      }
+    }
+
+    // ClickUp
+    if (runClickUp) {
+      try {
+        const cuIntegration = await prisma.clientIntegration.findUnique({
+          where: { client_id_provider: { client_id: client.id, provider: 'clickup' } },
+        });
+        if (cuIntegration?.access_token) {
+          const r = await pullClickUpData(client.id, cuIntegration.access_token, 30);
+          results.clickup = r;
+        }
+      } catch (e: any) {
+        results.clickup = { success: false, error: e.message };
       }
     }
 
