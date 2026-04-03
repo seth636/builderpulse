@@ -84,7 +84,7 @@ export default function TeamSettingsPage() {
         <Sidebar />
         <div className="flex-1 ml-60" style={{ backgroundColor: 'var(--bg-page)' }}>
           <TopBar title="Team Settings" />
-          <div className="p-8 text-center" style={{ color: '#8b8b9e' }}>Loading...</div>
+          <div className="p-8 text-center" style={{ color: 'var(--text-muted)' }}>Loading...</div>
         </div>
       </div>
     );
@@ -97,7 +97,7 @@ export default function TeamSettingsPage() {
         <TopBar title="Team Settings" />
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-white">Manage Team</h3>
+            <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Manage Team</h3>
             <button onClick={handleAdd} className="btn-teal">
               Add User
             </button>
@@ -113,11 +113,11 @@ export default function TeamSettingsPage() {
             <table className="w-full">
               <thead>
                 <tr style={{ background: 'rgba(0,0,0,0.4)', borderBottom: '1px solid rgba(147,107,218,0.1)' }}>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Client</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Client</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,10 +132,10 @@ export default function TeamSettingsPage() {
                     onMouseEnter={() => setHoveredRow(user.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{user.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#8b8b9e' }}>{user.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm capitalize" style={{ color: '#8b8b9e' }}>{user.role}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#8b8b9e' }}>{user.client?.name || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-primary)' }}>{user.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-muted)' }}>{user.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm capitalize" style={{ color: 'var(--text-muted)' }}>{user.role}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-muted)' }}>{user.client?.name || '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm" style={{ display: 'table-cell' }}>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
                         <button onClick={() => handleEdit(user)} className="text-accent hover:text-accent/80 font-medium">Edit</button>

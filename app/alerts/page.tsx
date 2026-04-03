@@ -79,7 +79,7 @@ const SEVERITY_STYLES: Record<string, React.CSSProperties> = {
 const filterSelectStyle: React.CSSProperties = {
   background: 'rgba(147,107,218,0.08)',
   border: '1px solid rgba(147,107,218,0.15)',
-  color: '#FFFFFF',
+  color: 'var(--text-primary)',
   borderRadius: 8,
   padding: '8px 12px',
   fontSize: 13,
@@ -183,7 +183,7 @@ export default function AlertsPage() {
           </div>
 
           {loading ? (
-            <p style={{ color: '#8b8b9e', fontSize: 14 }}>Loading alerts...</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Loading alerts...</p>
           ) : alerts.length === 0 ? (
             <div style={{
               background: 'rgba(13,17,23,0.95)',
@@ -192,7 +192,7 @@ export default function AlertsPage() {
               padding: 48,
               textAlign: 'center',
             }}>
-              <p style={{ color: '#8b8b9e', fontSize: 14 }}>No alerts. The system monitors all clients automatically.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>No alerts. The system monitors all clients automatically.</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -215,7 +215,7 @@ export default function AlertsPage() {
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                          <span style={{ color: '#8b8b9e', display: 'flex', alignItems: 'center' }}>
+                          <span style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
                             {TYPE_ICONS[alertType] || <IconAlertTriangle />}
                           </span>
                           <span style={{
@@ -236,9 +236,9 @@ export default function AlertsPage() {
                             <span style={{ fontSize: 11, backgroundColor: 'rgba(147,107,218,0.15)', color: '#926BD9', padding: '2px 6px', borderRadius: 4, fontWeight: 600 }}>NEW</span>
                           )}
                         </div>
-                        <p style={{ color: '#FFFFFF', fontWeight: 600, fontSize: 14, margin: '0 0 4px 0' }}>{alert?.title ?? 'Alert'}</p>
-                        <p style={{ color: '#8b8b9e', fontSize: 13, margin: 0 }}>{alert?.description ?? ''}</p>
-                        <p style={{ color: '#4a4a5a', fontSize: 12, marginTop: 6, marginBottom: 0 }}>
+                        <p style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: 14, margin: '0 0 4px 0' }}>{alert?.title ?? 'Alert'}</p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: 0 }}>{alert?.description ?? ''}</p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 6, marginBottom: 0 }}>
                           {alert?.created_at ? new Date(alert.created_at).toLocaleString() : ''}
                         </p>
                       </div>
@@ -248,7 +248,7 @@ export default function AlertsPage() {
                             onClick={() => markRead(alert?.id)}
                             style={{
                               fontSize: 12,
-                              color: '#8b8b9e',
+                              color: 'var(--text-muted)',
                               background: 'transparent',
                               border: '1px solid rgba(147,107,218,0.2)',
                               borderRadius: 6,
@@ -256,8 +256,8 @@ export default function AlertsPage() {
                               cursor: 'pointer',
                               transition: 'color 0.15s ease',
                             }}
-                            onMouseEnter={e => (e.currentTarget.style.color = '#FFFFFF')}
-                            onMouseLeave={e => (e.currentTarget.style.color = '#8b8b9e')}
+                            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+                            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
                           >
                             Mark Read
                           </button>
@@ -267,7 +267,7 @@ export default function AlertsPage() {
                             onClick={() => resolve(alert?.id)}
                             style={{
                               fontSize: 12,
-                              color: '#8b8b9e',
+                              color: 'var(--text-muted)',
                               background: 'transparent',
                               border: '1px solid rgba(147,107,218,0.2)',
                               borderRadius: 6,
@@ -275,8 +275,8 @@ export default function AlertsPage() {
                               cursor: 'pointer',
                               transition: 'color 0.15s ease',
                             }}
-                            onMouseEnter={e => (e.currentTarget.style.color = '#FFFFFF')}
-                            onMouseLeave={e => (e.currentTarget.style.color = '#8b8b9e')}
+                            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+                            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
                           >
                             Resolve
                           </button>

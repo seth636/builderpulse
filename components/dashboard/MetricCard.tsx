@@ -49,8 +49,8 @@ export default function MetricCard({
   if (loading) {
     return (
       <div style={{
-        background: 'rgba(255,255,255,0.025)',
-        border: '1px solid rgba(255,255,255,0.07)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
         borderRadius: '14px',
         padding: '20px',
         minHeight: '130px',
@@ -68,8 +68,8 @@ export default function MetricCard({
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.025)',
-      border: '1px solid rgba(255,255,255,0.07)',
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border)',
       borderRadius: '14px',
       padding: '20px',
       transition: 'border-color 0.2s',
@@ -86,14 +86,14 @@ export default function MetricCard({
       {/* Label */}
       <p style={{
         fontSize: '11px', fontWeight: '600', textTransform: 'uppercase',
-        letterSpacing: '0.09em', color: '#6b6b7e', marginBottom: '10px',
+        letterSpacing: '0.09em', color: 'var(--text-muted)', marginBottom: '10px',
       }}>
         {title}
       </p>
 
       {value === null ? (
         <div>
-          <p style={{ fontSize: '30px', fontWeight: '700', color: '#3d3d52', marginBottom: '6px', lineHeight: 1 }}>—</p>
+          <p style={{ fontSize: '30px', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '6px', lineHeight: 1 }}>—</p>
           <Link href="/settings/clients" style={{ fontSize: '12px', color: '#926BD9', textDecoration: 'none' }}>
             Connect data source
           </Link>
@@ -101,7 +101,7 @@ export default function MetricCard({
       ) : (
         <>
           {/* Value */}
-          <p style={{ fontSize: '30px', fontWeight: '700', color: '#FFFFFF', lineHeight: 1, marginBottom: '6px' }}>
+          <p style={{ fontSize: '30px', fontWeight: '700', color: 'var(--text-primary)', lineHeight: 1, marginBottom: '6px' }}>
             {formatValue(value, format)}
           </p>
 
@@ -120,7 +120,7 @@ export default function MetricCard({
             }}>
               <span style={{ fontSize: '10px' }}>{trend.isGood ? '▲' : '▼'}</span>
               {Math.abs(trend.change).toFixed(1)}%
-              <span style={{ color: '#64748b', fontWeight: '400' }}>vs prev</span>
+              <span style={{ color: 'var(--text-muted)', fontWeight: '400' }}>vs prev</span>
             </div>
           ) : !subtitle ? (
             <div style={{ height: '22px' }} />

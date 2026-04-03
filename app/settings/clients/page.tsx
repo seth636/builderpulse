@@ -34,7 +34,7 @@ const integrationBadgeStyle = (key: string): React.CSSProperties => {
     GHL:    { color: '#00FFD4', background: 'rgba(0,255,212,0.12)',   border: 'rgba(0,255,212,0.3)' },
     Reviews:{ color: '#F472B6', background: 'rgba(244,114,182,0.12)', border: 'rgba(244,114,182,0.3)' },
   };
-  const c = map[key] ?? { color: '#8b8b9e', background: 'rgba(139,139,158,0.1)', border: 'rgba(139,139,158,0.3)' };
+  const c = map[key] ?? { color: 'var(--text-muted)', background: 'rgba(139,139,158,0.1)', border: 'rgba(139,139,158,0.3)' };
   return {
     fontSize: 10,
     fontWeight: 500,
@@ -135,7 +135,7 @@ export default function ClientsSettingsPage() {
         <Sidebar />
         <div className="flex-1 ml-60" style={{ backgroundColor: 'var(--bg-page)' }}>
           <TopBar title="Client Settings" />
-          <div className="p-8 text-center" style={{ color: '#8b8b9e' }}>Loading...</div>
+          <div className="p-8 text-center" style={{ color: 'var(--text-muted)' }}>Loading...</div>
         </div>
       </div>
     );
@@ -148,7 +148,7 @@ export default function ClientsSettingsPage() {
         <TopBar title="Client Settings" />
         <div className="p-8">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-white">Manage Clients</h3>
+            <h3 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Manage Clients</h3>
             <button onClick={handleAdd} className="btn-teal">
               Add Client
             </button>
@@ -164,12 +164,12 @@ export default function ClientsSettingsPage() {
             <table className="w-full">
               <thead>
                 <tr style={{ background: 'rgba(0,0,0,0.4)', borderBottom: '1px solid rgba(147,107,218,0.1)' }}>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Website</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>PM</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Package</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Integrations</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style={{ color: '#8b8b9e' }}>Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Website</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>PM</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Package</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Integrations</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -184,10 +184,10 @@ export default function ClientsSettingsPage() {
                     onMouseEnter={() => setHoveredRow(client.id)}
                     onMouseLeave={() => setHoveredRow(null)}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{client.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#8b8b9e' }}>{client.website_url || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#8b8b9e' }}>{client.pm_name || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm capitalize" style={{ color: '#8b8b9e' }}>{client.package}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-primary)' }}>{client.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-muted)' }}>{client.website_url || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--text-muted)' }}>{client.pm_name || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm capitalize" style={{ color: 'var(--text-muted)' }}>{client.package}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                         {client.ga4_property_id && <span style={integrationBadgeStyle('GA4')}>GA4</span>}
@@ -196,7 +196,7 @@ export default function ClientsSettingsPage() {
                         {client.ghl_location_id && <span style={integrationBadgeStyle('GHL')}>GHL</span>}
                         {client.ghl_location_id && <span style={integrationBadgeStyle('Reviews')}>Reviews</span>}
                         {!client.ga4_property_id && !client.gsc_site_url && !client.meta_ad_account_id && !client.ghl_location_id && (
-                          <span style={{ color: '#8b8b9e', fontSize: 13 }}>-</span>
+                          <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>-</span>
                         )}
                       </div>
                     </td>

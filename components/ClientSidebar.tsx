@@ -151,7 +151,7 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
           }}>
             <span style={{ fontSize: '12px', fontWeight: '700', color: '#000' }}>B</span>
           </div>
-          <span style={{ fontSize: '15px', fontWeight: '600', color: '#FFFFFF' }}>
+          <span style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)' }}>
             BuilderPulse
           </span>
         </div>
@@ -161,13 +161,13 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            color: '#8b8b9e',
+            color: 'var(--text-muted)',
             fontSize: '13px',
             textDecoration: 'none',
             transition: 'color 0.15s ease',
           }}
-          onMouseEnter={(e) => e.currentTarget.style.color = '#FFFFFF'}
-          onMouseLeave={(e) => e.currentTarget.style.color = '#8b8b9e'}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
         >
           <span>←</span>
           <span>Back to Dashboard</span>
@@ -179,8 +179,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         borderBottom: '1px solid var(--border)',
         background: 'rgba(147, 107, 218, 0.03)',
       }}>
-        <p style={{ fontSize: '10px', color: '#6b6b7e', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>Client</p>
-        <p style={{ color: '#FFFFFF', fontWeight: '600', fontSize: '14px', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{clientName}</p>
+        <p style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>Client</p>
+        <p style={{ color: 'var(--text-primary)', fontWeight: '600', fontSize: '14px', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{clientName}</p>
       </div>
 
       <nav style={{ flex: 1, padding: '12px 8px', overflow: 'auto' }}>
@@ -188,8 +188,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         <Link
           href={`/client/${clientSlug}`}
           style={navLinkStyle(isActive(`/client/${clientSlug}`) && !pathname.includes('/seo/') && !pathname.includes('/recommendations') && !pathname.includes('/reports') && !pathname.includes('/traffic') && !pathname.includes('/ads') && !pathname.includes('/leads') && !pathname.includes('/reviews') && !pathname.includes('/connections'))}
-          onMouseEnter={e => { const active = isActive(`/client/${clientSlug}`) && !pathname.includes('/seo/'); if (!active) e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { const active = isActive(`/client/${clientSlug}`) && !pathname.includes('/seo/'); if (!active) e.currentTarget.style.color = '#8b8b9e'; }}
+          onMouseEnter={e => { const active = isActive(`/client/${clientSlug}`) && !pathname.includes('/seo/'); if (!active) e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseLeave={e => { const active = isActive(`/client/${clientSlug}`) && !pathname.includes('/seo/'); if (!active) e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
           <IconOverview />
           Overview
@@ -199,8 +199,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         <Link
           href={`/client/${clientSlug}/traffic`}
           style={navLinkStyle(isActive(`/client/${clientSlug}/traffic`))}
-          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/traffic`)) e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/traffic`)) e.currentTarget.style.color = '#8b8b9e'; }}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/traffic`)) e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/traffic`)) e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
           <IconTraffic />
           Traffic
@@ -210,8 +210,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         <Link
           href={`/client/${clientSlug}/seo/keywords`}
           style={navLinkStyle(pathname.includes('/seo/'))}
-          onMouseEnter={e => { if (!pathname.includes('/seo/')) e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { if (!pathname.includes('/seo/')) e.currentTarget.style.color = '#8b8b9e'; }}
+          onMouseEnter={e => { if (!pathname.includes('/seo/')) e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseLeave={e => { if (!pathname.includes('/seo/')) e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
           <IconSEO />
           SEO
@@ -230,8 +230,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         <Link
           href={`/client/${clientSlug}/ads`}
           style={navLinkStyle(isActive(`/client/${clientSlug}/ads`))}
-          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/ads`)) e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/ads`)) e.currentTarget.style.color = '#8b8b9e'; }}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/ads`)) e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/ads`)) e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
           <IconAds />
           Ads
@@ -241,8 +241,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         <Link
           href={`/client/${clientSlug}/leads`}
           style={navLinkStyle(isActive(`/client/${clientSlug}/leads`))}
-          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/leads`)) e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/leads`)) e.currentTarget.style.color = '#8b8b9e'; }}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/leads`)) e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/leads`)) e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
           <IconLeads />
           Leads
@@ -252,8 +252,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         <Link
           href={`/client/${clientSlug}/reviews`}
           style={navLinkStyle(isActive(`/client/${clientSlug}/reviews`))}
-          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/reviews`)) e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/reviews`)) e.currentTarget.style.color = '#8b8b9e'; }}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/reviews`)) e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/reviews`)) e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
           <IconReviews />
           Reviews
@@ -263,8 +263,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         <Link
           href={`/client/${clientSlug}/recommendations`}
           style={navLinkStyle(isActive(`/client/${clientSlug}/recommendations`))}
-          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/recommendations`)) e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/recommendations`)) e.currentTarget.style.color = '#8b8b9e'; }}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/recommendations`)) e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/recommendations`)) e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
           <IconAI />
           AI Recommendations
@@ -274,8 +274,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         <Link
           href={`/client/${clientSlug}/reports`}
           style={navLinkStyle(isActive(`/client/${clientSlug}/reports`))}
-          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/reports`)) e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/reports`)) e.currentTarget.style.color = '#8b8b9e'; }}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/reports`)) e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/reports`)) e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
           <IconReports />
           Reports
@@ -285,8 +285,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
         <Link
           href={`/client/${clientSlug}/connections`}
           style={navLinkStyle(isActive(`/client/${clientSlug}/connections`))}
-          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/connections`)) e.currentTarget.style.color = '#FFFFFF'; }}
-          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/connections`)) e.currentTarget.style.color = '#8b8b9e'; }}
+          onMouseEnter={e => { if (!isActive(`/client/${clientSlug}/connections`)) e.currentTarget.style.color = 'var(--text-primary)'; }}
+          onMouseLeave={e => { if (!isActive(`/client/${clientSlug}/connections`)) e.currentTarget.style.color = 'var(--text-muted)'; }}
         >
           <IconConnections />
           Connections
@@ -315,8 +315,8 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
             {session?.user?.name?.charAt(0) || 'U'}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: '13px', fontWeight: '500', color: '#FFFFFF', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{session?.user?.name}</p>
-            <p style={{ fontSize: '11px', color: '#6b6b7e', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{session?.user?.email}</p>
+            <p style={{ fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{session?.user?.name}</p>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{session?.user?.email}</p>
           </div>
         </div>
         <button
@@ -326,7 +326,7 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
             padding: '8px 14px',
             fontSize: '13px',
             fontWeight: '500',
-            color: '#8b8b9e',
+            color: 'var(--text-muted)',
             background: 'rgba(255, 255, 255, 0.02)',
             border: '1px solid rgba(147, 107, 218, 0.15)',
             borderRadius: '6px',
@@ -334,11 +334,11 @@ export default function ClientSidebar({ clientName, clientSlug }: Props) {
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#FFFFFF';
+            e.currentTarget.style.color = 'var(--text-primary)';
             e.currentTarget.style.background = 'rgba(147, 107, 218, 0.1)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#8b8b9e';
+            e.currentTarget.style.color = 'var(--text-muted)';
             e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)';
           }}
         >

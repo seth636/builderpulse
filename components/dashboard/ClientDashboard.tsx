@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import DateRangePicker, { DateRange, getDateRange, getPreviousPeriod } from './DateRangePicker';
-const MetricCard = dynamic(() => import('./MetricCard'), { ssr: false, loading: () => <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid var(--border)', borderRadius: '14px', height: '130px', animation: 'pulse 1.5s infinite' }} /> });
+const MetricCard = dynamic(() => import('./MetricCard'), { ssr: false, loading: () => <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '14px', height: '130px', animation: 'pulse 1.5s infinite' }} /> });
 import SkeletonCard from './SkeletonCard';
 
 const TrafficSection = dynamic(() => import('./TrafficSection'), { ssr: false, loading: () => <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}><SkeletonCard height="h-72" /><SkeletonCard height="h-64" /></div> });
@@ -385,7 +385,7 @@ export default function ClientDashboard({ client }: { client: Client }) {
             ].map(link => (
               <Link key={link.href} href={link.href} style={{
                 padding: '6px 14px', borderRadius: '7px', fontSize: '12px', fontWeight: '500',
-                background: 'rgba(255,255,255,0.04)', color: 'var(--text-secondary)',
+                background: 'var(--bg-card)', color: 'var(--text-secondary)',
                 border: '1px solid var(--border)', textDecoration: 'none',
                 transition: 'all 0.15s',
               }}>

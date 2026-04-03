@@ -86,6 +86,7 @@ interface IntegrationCardProps {
   onConnect: () => void;
   onDisconnect: () => void;
   note?: string;
+  isConnecting?: boolean;
 }
 
 function IntegrationCard({
@@ -98,6 +99,7 @@ function IntegrationCard({
   onConnect,
   onDisconnect,
   note,
+  isConnecting = false,
 }: IntegrationCardProps) {
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -118,6 +120,7 @@ function IntegrationCard({
       flexDirection: 'column',
       height: '100%',
       overflow: 'hidden',
+      minHeight: '160px',
     }}
     onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)')}
     onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
@@ -199,13 +202,16 @@ function IntegrationCard({
         {!showConfirm ? (
           <button
             onClick={connected ? () => setShowConfirm(true) : onConnect}
+            disabled={isConnecting}
             style={{
               padding: '7px 16px',
               fontSize: '13px',
               fontWeight: '500',
               borderRadius: '6px',
-              cursor: 'pointer',
+              cursor: isConnecting ? 'not-allowed' : 'pointer',
               transition: 'all 0.15s ease',
+              flexShrink: 0,
+              opacity: isConnecting ? 0.7 : 1,
               ...(connected ? {
                 color: '#EF4444',
                 background: 'transparent',
@@ -231,7 +237,7 @@ function IntegrationCard({
               }
             }}
           >
-            {connected ? 'Disconnect' : 'Connect'}
+            {isConnecting ? 'Connecting...' : connected ? 'Disconnect' : 'Connect'}
           </button>
         ) : (
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -331,6 +337,7 @@ export default function ConnectionsPage() {
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [connectingProvider, setConnectingProvider] = useState<string | null>(null);
 
   useEffect(() => {
     const connected = searchParams.get('connected');
@@ -376,6 +383,7 @@ export default function ConnectionsPage() {
   };
 
   const handleConnect = (provider: string) => {
+    setConnectingProvider(provider);
     if (provider === 'clickup') {
       // ClickUp uses a different OAuth initiation URL format
       window.location.href = `/api/auth/clickup/initiate?client_slug=${slug}`;
@@ -504,6 +512,7 @@ export default function ConnectionsPage() {
                 onConnect={() => handleConnect('google')}
                 onDisconnect={() => handleDisconnect('google')}
                 note={googleConnected ? undefined : 'Connect your Google account above to enable.'}
+                isConnecting={connectingProvider === 'google'}
               />
 
               <IntegrationCard
@@ -517,6 +526,7 @@ export default function ConnectionsPage() {
                 onConnect={() => handleConnect('google')}
                 onDisconnect={() => handleDisconnect('google')}
                 note={googleConnected ? undefined : 'Connect your Google account above to enable.'}
+                isConnecting={connectingProvider === 'google'}
               />
 
               <IntegrationCard
@@ -530,6 +540,7 @@ export default function ConnectionsPage() {
                 onConnect={() => handleConnect('google')}
                 onDisconnect={() => handleDisconnect('google')}
                 note={googleConnected ? undefined : 'Connect your Google account above to enable.'}
+                isConnecting={connectingProvider === 'google'}
               />
             </div>
           </div>
@@ -562,6 +573,7 @@ export default function ConnectionsPage() {
                 accountName={getIntegration('ghl')?.account_name}
                 onConnect={() => handleConnect('ghl')}
                 onDisconnect={() => handleDisconnect('ghl')}
+                isConnecting={connectingProvider === 'ghl'}
               />
 
               <IntegrationCard
@@ -574,6 +586,7 @@ export default function ConnectionsPage() {
                 accountName={getIntegration('meta')?.account_name}
                 onConnect={() => handleConnect('meta')}
                 onDisconnect={() => handleDisconnect('meta')}
+                isConnecting={connectingProvider === 'meta'}
               />
             </div>
           </div>
@@ -606,6 +619,7 @@ export default function ConnectionsPage() {
                 accountName={getIntegration('clickup')?.account_name}
                 onConnect={() => handleConnect('clickup')}
                 onDisconnect={() => handleDisconnect('clickup')}
+                isConnecting={connectingProvider === 'clickup'}
               />
             </div>
           </div>

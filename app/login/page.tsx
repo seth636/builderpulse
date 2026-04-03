@@ -37,7 +37,7 @@ export default function LoginPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#000000',
+      backgroundColor: 'var(--bg-page)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -87,14 +87,14 @@ export default function LoginPage() {
             <h1 style={{
               fontSize: '24px',
               fontWeight: '700',
-              color: '#FFFFFF',
+              color: 'var(--text-primary)',
               letterSpacing: '-0.3px',
               margin: 0,
             }}>
               BuilderPulse
             </h1>
           </div>
-          <p style={{ fontSize: '14px', color: '#8b8b9e' }}>
+          <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
             Sign in to your account
           </p>
         </div>
@@ -106,7 +106,7 @@ export default function LoginPage() {
               display: 'block',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#c4c4d4',
+              color: 'var(--text-secondary)',
               marginBottom: '8px',
             }}>
               Email
@@ -124,7 +124,7 @@ export default function LoginPage() {
                 border: '1px solid rgba(147, 107, 218, 0.15)',
                 borderRadius: '10px',
                 fontSize: '14px',
-                color: '#FFFFFF',
+                color: 'var(--text-primary)',
                 outline: 'none',
                 boxSizing: 'border-box',
                 transition: 'all 0.2s ease',
@@ -140,13 +140,13 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Password */}
+          {/* Password */
           <div>
             <label style={{
               display: 'block',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#c4c4d4',
+              color: 'var(--text-secondary)',
               marginBottom: '8px',
             }}>
               Password
@@ -164,7 +164,7 @@ export default function LoginPage() {
                 border: '1px solid rgba(147, 107, 218, 0.15)',
                 borderRadius: '10px',
                 fontSize: '14px',
-                color: '#FFFFFF',
+                color: 'var(--text-primary)',
                 outline: 'none',
                 boxSizing: 'border-box',
                 transition: 'all 0.2s ease',
@@ -180,7 +180,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Error */}
+          {/* Error */
           {error && (
             <div style={{
               backgroundColor: 'rgba(239,68,68,0.1)',
@@ -231,7 +231,7 @@ export default function LoginPage() {
 
         <p style={{
           fontSize: '12px',
-          color: '#4a4a5a',
+          color: 'var(--text-muted)',
           textAlign: 'center',
           marginTop: '28px',
         }}>
