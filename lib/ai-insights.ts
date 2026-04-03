@@ -22,6 +22,16 @@ export async function generateInsights(clientId: number, month: string): Promise
   const prevStart = new Date(year, mon - 2, 1);
   const prevEnd = new Date(year, mon - 1, 0);
 
+  // ClickUp task completion for the month
+  const weekStart = new Date(year, mon - 1, 1);
+  weekStart.setUTCDate(weekStart.getUTCDate() - weekStart.getUTCDay() + (weekStart.getUTCDay() === 0 ? -6 : 1));
+  const clickupTasks = await prisma.clickUpTask.findMany({
+    where: { client_id: clientId, week_start: { gte: periodStart, lte: periodEnd } },
+  }).catch(() => []);
+  const clickupCompleted = clickupTasks.filter((t: any) => t.status_type === 'closed').length;
+  const clickupTotal = clickupTasks.length;
+  const clickupCompletionRate = clickupTotal > 0 ? Math.round((clickupCompleted / clickupTotal) * 100) : null;
+
   const [ga4, gsc, meta, ghl, reviews, seoAudit] = await Promise.all([
     prisma.ga4Metric.findMany({ where: { client_id: clientId, date: { gte: periodStart, lte: periodEnd } } }),
     prisma.gscMetric.findMany({ where: { client_id: clientId, date: { gte: periodStart, lte: periodEnd } } }),
@@ -64,6 +74,9 @@ export async function generateInsights(clientId: number, month: string): Promise
     newReviews,
     avgRating: avgRating.toFixed(1),
     siteHealthScore: seoAudit?.overall_score || null,
+    clickupTasksCompleted: clickupCompleted || null,
+    clickupTasksTotal: clickupTotal || null,
+    clickupCompletionRate: clickupCompletionRate,
   }, null, 2);
 
   const prompt = `You are an AI marketing analyst at Home Builder Marketers. Analyze this client's data and provide exactly 5 insights. Each insight must:

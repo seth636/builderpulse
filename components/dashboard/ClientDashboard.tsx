@@ -89,6 +89,8 @@ export default function ClientDashboard({ client }: { client: Client }) {
   const [leadsSummary, setLeadsSummary] = useState<{ count: number; prevCount: number } | null>(null);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [reviewsSummary, setReviewsSummary] = useState<{ totalReviews: number; avgRating: number } | null>(null);
+  const [clickupLoading, setClickupLoading] = useState(true);
+  const [clickupSummary, setClickupSummary] = useState<{ completedThisWeek: number; completionRate: number } | null>(null);
 
   const fetchSummaries = useCallback(async () => {
     if (!dateRange.startDate || !dateRange.endDate) return;
@@ -146,6 +148,18 @@ export default function ClientDashboard({ client }: { client: Client }) {
       } catch { setReviewsSummary(null); }
       finally { setReviewsLoading(false); }
     } else { setReviewsLoading(false); }
+
+    // ClickUp
+    setClickupLoading(true);
+    try {
+      const res = await fetch(`/api/clickup/${client.slug}`).then(r => r.json());
+      if (res.connected && res.summary) {
+        setClickupSummary({ completedThisWeek: res.summary.completedThisWeek, completionRate: res.summary.completionRate });
+      } else {
+        setClickupSummary(null);
+      }
+    } catch { setClickupSummary(null); }
+    finally { setClickupLoading(false); }
   }, [client.slug, client.ga4_property_id, client.gsc_site_url, client.ghl_location_id, dateRange.startDate, dateRange.endDate]);
 
   useEffect(() => { fetchSummaries(); }, [fetchSummaries]);
@@ -257,7 +271,7 @@ export default function ClientDashboard({ client }: { client: Client }) {
       )}
 
       {/* ── Metric Cards ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '28px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '12px', marginBottom: '28px' }}>
         <MetricCard
           title="Sessions"
           value={client.ga4_property_id ? (analyticsSummary?.totalSessions ?? (analyticsLoading ? null : 0)) : null}
@@ -291,6 +305,15 @@ export default function ClientDashboard({ client }: { client: Client }) {
           format="number"
           loading={reviewsLoading && !!client.ghl_location_id}
           accentColor="#926BD9"
+        />
+        <MetricCard
+          title="Tasks Completed (Week)"
+          value={clickupSummary ? clickupSummary.completedThisWeek : null}
+          previousValue={null}
+          format="number"
+          loading={clickupLoading}
+          accentColor="#7B68EE"
+          subtitle={clickupSummary ? `${clickupSummary.completionRate}% completion rate` : undefined}
         />
       </div>
 

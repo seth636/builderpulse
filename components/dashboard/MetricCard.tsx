@@ -14,6 +14,7 @@ type Props = {
   loading?: boolean;
   icon?: React.ReactNode;
   accentColor?: string;
+  subtitle?: string;
 };
 
 function formatValue(val: number, format: Format): string {
@@ -43,6 +44,7 @@ export default function MetricCard({
   sparklineData = [],
   loading = false,
   accentColor = '#926BD9',
+  subtitle,
 }: Props) {
   if (loading) {
     return (
@@ -103,8 +105,13 @@ export default function MetricCard({
             {formatValue(value, format)}
           </p>
 
+          {/* Subtitle (optional override for trend area) */}
+          {subtitle && (
+            <div style={{ fontSize: '12px', color: '#8b8b9e', marginBottom: '4px' }}>{subtitle}</div>
+          )}
+
           {/* Trend badge */}
-          {trend !== null ? (
+          {!subtitle && trend !== null ? (
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: '4px',
               fontSize: '12px', fontWeight: '500', color: trendColor,
@@ -115,9 +122,9 @@ export default function MetricCard({
               {Math.abs(trend.change).toFixed(1)}%
               <span style={{ color: '#64748b', fontWeight: '400' }}>vs prev</span>
             </div>
-          ) : (
+          ) : !subtitle ? (
             <div style={{ height: '22px' }} />
-          )}
+          ) : null}
 
           {/* Sparkline */}
           {sparkPoints.length > 2 && (

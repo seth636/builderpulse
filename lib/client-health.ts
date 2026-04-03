@@ -87,9 +87,25 @@ export async function calculateHealthScore(clientId: number): Promise<number> {
     } else { score += 5; }
   } catch { score += 5; }
 
-  // 7. Task completion (10%) — neutral
-  score += 5;
-  breakdown.taskCompletion = { score: 50, weight: 10, label: 'Task Completion' };
+  // 7. Task completion (10%) — ClickUp data if connected
+  try {
+    const cuTasks = await prisma.clickUpTask.findMany({
+      where: { client_id: clientId, week_start: { gte: thisMonthStart } },
+    }).catch(() => null);
+    if (cuTasks && cuTasks.length > 0) {
+      const completed = cuTasks.filter((t: any) => t.status_type === 'closed').length;
+      const rate = Math.round((completed / cuTasks.length) * 100);
+      const taskScore = rate >= 80 ? 100 : rate >= 60 ? 75 : rate >= 40 ? 50 : 25;
+      breakdown.taskCompletion = { score: taskScore, weight: 10, label: 'Task Completion' };
+      score += (taskScore * 10) / 100;
+    } else {
+      score += 5;
+      breakdown.taskCompletion = { score: 50, weight: 10, label: 'Task Completion' };
+    }
+  } catch {
+    score += 5;
+    breakdown.taskCompletion = { score: 50, weight: 10, label: 'Task Completion' };
+  }
 
   const finalScore = Math.round(Math.min(100, Math.max(0, score)));
 
