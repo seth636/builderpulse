@@ -298,9 +298,9 @@ export default function ClientReportsPage() {
           {/* Reports table */}
           {reports.length === 0 ? (
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', padding: '64px', textAlign: 'center', marginBottom: '32px' }}>
-              <p style={{ fontSize: '36px', margin: '0 0 12px' }}>📊</p>
               <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', margin: '0 0 8px' }}>No reports yet</h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 20px' }}>Generate your first monthly report to get started.</p>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '0 0 4px' }}>Generate your first monthly report to get started.</p>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 20px' }}>Reports pull from connected integrations (Google, GHL, Meta). Make sure at least one is connected and synced first.</p>
               <button onClick={() => setShowModal(true)} style={{ padding: '9px 18px', background: '#926BD9', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>
                 Generate First Report
               </button>
@@ -450,6 +450,11 @@ export default function ClientReportsPage() {
                 </select>
               </div>
               {generating && <p style={{ fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center' }}>Generating AI report — this may take 30–60 seconds...</p>}
+              {generateError && (
+                <div style={{ padding: '12px 14px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', fontSize: '13px', color: '#EF4444', lineHeight: '1.5' }}>
+                  {generateError}
+                </div>
+              )}
             </div>
             <div style={{ display: 'flex', gap: '10px', marginTop: '24px' }}>
               <button onClick={handleGenerate} disabled={generating} style={{ flex: 1, padding: '10px', background: '#926BD9', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '600', fontSize: '14px', cursor: 'pointer', opacity: generating ? 0.6 : 1 }}>

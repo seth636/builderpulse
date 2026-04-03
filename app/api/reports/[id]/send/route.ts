@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_UiaDYEhh_9kUMBq5B4AfQm9NUAi94BfBm';
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const APP_URL = 'https://builderpulse-app-production.up.railway.app';
 
 export async function POST(
@@ -26,6 +26,10 @@ export async function POST(
 
     if (!report) {
       return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+    }
+
+    if (!RESEND_API_KEY) {
+      return NextResponse.json({ error: 'RESEND_API_KEY not configured in environment.' }, { status: 500 });
     }
 
     // Determine recipient email

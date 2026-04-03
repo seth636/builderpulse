@@ -77,7 +77,7 @@ RECOMMENDATIONS: 3-5 specific, actionable bullet points based on the data. Each 
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-5',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }],
       }),
