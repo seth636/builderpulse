@@ -12,28 +12,82 @@ interface Integration {
   created_at?: string;
 }
 
+// ── SVG Icons ─────────────────────────────────────────────────────────────────
+
+function GA4Icon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="12" width="5" height="10" rx="1" fill="#F9AB00" />
+      <rect x="9.5" y="6" width="5" height="16" rx="1" fill="#E37400" />
+      <circle cx="19.5" cy="4" r="3" fill="#E37400" />
+    </svg>
+  );
+}
+
+function GSCIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="11" r="7" stroke="#4285F4" strokeWidth="2" fill="none" />
+      <path d="M16.5 16.5L21 21" stroke="#4285F4" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M9 11h6M12 8v6" stroke="#4285F4" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function GBPIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#34A853" />
+      <circle cx="12" cy="9" r="2.5" fill="white" />
+    </svg>
+  );
+}
+
+function GHLIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="3" width="18" height="18" rx="4" fill="#F8B600" />
+      <path d="M8 12h8M12 8v8" stroke="white" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function MetaIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M2.5 12.5C2.5 8.5 5 5 8 5c1.8 0 3.2 1.2 4 3 .8-1.8 2.2-3 4-3 3 0 5.5 3.5 5.5 7.5 0 2.5-1 4.5-2.5 5.5-.8.5-1.5.5-2 0-1-.8-2-3-2-5.5 0 2.5-1 4.7-2 5.5-.5.5-1.2.5-2 0C4.5 17 2.5 15 2.5 12.5z"
+        fill="#0866FF"
+      />
+    </svg>
+  );
+}
+
+// ── Card Component ─────────────────────────────────────────────────────────────
+
 interface IntegrationCardProps {
   provider: string;
   name: string;
   description: string;
   icon: React.ReactNode;
+  accentColor: string;
   connected: boolean;
   accountName?: string | null;
   onConnect: () => void;
   onDisconnect: () => void;
-  comingSoon?: boolean;
+  note?: string;
 }
 
 function IntegrationCard({
-  provider,
   name,
   description,
   icon,
+  accentColor,
   connected,
   accountName,
   onConnect,
   onDisconnect,
-  comingSoon = false,
+  note,
 }: IntegrationCardProps) {
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -44,33 +98,37 @@ function IntegrationCard({
 
   return (
     <div style={{
-      background: 'rgba(147, 107, 218, 0.03)',
-      border: '1px solid rgba(147, 107, 218, 0.15)',
+      background: '#FFFFFF',
+      border: '1px solid #E5E7EB',
       borderRadius: '12px',
       padding: '24px',
-      transition: 'all 0.2s ease',
+      transition: 'box-shadow 0.2s ease',
       position: 'relative',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', marginBottom: '16px' }}>
+    }}
+    onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)')}
+    onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
+    >
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', marginBottom: '20px' }}>
+        {/* Icon container with brand accent */}
         <div style={{
-          width: '48px',
-          height: '48px',
+          width: '44px',
+          height: '44px',
           borderRadius: '10px',
-          background: 'rgba(0, 255, 212, 0.08)',
-          border: '1px solid rgba(0, 255, 212, 0.2)',
+          background: `${accentColor}12`,
+          border: `1px solid ${accentColor}30`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '24px',
           flexShrink: 0,
         }}>
           {icon}
         </div>
+
         <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{
-            fontSize: '18px',
+            fontSize: '15px',
             fontWeight: '600',
-            color: '#FFFFFF',
+            color: '#111827',
             margin: 0,
             marginBottom: '4px',
           }}>
@@ -78,7 +136,7 @@ function IntegrationCard({
           </h3>
           <p style={{
             fontSize: '13px',
-            color: '#8b8b9e',
+            color: '#6B7280',
             margin: 0,
             lineHeight: '1.5',
           }}>
@@ -87,140 +145,167 @@ function IntegrationCard({
         </div>
       </div>
 
-      {!comingSoon && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              background: connected ? '#10b981' : '#6b6b7e',
-            }} />
-            <span style={{
-              fontSize: '13px',
-              color: connected ? '#10b981' : '#6b6b7e',
-              fontWeight: '500',
-            }}>
-              {connected ? 'Connected' : 'Not connected'}
-            </span>
-            {connected && accountName && (
-              <span style={{
-                fontSize: '12px',
-                color: '#6b6b7e',
-                marginLeft: '4px',
-              }}>
-                ({accountName})
-              </span>
-            )}
-          </div>
+      {note && (
+        <div style={{
+          marginBottom: '16px',
+          padding: '8px 12px',
+          background: '#F0FDF4',
+          border: '1px solid #BBF7D0',
+          borderRadius: '6px',
+          fontSize: '12px',
+          color: '#166534',
+          lineHeight: '1.5',
+        }}>
+          {note}
+        </div>
+      )}
 
-          {!showConfirm ? (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+          <div style={{
+            width: '7px',
+            height: '7px',
+            borderRadius: '50%',
+            background: connected ? '#10B981' : '#D1D5DB',
+          }} />
+          <span style={{
+            fontSize: '13px',
+            color: connected ? '#059669' : '#9CA3AF',
+            fontWeight: '500',
+          }}>
+            {connected ? 'Connected' : 'Not connected'}
+          </span>
+          {connected && accountName && (
+            <span style={{ fontSize: '12px', color: '#9CA3AF', marginLeft: '2px' }}>
+              · {accountName}
+            </span>
+          )}
+        </div>
+
+        {!showConfirm ? (
+          <button
+            onClick={connected ? () => setShowConfirm(true) : onConnect}
+            style={{
+              padding: '7px 16px',
+              fontSize: '13px',
+              fontWeight: '500',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              ...(connected ? {
+                color: '#EF4444',
+                background: 'transparent',
+                border: '1px solid #FECACA',
+              } : {
+                color: '#FFFFFF',
+                background: accentColor,
+                border: 'none',
+              }),
+            }}
+            onMouseEnter={e => {
+              if (connected) {
+                e.currentTarget.style.background = '#FEF2F2';
+              } else {
+                e.currentTarget.style.opacity = '0.88';
+              }
+            }}
+            onMouseLeave={e => {
+              if (connected) {
+                e.currentTarget.style.background = 'transparent';
+              } else {
+                e.currentTarget.style.opacity = '1';
+              }
+            }}
+          >
+            {connected ? 'Disconnect' : 'Connect'}
+          </button>
+        ) : (
+          <div style={{ display: 'flex', gap: '8px' }}>
             <button
-              onClick={connected ? () => setShowConfirm(true) : onConnect}
+              onClick={handleDisconnect}
               style={{
-                padding: '8px 16px',
+                padding: '7px 16px',
                 fontSize: '13px',
                 fontWeight: '500',
                 borderRadius: '6px',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                ...(connected ? {
-                  color: '#ef4444',
-                  background: 'transparent',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                } : {
-                  color: '#000',
-                  background: '#00FFD4',
-                  border: 'none',
-                }),
-              }}
-              onMouseEnter={(e) => {
-                if (connected) {
-                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
-                } else {
-                  e.currentTarget.style.background = '#00e5c3';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (connected) {
-                  e.currentTarget.style.background = 'transparent';
-                } else {
-                  e.currentTarget.style.background = '#00FFD4';
-                }
+                color: '#FFFFFF',
+                background: '#EF4444',
+                border: 'none',
               }}
             >
-              {connected ? 'Disconnect' : 'Connect'}
+              Confirm
             </button>
-          ) : (
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={handleDisconnect}
-                style={{
-                  padding: '8px 16px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  color: '#FFFFFF',
-                  background: '#ef4444',
-                  border: 'none',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#dc2626';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#ef4444';
-                }}
-              >
-                Confirm
-              </button>
-              <button
-                onClick={() => setShowConfirm(false)}
-                style={{
-                  padding: '8px 16px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  color: '#8b8b9e',
-                  background: 'rgba(147, 107, 218, 0.08)',
-                  border: '1px solid rgba(147, 107, 218, 0.15)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(147, 107, 218, 0.15)';
-                  e.currentTarget.style.color = '#FFFFFF';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(147, 107, 218, 0.08)';
-                  e.currentTarget.style.color = '#8b8b9e';
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {comingSoon && (
-        <div style={{
-          padding: '8px 16px',
-          fontSize: '13px',
-          fontWeight: '500',
-          borderRadius: '6px',
-          color: '#6b6b7e',
-          background: 'rgba(147, 107, 218, 0.08)',
-          border: '1px solid rgba(147, 107, 218, 0.15)',
-          textAlign: 'center',
-        }}>
-          Coming Soon
-        </div>
-      )}
+            <button
+              onClick={() => setShowConfirm(false)}
+              style={{
+                padding: '7px 16px',
+                fontSize: '13px',
+                fontWeight: '500',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                color: '#6B7280',
+                background: '#F9FAFB',
+                border: '1px solid #E5E7EB',
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
+// ── Google group banner ────────────────────────────────────────────────────────
+
+function GoogleGroupBanner({ connected, onConnect }: { connected: boolean; onConnect: () => void }) {
+  if (connected) return null;
+  return (
+    <div style={{
+      gridColumn: '1 / -1',
+      padding: '14px 18px',
+      background: '#EFF6FF',
+      border: '1px solid #BFDBFE',
+      borderRadius: '10px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: '16px',
+    }}>
+      <div>
+        <p style={{ margin: 0, fontSize: '13px', fontWeight: '600', color: '#1E40AF' }}>
+          Connect all three Google services at once
+        </p>
+        <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#3B82F6' }}>
+          One Google sign-in grants access to Analytics 4, Search Console, and Business Profile simultaneously.
+        </p>
+      </div>
+      <button
+        onClick={onConnect}
+        style={{
+          padding: '8px 18px',
+          fontSize: '13px',
+          fontWeight: '600',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          color: '#FFFFFF',
+          background: '#4285F4',
+          border: 'none',
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
+        }}
+        onMouseEnter={e => (e.currentTarget.style.background = '#3367D6')}
+        onMouseLeave={e => (e.currentTarget.style.background = '#4285F4')}
+      >
+        Connect Google Account
+      </button>
+    </div>
+  );
+}
+
+// ── Page ───────────────────────────────────────────────────────────────────────
 
 export default function ConnectionsPage() {
   const params = useParams();
@@ -234,7 +319,6 @@ export default function ConnectionsPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for success/error messages in URL
     const connected = searchParams.get('connected');
     const error = searchParams.get('error');
 
@@ -242,7 +326,7 @@ export default function ConnectionsPage() {
       const providerNames: { [key: string]: string } = {
         google: 'Google',
         ghl: 'GoHighLevel',
-        meta: 'Meta',
+        meta: 'Meta Ads',
       };
       setSuccessMessage(`${providerNames[connected] || connected} connected successfully!`);
       setTimeout(() => setSuccessMessage(null), 5000);
@@ -258,14 +342,12 @@ export default function ConnectionsPage() {
 
   const fetchData = async () => {
     try {
-      // Fetch client info
       const clientRes = await fetch(`/api/clients/${slug}`);
       if (clientRes.ok) {
         const clientData = await clientRes.json();
         setClient(clientData);
       }
 
-      // Fetch integrations
       const intRes = await fetch(`/api/clients/${slug}/integrations`);
       if (intRes.ok) {
         const intData = await intRes.json();
@@ -287,7 +369,6 @@ export default function ConnectionsPage() {
       const res = await fetch(`/api/clients/${slug}/integrations/${provider}`, {
         method: 'DELETE',
       });
-
       if (res.ok) {
         setSuccessMessage(`${provider.charAt(0).toUpperCase() + provider.slice(1)} disconnected successfully!`);
         setTimeout(() => setSuccessMessage(null), 5000);
@@ -303,18 +384,19 @@ export default function ConnectionsPage() {
     }
   };
 
-  const getIntegration = (provider: string): Integration | undefined => {
-    return integrations.find(i => i.provider === provider);
-  };
+  const getIntegration = (provider: string): Integration | undefined =>
+    integrations.find(i => i.provider === provider);
+
+  const googleConnected = !!getIntegration('google');
 
   if (loading || !client) {
     return (
-      <div className="flex min-h-screen" style={{ backgroundColor: '#000000' }}>
+      <div className="flex min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
         <ClientSidebar clientName={client?.name || 'Loading...'} clientSlug={slug} />
-        <div className="flex-1 ml-60" style={{ backgroundColor: '#000000' }}>
+        <div className="flex-1 ml-60" style={{ backgroundColor: '#F9FAFB' }}>
           <TopBar title="Integrations & Connections" />
           <div className="p-8">
-            <p style={{ color: '#8b8b9e' }}>Loading...</p>
+            <p style={{ color: '#6B7280' }}>Loading...</p>
           </div>
         </div>
       </div>
@@ -322,35 +404,35 @@ export default function ConnectionsPage() {
   }
 
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: '#000000' }}>
+    <div className="flex min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
       <ClientSidebar clientName={client.name} clientSlug={client.slug} />
-      <div className="flex-1 ml-60" style={{ backgroundColor: '#000000' }}>
+      <div className="flex-1 ml-60" style={{ backgroundColor: '#F9FAFB' }}>
         <TopBar title="Integrations & Connections" />
         <div className="p-8">
-          {/* Success/Error Messages */}
+
+          {/* Success / Error banners */}
           {successMessage && (
             <div style={{
               marginBottom: '24px',
               padding: '12px 16px',
-              background: 'rgba(16, 185, 129, 0.1)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
+              background: '#F0FDF4',
+              border: '1px solid #BBF7D0',
               borderRadius: '8px',
-              color: '#10b981',
+              color: '#166534',
               fontSize: '14px',
               fontWeight: '500',
             }}>
               {successMessage}
             </div>
           )}
-
           {errorMessage && (
             <div style={{
               marginBottom: '24px',
               padding: '12px 16px',
-              background: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
+              background: '#FEF2F2',
+              border: '1px solid #FECACA',
               borderRadius: '8px',
-              color: '#ef4444',
+              color: '#991B1B',
               fontSize: '14px',
               fontWeight: '500',
             }}>
@@ -358,86 +440,122 @@ export default function ConnectionsPage() {
             </div>
           )}
 
-          <div style={{ marginBottom: '24px' }}>
-            <h2 style={{
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#FFFFFF',
-              margin: 0,
-              marginBottom: '8px',
-            }}>
+          {/* Page header */}
+          <div style={{ marginBottom: '28px' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', margin: 0, marginBottom: '6px' }}>
               Connect Your Services
             </h2>
-            <p style={{
-              fontSize: '14px',
-              color: '#8b8b9e',
-              margin: 0,
-            }}>
-              Authorize BuilderPulse to access your marketing and analytics platforms
+            <p style={{ fontSize: '14px', color: '#6B7280', margin: 0 }}>
+              Authorize BuilderPulse to pull data from your marketing and analytics platforms.
             </p>
           </div>
 
-          {/* Integration Cards Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: '20px',
-          }}>
-            <IntegrationCard
-              provider="google"
-              name="Google"
-              description="Google Analytics 4, Search Console & Business Profile"
-              icon="🔍"
-              connected={!!getIntegration('google')}
-              accountName={getIntegration('google')?.account_name}
-              onConnect={() => handleConnect('google')}
-              onDisconnect={() => handleDisconnect('google')}
-            />
+          {/* ── Google section ── */}
+          <div style={{ marginBottom: '12px' }}>
+            <p style={{
+              fontSize: '11px',
+              fontWeight: '600',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: '#9CA3AF',
+              margin: '0 0 12px 2px',
+            }}>
+              Google
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: '16px',
+            }}>
+              <GoogleGroupBanner
+                connected={googleConnected}
+                onConnect={() => handleConnect('google')}
+              />
 
-            <IntegrationCard
-              provider="ghl"
-              name="GoHighLevel"
-              description="Leads, appointments, calls and contact data"
-              icon="📊"
-              connected={!!getIntegration('ghl')}
-              accountName={getIntegration('ghl')?.account_name}
-              onConnect={() => handleConnect('ghl')}
-              onDisconnect={() => handleDisconnect('ghl')}
-            />
+              <IntegrationCard
+                provider="google"
+                name="Google Analytics 4"
+                description="Website traffic, sessions, conversions, and funnel data"
+                icon={<GA4Icon />}
+                accentColor="#F9AB00"
+                connected={googleConnected}
+                accountName={getIntegration('google')?.account_name}
+                onConnect={() => handleConnect('google')}
+                onDisconnect={() => handleDisconnect('google')}
+                note={googleConnected ? undefined : 'Connect your Google account above to enable.'}
+              />
 
-            <IntegrationCard
-              provider="meta"
-              name="Meta Ads"
-              description="Facebook & Instagram advertising metrics"
-              icon="📱"
-              connected={!!getIntegration('meta')}
-              accountName={getIntegration('meta')?.account_name}
-              onConnect={() => handleConnect('meta')}
-              onDisconnect={() => handleDisconnect('meta')}
-            />
+              <IntegrationCard
+                provider="google"
+                name="Google Search Console"
+                description="Search rankings, impressions, clicks, and keyword data"
+                icon={<GSCIcon />}
+                accentColor="#4285F4"
+                connected={googleConnected}
+                accountName={getIntegration('google')?.account_name}
+                onConnect={() => handleConnect('google')}
+                onDisconnect={() => handleDisconnect('google')}
+                note={googleConnected ? undefined : 'Connect your Google account above to enable.'}
+              />
 
-            <IntegrationCard
-              provider="agency-analytics"
-              name="Agency Analytics"
-              description="SEO rankings, backlinks and site audits"
-              icon="📈"
-              connected={false}
-              onConnect={() => {}}
-              onDisconnect={() => {}}
-              comingSoon
-            />
-
-            <IntegrationCard
-              provider="clickup"
-              name="ClickUp"
-              description="Project management and task tracking"
-              icon="✅"
-              connected={false}
-              onConnect={() => {}}
-              onDisconnect={() => {}}
-              comingSoon
-            />
+              <IntegrationCard
+                provider="google"
+                name="Google Business Profile"
+                description="Reviews, calls, direction requests, and local visibility"
+                icon={<GBPIcon />}
+                accentColor="#34A853"
+                connected={googleConnected}
+                accountName={getIntegration('google')?.account_name}
+                onConnect={() => handleConnect('google')}
+                onDisconnect={() => handleDisconnect('google')}
+                note={googleConnected ? undefined : 'Connect your Google account above to enable.'}
+              />
+            </div>
           </div>
+
+          {/* ── Other services ── */}
+          <div style={{ marginTop: '32px' }}>
+            <p style={{
+              fontSize: '11px',
+              fontWeight: '600',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: '#9CA3AF',
+              margin: '0 0 12px 2px',
+            }}>
+              Advertising & CRM
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: '16px',
+            }}>
+              <IntegrationCard
+                provider="ghl"
+                name="GoHighLevel"
+                description="Leads, appointments, calls, and contact pipeline data"
+                icon={<GHLIcon />}
+                accentColor="#F8B600"
+                connected={!!getIntegration('ghl')}
+                accountName={getIntegration('ghl')?.account_name}
+                onConnect={() => handleConnect('ghl')}
+                onDisconnect={() => handleDisconnect('ghl')}
+              />
+
+              <IntegrationCard
+                provider="meta"
+                name="Meta Ads"
+                description="Facebook and Instagram advertising metrics and spend"
+                icon={<MetaIcon />}
+                accentColor="#0866FF"
+                connected={!!getIntegration('meta')}
+                accountName={getIntegration('meta')?.account_name}
+                onConnect={() => handleConnect('meta')}
+                onDisconnect={() => handleDisconnect('meta')}
+              />
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
